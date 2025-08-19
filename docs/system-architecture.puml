@@ -1,0 +1,433 @@
+@startuml MediSimv1-System-Architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title MediSimv1 系统架构图 - 详细视图
+
+' 定义样式
+skinparam component {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+
+skinparam database {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+
+skinparam queue {
+    BackgroundColor #FFF3E0
+    BorderColor #F57C00
+    FontColor #E65100
+}
+
+' 用户层
+package "用户界面层" {
+    actor "系统管理员" as Admin
+    actor "仿真协调员" as Coordinator
+    actor "教师" as Instructor
+    actor "学生" as Student
+}
+
+' 前端层
+package "前端应用层" {
+    component "主应用入口\n(App.tsx)" as App
+    
+    package "认证模块" {
+        component "AuthProvider" as AuthProvider
+        component "useAuth Hook" as UseAuth
+        component "登录页面\n(Login.tsx)" as Login
+    }
+    
+    package "路由模块" {
+        component "Wouter路由\n(Router)" as Router
+        component "路由守卫\n(RouteGuard)" as RouteGuard
+    }
+    
+    package "仪表板模块" {
+        component "管理员仪表板\n(AdminDashboard)" as AdminDash
+        component "协调员仪表板\n(CoordinatorDashboard)" as CoordDash
+        component "教师仪表板\n(InstructorDashboard)" as InstructorDash
+        component "学生仪表板\n(StudentDashboard)" as StudentDash
+    }
+    
+    package "核心功能模块" {
+        component "患者管理\n(PatientManagement)" as PatientMgmt
+        component "SOAP笔记系统\n(SOAPNotes)" as SOAPNotes
+        component "医嘱管理\n(OrdersManagement)" as OrdersMgmt
+        component "组管理\n(GroupManagement)" as GroupMgmt
+        component "文档管理\n(DocumentManagement)" as DocMgmt
+    }
+    
+    package "共享组件" {
+        component "UI组件库\n(shadcn/ui)" as UIComponents
+        component "表单组件\n(Forms)" as Forms
+        component "数据表格\n(DataTable)" as DataTable
+        component "通知系统\n(Toast)" as Toast
+    }
+    
+    package "状态管理" {
+        component "React Query\n(QueryClient)" as QueryClient
+        component "Context API\n(GlobalState)" as ContextAPI
+        component "本地存储\n(LocalStorage)" as LocalStorage
+    }
+}
+
+' API网关层
+package "API网关层" {
+    component "Express服务器\n(server/index.ts)" as ExpressServer
+    
+    package "中间件栈" {
+        component "CORS中间件" as CORS
+        component "JSON解析中间件" as JSONParser
+        component "会话中间件\n(Express Session)" as Session
+        component "日志中间件" as Logging
+        component "错误处理中间件" as ErrorHandler
+    }
+    
+    package "安全中间件" {
+        component "HTTPS强制" as HTTPS
+        component "速率限制\n(Rate Limiting)" as RateLimit
+        component "安全头设置\n(Helmet)" as Helmet
+        component "CSRF保护" as CSRF
+    }
+}
+
+' 业务逻辑层
+package "业务逻辑层" {
+    package "认证服务" {
+        component "认证控制器\n(AuthController)" as AuthController
+        component "密码哈希\n(bcrypt)" as PasswordHash
+        component "JWT生成器" as JWTGenerator
+        component "会话管理器" as SessionManager
+    }
+    
+    package "用户服务" {
+        component "用户控制器\n(UserController)" as UserController
+        component "权限验证器\n(PermissionValidator)" as PermissionValidator
+        component "角色管理器\n(RoleManager)" as RoleManager
+    }
+    
+    package "患者服务" {
+        component "患者控制器\n(PatientController)" as PatientController
+        component "生命体征服务\n(VitalSignsService)" as VitalSignsService
+        component "实验室结果服务\n(LabResultsService)" as LabResultsService
+        component "医疗历史服务\n(MedicalHistoryService)" as MedicalHistoryService
+    }
+    
+    package "临床服务" {
+        component "SOAP笔记控制器\n(SOAPController)" as SOAPController
+        component "医嘱控制器\n(OrdersController)" as OrdersController
+        component "临床决策支持\n(ClinicalDecisionSupport)" as ClinicalDecisionSupport
+    }
+    
+    package "组管理服务" {
+        component "组控制器\n(GroupController)" as GroupController
+        component "数据分配服务\n(DataAssignmentService)" as DataAssignmentService
+        component "权限隔离服务\n(PermissionIsolationService)" as PermissionIsolationService
+    }
+    
+    package "文档服务" {
+        component "文档控制器\n(DocumentController)" as DocumentController
+        component "文件上传服务\n(FileUploadService)" as FileUploadService
+        component "文档版本控制\n(DocumentVersioning)" as DocumentVersioning
+    }
+    
+    package "审计服务" {
+        component "审计控制器\n(AuditController)" as AuditController
+        component "活动记录器\n(ActivityLogger)" as ActivityLogger
+        component "安全事件监控\n(SecurityMonitor)" as SecurityMonitor
+    }
+}
+
+' 数据访问层
+package "数据访问层" {
+    package "ORM层" {
+        component "Drizzle ORM" as DrizzleORM
+        component "查询构建器" as QueryBuilder
+        component "迁移管理器" as MigrationManager
+    }
+    
+    package "数据库连接" {
+        component "连接池管理器" as ConnectionPool
+        component "事务管理器" as TransactionManager
+        component "查询优化器" as QueryOptimizer
+    }
+    
+    package "缓存层" {
+        component "内存缓存\n(Memory Cache)" as MemoryCache
+        component "查询缓存" as QueryCache
+        component "会话缓存" as SessionCache
+    }
+}
+
+' 数据存储层
+package "数据存储层" {
+    database "PostgreSQL主数据库" as MainDB
+    
+    package "用户数据" {
+        database "用户表\n(users)" as UsersTable
+        database "用户会话表\n(sessions)" as SessionsTable
+        database "用户权限表\n(user_permissions)" as UserPermissionsTable
+    }
+    
+    package "患者数据" {
+        database "患者表\n(patients)" as PatientsTable
+        database "生命体征表\n(vital_signs)" as VitalsTable
+        database "实验室结果表\n(lab_results)" as LabResultsTable
+        database "医疗历史表\n(medical_history)" as MedicalHistoryTable
+        database "用药记录表\n(medications)" as MedicationsTable
+    }
+    
+    package "临床数据" {
+        database "SOAP笔记表\n(soap_notes)" as SOAPNotesTable
+        database "医嘱表\n(orders)" as OrdersTable
+        database "护理记录表\n(nursing_notes)" as NursingNotesTable
+        database "评估记录表\n(assessments)" as AssessmentsTable
+    }
+    
+    package "组织数据" {
+        database "组表\n(groups)" as GroupsTable
+        database "组成员表\n(group_members)" as GroupMembersTable
+        database "组数据分配表\n(group_data_assignments)" as GroupDataAssignmentsTable
+        database "数据版本表\n(data_versions)" as DataVersionsTable
+    }
+    
+    package "文档数据" {
+        database "文档表\n(documents)" as DocumentsTable
+        database "文档版本表\n(document_versions)" as DocumentVersionsTable
+        database "文档发布表\n(document_releases)" as DocumentReleasesTable
+    }
+    
+    package "审计数据" {
+        database "审计日志表\n(audit_logs)" as AuditLogsTable
+        database "安全事件表\n(security_events)" as SecurityEventsTable
+        database "访问日志表\n(access_logs)" as AccessLogsTable
+    }
+}
+
+' 外部服务层
+package "外部服务层" {
+    component "Google Cloud Storage\n(文件存储)" as GCS
+    component "Neon Database\n(云数据库)" as NeonDB
+    component "邮件服务\n(SMTP)" as EmailService
+    component "短信服务\n(SMS)" as SMSService
+}
+
+' 安全层
+package "安全架构层" {
+    component "HTTPS/TLS\n加密传输" as HTTPS
+    component "JWT令牌管理" as JWTManager
+    component "会话安全" as SessionSecurity
+    component "数据加密\n(AES-256)" as DataEncryption
+    component "权限控制\n(RBAC)" as RBAC
+    component "审计追踪" as AuditTrail
+}
+
+' 监控和运维层
+package "监控运维层" {
+    component "性能监控\n(Performance Monitor)" as PerformanceMonitor
+    component "错误追踪\n(Error Tracking)" as ErrorTracking
+    component "日志聚合\n(Log Aggregation)" as LogAggregation
+    component "健康检查\n(Health Checks)" as HealthChecks
+    component "指标收集\n(Metrics Collection)" as MetricsCollection
+}
+
+' 连接关系 - 用户到前端
+Admin --> App : 访问系统
+Coordinator --> App : 访问系统
+Instructor --> App : 访问系统
+Student --> App : 访问系统
+
+' 前端内部连接
+App --> AuthProvider : 认证状态管理
+App --> Router : 路由控制
+Router --> RouteGuard : 权限验证
+RouteGuard --> AdminDash : 管理员访问
+RouteGuard --> CoordDash : 协调员访问
+RouteGuard --> InstructorDash : 教师访问
+RouteGuard --> StudentDash : 学生访问
+
+' 仪表板到功能模块
+AdminDash --> PatientMgmt : 患者管理
+AdminDash --> GroupMgmt : 组管理
+CoordDash --> DocMgmt : 文档管理
+InstructorDash --> PatientMgmt : 患者监控
+InstructorDash --> SOAPNotes : 临床记录
+StudentDash --> PatientMgmt : 患者查看
+StudentDash --> SOAPNotes : 记录编写
+
+' 功能模块到共享组件
+PatientMgmt --> UIComponents : 使用UI组件
+SOAPNotes --> Forms : 表单输入
+OrdersMgmt --> DataTable : 数据展示
+GroupMgmt --> Toast : 通知反馈
+
+' 状态管理连接
+PatientMgmt --> QueryClient : 数据获取
+SOAPNotes --> ContextAPI : 状态共享
+OrdersMgmt --> LocalStorage : 本地缓存
+
+' 前端到API网关
+QueryClient --> ExpressServer : HTTP请求
+ContextAPI --> ExpressServer : API调用
+
+' API网关内部连接
+ExpressServer --> CORS : 跨域处理
+ExpressServer --> JSONParser : 请求解析
+ExpressServer --> Session : 会话管理
+ExpressServer --> Logging : 请求日志
+ExpressServer --> ErrorHandler : 错误处理
+
+' 安全中间件连接
+ExpressServer --> HTTPS : 强制HTTPS
+ExpressServer --> RateLimit : 速率限制
+ExpressServer --> Helmet : 安全头设置
+ExpressServer --> CSRF : CSRF保护
+
+' API网关到业务逻辑
+ExpressServer --> AuthController : 认证请求
+ExpressServer --> UserController : 用户管理
+ExpressServer --> PatientController : 患者管理
+ExpressServer --> SOAPController : SOAP笔记
+ExpressServer --> OrdersController : 医嘱管理
+ExpressServer --> GroupController : 组管理
+ExpressServer --> DocumentController : 文档管理
+ExpressServer --> AuditController : 审计记录
+
+' 业务逻辑内部连接
+AuthController --> PasswordHash : 密码验证
+AuthController --> JWTGenerator : 生成令牌
+AuthController --> SessionManager : 会话管理
+
+UserController --> PermissionValidator : 权限验证
+UserController --> RoleManager : 角色管理
+
+PatientController --> VitalSignsService : 生命体征
+PatientController --> LabResultsService : 实验室结果
+PatientController --> MedicalHistoryService : 医疗历史
+
+SOAPController --> ClinicalDecisionSupport : 决策支持
+OrdersController --> ClinicalDecisionSupport : 医嘱验证
+
+GroupController --> DataAssignmentService : 数据分配
+GroupController --> PermissionIsolationService : 权限隔离
+
+DocumentController --> FileUploadService : 文件上传
+DocumentController --> DocumentVersioning : 版本控制
+
+AuditController --> ActivityLogger : 活动记录
+AuditController --> SecurityMonitor : 安全监控
+
+' 业务逻辑到数据访问
+AuthController --> DrizzleORM : 用户数据
+UserController --> DrizzleORM : 权限数据
+PatientController --> DrizzleORM : 患者数据
+SOAPController --> DrizzleORM : 临床数据
+OrdersController --> DrizzleORM : 医嘱数据
+GroupController --> DrizzleORM : 组数据
+DocumentController --> DrizzleORM : 文档数据
+AuditController --> DrizzleORM : 审计数据
+
+' 数据访问层内部连接
+DrizzleORM --> QueryBuilder : 查询构建
+DrizzleORM --> MigrationManager : 数据库迁移
+DrizzleORM --> ConnectionPool : 连接管理
+DrizzleORM --> TransactionManager : 事务管理
+DrizzleORM --> QueryOptimizer : 查询优化
+
+' 缓存连接
+QueryBuilder --> MemoryCache : 查询缓存
+SessionManager --> SessionCache : 会话缓存
+
+' 数据访问到数据存储
+DrizzleORM --> MainDB : 数据操作
+MainDB --> UsersTable : 用户数据
+MainDB --> PatientsTable : 患者数据
+MainDB --> SOAPNotesTable : SOAP笔记
+MainDB --> OrdersTable : 医嘱数据
+MainDB --> GroupsTable : 组数据
+MainDB --> DocumentsTable : 文档数据
+MainDB --> AuditLogsTable : 审计数据
+
+' 外部服务连接
+DocumentController --> GCS : 文件存储
+MainDB --> NeonDB : 数据库托管
+UserController --> EmailService : 邮件通知
+UserController --> SMSService : 短信验证
+
+' 安全层连接
+HTTPS --> ExpressServer : 传输加密
+JWTManager --> AuthController : 令牌管理
+SessionSecurity --> SessionManager : 会话安全
+DataEncryption --> MainDB : 数据加密
+RBAC --> PermissionValidator : 权限控制
+AuditTrail --> AuditController : 审计追踪
+
+' 监控运维连接
+PerformanceMonitor --> ExpressServer : 性能监控
+ErrorTracking --> ExpressServer : 错误追踪
+LogAggregation --> ExpressServer : 日志收集
+HealthChecks --> ExpressServer : 健康检查
+MetricsCollection --> ExpressServer : 指标收集
+
+' 数据流标注
+note right of ExpressServer
+  API请求流程:
+  1. 中间件处理 (CORS, 解析, 会话)
+  2. 安全验证 (HTTPS, 速率限制)
+  3. 路由分发到对应控制器
+  4. 业务逻辑处理
+  5. 数据访问和存储
+  6. 响应返回和日志记录
+end note
+
+note right of PermissionIsolationService
+  数据隔离机制:
+  - 基于用户角色的数据访问控制
+  - 组级数据边界管理
+  - 实时权限验证和审计
+  - 防止越权访问和数据泄露
+end note
+
+note right of ClinicalDecisionSupport
+  临床决策支持:
+  - 基于规则的医嘱验证
+  - 药物相互作用检查
+  - 剂量范围验证
+  - 临床路径指导
+end note
+
+note right of MainDB
+  数据库设计特点:
+  - 规范化设计确保数据一致性
+  - 索引优化提升查询性能
+  - 分区表支持大数据量
+  - 备份和恢复策略
+end note
+
+' MVP特性总结
+note top of App
+  MVP核心功能架构:
+  ✅ 完整的四角色权限系统
+  ✅ 患者生命周期管理
+  ✅ 临床记录和医嘱系统
+  ✅ 组级数据隔离和安全
+  ✅ 文档管理和版本控制
+  ✅ 全面的审计和监控
+end note
+
+note bottom of ExpressServer
+  技术架构特点:
+  ✅ 全栈TypeScript类型安全
+  ✅ 微服务架构设计
+  ✅ 多层安全防护
+  ✅ 高性能数据访问
+  ✅ 可扩展的组件系统
+  ✅ 完整的监控运维
+end note
+
+@enduml

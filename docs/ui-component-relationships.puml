@@ -1,0 +1,540 @@
+@startuml MediSimv1-UI-Component-Relationships
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title MediSimv1 UI组件关系图 - 组件依赖和继承结构
+
+' 定义样式
+skinparam class {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+
+skinparam interface {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+
+skinparam abstract {
+    BackgroundColor #E8F5E8
+    BorderColor #388E3C
+    FontColor #1B5E20
+}
+
+' 根组件和提供者
+package "根组件层" {
+    class App {
+        +render(): JSX.Element
+        +handleRouting(): void
+        +manageGlobalState(): void
+    }
+    
+    class QueryClientProvider {
+        +client: QueryClient
+        +children: ReactNode
+    }
+    
+    class AuthProvider {
+        +user: User | null
+        +isLoading: boolean
+        +login(credentials): Promise<User>
+        +logout(): void
+    }
+    
+    class TooltipProvider {
+        +delayDuration: number
+        +children: ReactNode
+    }
+}
+
+' 路由组件
+package "路由组件层" {
+    abstract class Router {
+        +routes: Route[]
+        +currentPath: string
+        +navigate(path): void
+    }
+    
+    class RouteGuard {
+        +requiredRole: UserRole
+        +children: ReactNode
+        +checkPermission(): boolean
+    }
+    
+    class AppRouter {
+        +user: User
+        +getDashboard(): ComponentType
+        +renderRoute(): JSX.Element
+    }
+}
+
+' 页面组件
+package "页面组件层" {
+    abstract class DashboardBase {
+        +user: User
+        +navigation: Navigation
+        +render(): JSX.Element
+    }
+    
+    class Landing {
+        +showLoginForm: boolean
+        +handleLogin(): void
+    }
+    
+    class AdminDashboard {
+        +users: User[]
+        +groups: Group[]
+        +systemStats: SystemStats
+        +manageUsers(): void
+        +manageGroups(): void
+    }
+    
+    class CoordinatorDashboard {
+        +documents: Document[]
+        +releases: Release[]
+        +activities: Activity[]
+        +manageDocuments(): void
+        +manageReleases(): void
+    }
+    
+    class InstructorDashboard {
+        +scenarios: Scenario[]
+        +students: Student[]
+        +currentScenario: Scenario
+        +controlScenario(): void
+        +monitorStudents(): void
+    }
+    
+    class StudentDashboard {
+        +patient: Patient
+        +soapNotes: SOAPNote[]
+        +orders: Order[]
+        +viewPatient(): void
+        +writeRecords(): void
+    }
+    
+    class GroupManager {
+        +groups: Group[]
+        +members: User[]
+        +permissions: Permission[]
+        +managePermissions(): void
+    }
+    
+    class NotFound {
+        +render(): JSX.Element
+    }
+}
+
+' 布局组件
+package "布局组件层" {
+    abstract class LayoutBase {
+        +children: ReactNode
+        +navigation: Navigation
+        +sidebar: Sidebar
+    }
+    
+    class TopNavigation {
+        +user: User
+        +notifications: Notification[]
+        +userMenu: UserMenu
+        +handleLogout(): void
+    }
+    
+    class Sidebar {
+        +menuItems: MenuItem[]
+        +isCollapsed: boolean
+        +activeItem: string
+        +toggleCollapse(): void
+    }
+    
+    class PageHeader {
+        +title: string
+        +breadcrumb: BreadcrumbItem[]
+        +actions: Action[]
+    }
+    
+    class MainContent {
+        +children: ReactNode
+        +className: string
+        +padding: string
+    }
+}
+
+' 功能组件
+package "功能组件层" {
+    abstract class FeatureComponentBase {
+        +data: any
+        +loading: boolean
+        +error: Error | null
+        +onUpdate(): void
+    }
+    
+    class PatientList {
+        +patients: Patient[]
+        +filters: PatientFilter
+        +onSelectPatient(patient): void
+        +onFilterChange(filters): void
+    }
+    
+    class PatientOverview {
+        +patient: Patient
+        +vitals: VitalSigns[]
+        +labResults: LabResult[]
+        +onVitalUpdate(): void
+    }
+    
+    class PatientHeader {
+        +patient: Patient
+        +showDetails: boolean
+        +onToggleDetails(): void
+    }
+    
+    class SOAPNotesForm {
+        +note: SOAPNote
+        +patient: Patient
+        +onSave(note): void
+        +onSubmit(note): void
+        +autoSave: boolean
+    }
+    
+    class OrdersForm {
+        +orders: Order[]
+        +patient: Patient
+        +templates: OrderTemplate[]
+        +onAddOrder(order): void
+        +onRemoveOrder(id): void
+    }
+    
+    class InstructorControls {
+        +scenario: Scenario
+        +isRunning: boolean
+        +timeRemaining: number
+        +onStart(): void
+        +onPause(): void
+        +onReset(): void
+    }
+    
+    class NotificationToast {
+        +message: string
+        +type: NotificationType
+        +duration: number
+        +onClose(): void
+    }
+}
+
+' UI基础组件
+package "UI基础组件层" {
+    interface UIComponent {
+        +className?: string
+        +children?: ReactNode
+        +onClick?(): void
+    }
+    
+    class Button {
+        +variant: ButtonVariant
+        +size: ButtonSize
+        +disabled: boolean
+        +loading: boolean
+        +onClick(): void
+    }
+    
+    class Input {
+        +type: InputType
+        +value: string
+        +placeholder: string
+        +onChange(value): void
+        +onBlur(): void
+    }
+    
+    class Textarea {
+        +value: string
+        +rows: number
+        +cols: number
+        +onChange(value): void
+        +onResize(): void
+    }
+    
+    class Select {
+        +options: SelectOption[]
+        +value: string
+        +multiple: boolean
+        +onChange(value): void
+        +onSearch(query): void
+    }
+    
+    class Card {
+        +title: string
+        +description: string
+        +children: ReactNode
+        +actions: Action[]
+    }
+    
+    class Dialog {
+        +open: boolean
+        +title: string
+        +children: ReactNode
+        +onClose(): void
+        +onConfirm(): void
+    }
+    
+    class Table {
+        +columns: Column[]
+        +data: any[]
+        +pagination: Pagination
+        +sorting: Sorting
+        +onSort(): void
+        +onPageChange(): void
+    }
+    
+    class Tabs {
+        +items: TabItem[]
+        +activeTab: string
+        +onTabChange(tab): void
+    }
+    
+    class Toast {
+        +title: string
+        +description: string
+        +variant: ToastVariant
+        +action: Action
+    }
+    
+    class Progress {
+        +value: number
+        +max: number
+        +showLabel: boolean
+        +color: string
+    }
+    
+    class Badge {
+        +children: ReactNode
+        +variant: BadgeVariant
+        +size: BadgeSize
+    }
+    
+    class Avatar {
+        +src: string
+        +alt: string
+        +fallback: string
+        +size: AvatarSize
+    }
+}
+
+' Hooks和工具
+package "Hooks和工具层" {
+    abstract class CustomHook {
+        +dependencies: any[]
+        +cleanup(): void
+    }
+    
+    class useAuth {
+        +user: User | null
+        +isLoading: boolean
+        +login(credentials): Promise<void>
+        +logout(): void
+        +checkPermission(role): boolean
+    }
+    
+    class usePatient {
+        +patient: Patient | null
+        +loading: boolean
+        +error: Error | null
+        +updatePatient(data): void
+        +refreshPatient(): void
+    }
+    
+    class useToast {
+        +toast: Toast
+        +showToast(options): void
+        +dismissToast(id): void
+    }
+    
+    class useMobile {
+        +isMobile: boolean
+        +breakpoint: string
+        +orientation: string
+    }
+    
+    class useLocalStorage {
+        +value: any
+        +setValue(value): void
+        +removeValue(): void
+    }
+    
+    class useDebounce {
+        +debouncedValue: any
+        +delay: number
+        +cancel(): void
+    }
+}
+
+' 类型定义
+package "类型定义层" {
+    interface User {
+        +id: string
+        +username: string
+        +role: UserRole
+        +firstName: string
+        +lastName: string
+    }
+    
+    interface Patient {
+        +id: string
+        +mrn: string
+        +firstName: string
+        +lastName: string
+        +dateOfBirth: string
+        +status: PatientStatus
+    }
+    
+    interface SOAPNote {
+        +id: string
+        +patientId: string
+        +subjective: string
+        +objective: string
+        +assessment: string
+        +plan: string
+        +createdAt: Date
+    }
+    
+    interface Order {
+        +id: string
+        +patientId: string
+        +type: OrderType
+        +description: string
+        +status: OrderStatus
+        +createdBy: string
+    }
+    
+    enum UserRole {
+        ADMIN
+        COORDINATOR
+        INSTRUCTOR
+        STUDENT
+    }
+    
+    enum PatientStatus {
+        CRITICAL
+        STABLE
+        MONITORING
+        DISCHARGED
+    }
+}
+
+' 继承关系
+Router <|-- AppRouter
+DashboardBase <|-- AdminDashboard
+DashboardBase <|-- CoordinatorDashboard
+DashboardBase <|-- InstructorDashboard
+DashboardBase <|-- StudentDashboard
+
+LayoutBase <|-- TopNavigation
+LayoutBase <|-- Sidebar
+
+FeatureComponentBase <|-- PatientList
+FeatureComponentBase <|-- PatientOverview
+FeatureComponentBase <|-- SOAPNotesForm
+FeatureComponentBase <|-- OrdersForm
+
+UIComponent <|.. Button
+UIComponent <|.. Input
+UIComponent <|.. Card
+UIComponent <|.. Dialog
+
+CustomHook <|-- useAuth
+CustomHook <|-- usePatient
+CustomHook <|-- useToast
+
+' 组合关系
+App *-- QueryClientProvider
+App *-- AuthProvider
+App *-- AppRouter
+
+AppRouter *-- RouteGuard
+AppRouter *-- AdminDashboard
+AppRouter *-- CoordinatorDashboard
+AppRouter *-- InstructorDashboard
+AppRouter *-- StudentDashboard
+
+AdminDashboard *-- TopNavigation
+AdminDashboard *-- Sidebar
+AdminDashboard *-- PatientList
+
+CoordinatorDashboard *-- TopNavigation
+CoordinatorDashboard *-- MainContent
+
+InstructorDashboard *-- TopNavigation
+InstructorDashboard *-- InstructorControls
+InstructorDashboard *-- PatientOverview
+
+StudentDashboard *-- TopNavigation
+StudentDashboard *-- PatientHeader
+StudentDashboard *-- SOAPNotesForm
+StudentDashboard *-- OrdersForm
+
+' 依赖关系
+PatientList ..> Patient : uses
+PatientOverview ..> Patient : uses
+SOAPNotesForm ..> SOAPNote : uses
+OrdersForm ..> Order : uses
+
+SOAPNotesForm ..> usePatient : uses
+OrdersForm ..> usePatient : uses
+PatientOverview ..> useAuth : uses
+
+TopNavigation ..> useAuth : uses
+TopNavigation ..> useToast : uses
+AdminDashboard ..> useMobile : uses
+
+' 数据流关系
+AuthProvider --> useAuth : provides
+QueryClientProvider --> PatientList : provides data
+QueryClientProvider --> SOAPNotesForm : provides data
+
+' 组件关系注释
+note right of App
+  根组件职责:
+  - 全局状态提供
+  - 路由配置管理
+  - 错误边界处理
+  - 主题和样式配置
+end note
+
+note right of DashboardBase
+  仪表板基类特点:
+  - 统一的布局结构
+  - 共享的导航逻辑
+  - 角色权限检查
+  - 响应式设计支持
+end note
+
+note right of FeatureComponentBase
+  功能组件基类:
+  - 数据获取和管理
+  - 加载和错误状态
+  - 用户交互处理
+  - 性能优化措施
+end note
+
+note bottom of UIComponent
+  UI组件设计原则:
+  ✅ 可重用性高
+  ✅ API设计一致
+  ✅ 可访问性支持
+  ✅ TypeScript类型安全
+  ✅ 样式系统集成
+end note
+
+' 架构优势注释
+note top of CustomHook
+  自定义Hook优势:
+  - 逻辑复用和封装
+  - 状态管理简化
+  - 副作用处理统一
+  - 测试友好设计
+end note
+
+@enduml

@@ -1,0 +1,334 @@
+@startuml MediSimv1-UI-Visualization
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title MediSimv1 用户界面可视化 - UI组件和页面结构
+
+' 定义样式
+skinparam component {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+
+skinparam package {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+
+skinparam rectangle {
+    BackgroundColor #E8F5E8
+    BorderColor #388E3C
+    FontColor #1B5E20
+}
+
+' 主应用布局
+package "主应用容器 (App.tsx)" {
+    rectangle "全局状态管理" as GlobalState {
+        component "QueryClientProvider" as QueryProvider
+        component "AuthProvider" as AuthProvider
+        component "TooltipProvider" as TooltipProvider
+        component "Toaster" as Toaster
+    }
+    
+    rectangle "路由系统" as RouterSystem {
+        component "Switch/Route" as Router
+        component "路由守卫" as RouteGuard
+    }
+}
+
+' 认证和登录界面
+package "认证界面" {
+    rectangle "登录页面 (Landing.tsx)" as LandingPage {
+        component "登录表单" as LoginForm
+        component "用户名输入" as UsernameInput
+        component "密码输入" as PasswordInput
+        component "登录按钮" as LoginButton
+        component "错误提示" as ErrorMessage
+    }
+    
+    rectangle "认证状态" as AuthState {
+        component "useAuth Hook" as UseAuthHook
+        component "用户信息存储" as UserStorage
+        component "会话管理" as SessionManagement
+    }
+}
+
+' 导航组件
+package "全局导航组件" {
+    rectangle "顶部导航 (TopNavigation.tsx)" as TopNav {
+        component "用户头像" as UserAvatar
+        component "用户信息" as UserInfo
+        component "退出按钮" as LogoutButton
+        component "通知图标" as NotificationIcon
+    }
+    
+    rectangle "面包屑导航" as Breadcrumb {
+        component "页面路径" as PagePath
+        component "导航链接" as NavLinks
+    }
+}
+
+' 管理员仪表板
+package "管理员仪表板 (AdminDashboard.tsx)" {
+    rectangle "页面布局" as AdminLayout {
+        component "侧边栏" as AdminSidebar
+        component "主内容区" as AdminMainContent
+    }
+    
+    rectangle "用户管理区域" as UserManagement {
+        component "用户列表" as UserList
+        component "添加用户按钮" as AddUserButton
+        component "用户搜索" as UserSearch
+        component "用户操作按钮" as UserActions
+    }
+    
+    rectangle "组管理区域" as GroupManagement {
+        component "组列表" as GroupList
+        component "创建组按钮" as CreateGroupButton
+        component "组详情卡片" as GroupCard
+        component "组成员管理" as GroupMembers
+    }
+    
+    rectangle "系统统计" as SystemStats {
+        component "用户统计卡片" as UserStatsCard
+        component "活跃会话卡片" as ActiveSessionsCard
+        component "数据使用统计" as DataUsageStats
+    }
+}
+
+' 协调员仪表板
+package "协调员仪表板 (CoordinatorDashboard.tsx)" {
+    rectangle "文档管理区域" as DocumentManagement {
+        component "文档列表" as DocumentList
+        component "上传文档按钮" as UploadDocButton
+        component "文档预览" as DocumentPreview
+        component "版本控制" as VersionControl
+    }
+    
+    rectangle "发布管理区域" as ReleaseManagement {
+        component "发布计划表" as ReleaseSchedule
+        component "创建发布按钮" as CreateReleaseButton
+        component "发布状态指示器" as ReleaseStatusIndicator
+    }
+    
+    rectangle "活动监控" as ActivityMonitoring {
+        component "用户活动日志" as UserActivityLog
+        component "系统性能监控" as SystemPerformanceMonitor
+        component "错误日志查看器" as ErrorLogViewer
+    }
+}
+
+' 教师仪表板
+package "教师仪表板 (InstructorDashboard.tsx)" {
+    rectangle "场景控制区域" as ScenarioControl {
+        component "场景选择器" as ScenarioSelector
+        component "开始/停止按钮" as StartStopButton
+        component "时间控制器" as TimeController
+        component "场景状态显示" as ScenarioStatus
+    }
+    
+    rectangle "学生监控区域" as StudentMonitoring {
+        component "学生列表" as StudentList
+        component "学生状态指示器" as StudentStatusIndicator
+        component "实时活动监控" as RealTimeActivityMonitor
+    }
+    
+    rectangle "患者概览" as PatientOverviewTeacher {
+        component "患者信息卡片" as PatientInfoCard
+        component "生命体征显示" as VitalSignsDisplay
+        component "最新记录摘要" as LatestRecordsSummary
+    }
+}
+
+' 学生仪表板
+package "学生仪表板 (StudentDashboard.tsx)" {
+    rectangle "患者信息区域" as PatientInfoArea {
+        component "患者头部信息" as PatientHeader
+        component "基本信息表格" as BasicInfoTable
+        component "医疗历史" as MedicalHistory
+    }
+    
+    rectangle "临床记录区域" as ClinicalRecordsArea {
+        component "SOAP笔记编辑器" as SOAPNotesEditor
+        component "医嘱输入表单" as OrdersInputForm
+        component "保存草稿按钮" as SaveDraftButton
+        component "提交记录按钮" as SubmitRecordButton
+    }
+    
+    rectangle "数据查看区域" as DataViewArea {
+        component "生命体征图表" as VitalSignsChart
+        component "实验室结果表格" as LabResultsTable
+        component "用药记录列表" as MedicationsList
+    }
+}
+
+' 共享UI组件
+package "共享UI组件库" {
+    rectangle "患者相关组件" as PatientComponents {
+        component "患者列表 (PatientList.tsx)" as PatientListComp
+        component "患者概览 (PatientOverview.tsx)" as PatientOverviewComp
+        component "患者头部 (PatientHeader.tsx)" as PatientHeaderComp
+    }
+    
+    rectangle "表单组件" as FormComponents {
+        component "SOAP笔记表单 (SOAPNotesForm.tsx)" as SOAPForm
+        component "医嘱表单 (OrdersForm.tsx)" as OrdersForm
+        component "输入字段组件" as InputFields
+        component "文本区域组件" as TextareaComponents
+    }
+    
+    rectangle "反馈组件" as FeedbackComponents {
+        component "通知Toast (NotificationToast.tsx)" as NotificationToast
+        component "加载指示器" as LoadingIndicator
+        component "错误边界" as ErrorBoundary
+        component "确认对话框" as ConfirmDialog
+    }
+    
+    rectangle "数据展示组件" as DataDisplayComponents {
+        component "数据表格" as DataTable
+        component "图表组件" as ChartComponents
+        component "统计卡片" as StatCard
+        component "进度条" as ProgressBar
+    }
+}
+
+' shadcn/ui基础组件
+package "shadcn/ui基础组件库" {
+    rectangle "输入组件" as InputComponents {
+        component "Button" as Button
+        component "Input" as Input
+        component "Textarea" as Textarea
+        component "Select" as Select
+        component "Checkbox" as Checkbox
+        component "Radio" as Radio
+    }
+    
+    rectangle "布局组件" as LayoutComponents {
+        component "Card" as Card
+        component "Dialog" as Dialog
+        component "Sheet" as Sheet
+        component "Tabs" as Tabs
+        component "Accordion" as Accordion
+        component "Separator" as Separator
+    }
+    
+    rectangle "反馈组件" as UIFeedbackComponents {
+        component "Toast" as Toast
+        component "Alert" as Alert
+        component "Badge" as Badge
+        component "Progress" as Progress
+        component "Skeleton" as Skeleton
+    }
+    
+    rectangle "导航组件" as NavigationComponents {
+        component "NavigationMenu" as NavigationMenu
+        component "Breadcrumb" as BreadcrumbComp
+        component "Pagination" as Pagination
+        component "Command" as Command
+    }
+}
+
+' 组件关系和数据流
+GlobalState --> RouterSystem : 提供全局状态
+RouterSystem --> LandingPage : 未认证路由
+RouterSystem --> AdminLayout : 管理员路由
+RouterSystem --> DocumentManagement : 协调员路由
+RouterSystem --> ScenarioControl : 教师路由
+RouterSystem --> PatientInfoArea : 学生路由
+
+' 认证流程
+LandingPage --> AuthState : 登录验证
+AuthState --> RouterSystem : 认证状态
+
+' 导航组件连接
+AdminLayout --> TopNav : 顶部导航
+DocumentManagement --> TopNav : 顶部导航
+ScenarioControl --> TopNav : 顶部导航
+PatientInfoArea --> TopNav : 顶部导航
+
+' 管理员仪表板内部连接
+AdminLayout --> UserManagement : 用户管理
+AdminLayout --> GroupManagement : 组管理
+AdminLayout --> SystemStats : 系统统计
+
+' 协调员仪表板内部连接
+DocumentManagement --> ReleaseManagement : 发布管理
+DocumentManagement --> ActivityMonitoring : 活动监控
+
+' 教师仪表板内部连接
+ScenarioControl --> StudentMonitoring : 学生监控
+ScenarioControl --> PatientOverviewTeacher : 患者概览
+
+' 学生仪表板内部连接
+PatientInfoArea --> ClinicalRecordsArea : 临床记录
+PatientInfoArea --> DataViewArea : 数据查看
+
+' 共享组件使用关系
+PatientInfoArea --> PatientComponents : 使用患者组件
+ClinicalRecordsArea --> FormComponents : 使用表单组件
+DataViewArea --> DataDisplayComponents : 使用数据展示组件
+UserManagement --> FeedbackComponents : 使用反馈组件
+
+' 基础UI组件使用关系
+FormComponents --> InputComponents : 使用输入组件
+PatientComponents --> LayoutComponents : 使用布局组件
+FeedbackComponents --> UIFeedbackComponents : 使用反馈组件
+DataDisplayComponents --> NavigationComponents : 使用导航组件
+
+' UI交互流程注释
+note right of LandingPage
+  登录流程:
+  1. 输入用户名密码
+  2. 点击登录按钮
+  3. 验证身份信息
+  4. 跳转到对应仪表板
+end note
+
+note right of AdminLayout
+  管理员界面特点:
+  - 用户和组管理权限
+  - 系统统计监控
+  - 全局配置管理
+  - 多级权限控制
+end note
+
+note right of ScenarioControl
+  教师控制界面:
+  - 场景启动/停止
+  - 学生实时监控
+  - 患者状态调整
+  - 教学进度控制
+end note
+
+note right of PatientInfoArea
+  学生学习界面:
+  - 患者信息查看
+  - 临床记录编写
+  - 医嘱下达练习
+  - 数据分析学习
+end note
+
+' 响应式设计说明
+note top of GlobalState
+  响应式设计特点:
+  ✅ 移动端友好布局
+  ✅ 自适应屏幕尺寸
+  ✅ 触控优化交互
+  ✅ 可访问性支持
+  ✅ 暗色主题支持
+end note
+
+' UI组件化架构说明
+note bottom of FormComponents
+  组件化架构优势:
+  ✅ 组件复用性高
+  ✅ 状态管理统一
+  ✅ 样式系统一致
+  ✅ 类型安全保证
+  ✅ 易于维护扩展
+end note
+
+@enduml

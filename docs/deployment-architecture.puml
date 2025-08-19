@@ -1,0 +1,349 @@
+@startuml MediSimv1-Deployment-Architecture
+!theme plain
+skinparam backgroundColor #FFFFFF
+skinparam componentStyle rectangle
+
+title MediSimv1 部署架构图 - MVP生产环境
+
+' 定义样式
+skinparam component {
+    BackgroundColor #E3F2FD
+    BorderColor #1976D2
+    FontColor #0D47A1
+}
+
+skinparam database {
+    BackgroundColor #F3E5F5
+    BorderColor #7B1FA2
+    FontColor #4A148C
+}
+
+skinparam cloud {
+    BackgroundColor #E8F5E8
+    BorderColor #388E3C
+    FontColor #1B5E20
+}
+
+' 用户层
+package "用户访问层" {
+    actor "系统管理员" as Admin
+    actor "仿真协调员" as Coordinator
+    actor "教师" as Instructor
+    actor "学生" as Student
+}
+
+' CDN和负载均衡
+package "内容分发和负载均衡" {
+    cloud "Cloudflare CDN" as CDN {
+        component "全球边缘节点" as EdgeNodes
+        component "DDoS防护" as DDoSProtection
+        component "SSL/TLS终止" as SSLTermination
+    }
+    
+    cloud "负载均衡器" as LoadBalancer {
+        component "Nginx负载均衡" as NginxLB
+        component "健康检查" as HealthCheck
+        component "会话保持" as SessionSticky
+    }
+}
+
+' 应用服务器层
+package "应用服务器层" {
+    package "主应用服务器 1" as AppServer1 {
+        component "Node.js进程" as NodeProcess1
+        component "Express应用" as ExpressApp1
+        component "PM2进程管理" as PM2Manager1
+        component "应用监控" as AppMonitor1
+    }
+    
+    package "主应用服务器 2" as AppServer2 {
+        component "Node.js进程" as NodeProcess2
+        component "Express应用" as ExpressApp2
+        component "PM2进程管理" as PM2Manager2
+        component "应用监控" as AppMonitor2
+    }
+    
+    package "静态资源服务器" as StaticServer {
+        component "Vite构建产物" as ViteBuild
+        component "React应用" as ReactApp
+        component "静态文件服务" as StaticFiles
+    }
+}
+
+' 缓存层
+package "缓存层" {
+    cloud "Redis集群" as RedisCluster {
+        component "Redis主节点" as RedisMaster
+        component "Redis从节点1" as RedisSlave1
+        component "Redis从节点2" as RedisSlave2
+        component "Redis哨兵" as RedisSentinel
+    }
+    
+    component "内存缓存" as MemoryCache
+    component "查询缓存" as QueryCache
+}
+
+' 数据库层
+package "数据库层" {
+    cloud "Neon PostgreSQL" as NeonDB {
+        component "主数据库" as PrimaryDB
+        component "只读副本" as ReadReplica
+        component "连接池" as ConnectionPool
+        component "自动备份" as AutoBackup
+    }
+    
+    package "本地数据库" as LocalDB {
+        database "PostgreSQL主库" as LocalPrimary
+        database "PostgreSQL从库" as LocalReplica
+        component "连接池管理器" as LocalConnectionPool
+    }
+}
+
+' 文件存储层
+package "文件存储层" {
+    cloud "Google Cloud Storage" as GCS {
+        component "医疗文档存储" as MedicalDocs
+        component "用户上传文件" as UserUploads
+        component "系统备份" as SystemBackups
+        component "CDN缓存" as GCSCDN
+    }
+    
+    component "本地文件存储" as LocalFileStorage
+}
+
+' 监控和日志层
+package "监控和运维层" {
+    cloud "监控平台" as MonitoringPlatform {
+        component "Prometheus" as Prometheus
+        component "Grafana仪表板" as Grafana
+        component "告警管理器" as AlertManager
+        component "指标收集器" as MetricsCollector
+    }
+    
+    cloud "日志管理" as LogManagement {
+        component "ELK Stack" as ELKStack
+        component "日志聚合器" as LogAggregator
+        component "日志分析" as LogAnalysis
+        component "日志存储" as LogStorage
+    }
+    
+    component "健康检查服务" as HealthCheckService
+    component "性能监控" as PerformanceMonitor
+}
+
+' 安全层
+package "安全架构层" {
+    cloud "安全服务" as SecurityServices {
+        component "WAF防火墙" as WAF
+        component "DDoS防护" as DDoSProtection
+        component "入侵检测" as IDS
+        component "安全扫描" as SecurityScan
+    }
+    
+    component "HTTPS/TLS证书" as SSLCert
+    component "密钥管理" as KeyManagement
+    component "审计日志" as AuditLog
+}
+
+' 外部服务
+package "外部服务集成" {
+    cloud "邮件服务" as EmailService {
+        component "SMTP服务器" as SMTPServer
+        component "邮件队列" as EmailQueue
+        component "邮件模板" as EmailTemplates
+    }
+    
+    cloud "短信服务" as SMSService {
+        component "SMS网关" as SMSGateway
+        component "短信队列" as SMSQueue
+        component "短信模板" as SMSTemplates
+    }
+    
+    cloud "第三方认证" as ThirdPartyAuth {
+        component "OAuth提供商" as OAuthProvider
+        component "SSO集成" as SSOIntegration
+        component "多因素认证" as MFA
+    }
+}
+
+' 开发环境
+package "开发环境" {
+    cloud "Replit开发平台" as ReplitDev {
+        component "代码编辑器" as CodeEditor
+        component "版本控制" as VersionControl
+        component "协作工具" as CollaborationTools
+        component "开发服务器" as DevServer
+    }
+    
+    component "本地开发环境" as LocalDev
+    component "测试环境" as TestEnv
+}
+
+' 连接关系 - 用户到CDN
+Admin --> CDN : HTTPS访问
+Coordinator --> CDN : HTTPS访问
+Instructor --> CDN : HTTPS访问
+Student --> CDN : HTTPS访问
+
+' CDN到负载均衡器
+CDN --> LoadBalancer : 请求转发
+EdgeNodes --> LoadBalancer : 边缘节点路由
+DDoSProtection --> LoadBalancer : 攻击防护
+
+' 负载均衡器到应用服务器
+LoadBalancer --> AppServer1 : 负载分发
+LoadBalancer --> AppServer2 : 负载分发
+LoadBalancer --> StaticServer : 静态资源
+
+NginxLB --> AppServer1 : 应用请求
+NginxLB --> AppServer2 : 应用请求
+HealthCheck --> AppServer1 : 健康检查
+HealthCheck --> AppServer2 : 健康检查
+
+' 应用服务器内部
+AppServer1 --> RedisCluster : 缓存访问
+AppServer2 --> RedisCluster : 缓存访问
+AppServer1 --> NeonDB : 数据访问
+AppServer2 --> NeonDB : 数据访问
+
+NodeProcess1 --> ExpressApp1 : 进程管理
+NodeProcess2 --> ExpressApp2 : 进程管理
+PM2Manager1 --> AppMonitor1 : 进程监控
+PM2Manager2 --> AppMonitor2 : 进程监控
+
+' 缓存层连接
+RedisMaster --> RedisSlave1 : 主从复制
+RedisMaster --> RedisSlave2 : 主从复制
+RedisSentinel --> RedisMaster : 故障检测
+RedisSentinel --> RedisSlave1 : 故障检测
+RedisSentinel --> RedisSlave2 : 故障检测
+
+' 数据库连接
+PrimaryDB --> ReadReplica : 主从复制
+ConnectionPool --> PrimaryDB : 连接管理
+ConnectionPool --> ReadReplica : 连接管理
+AutoBackup --> PrimaryDB : 自动备份
+
+' 文件存储连接
+MedicalDocs --> GCSCDN : CDN缓存
+UserUploads --> GCSCDN : CDN缓存
+SystemBackups --> GCSCDN : CDN缓存
+
+' 监控连接
+Prometheus --> AppServer1 : 指标收集
+Prometheus --> AppServer2 : 指标收集
+Prometheus --> NeonDB : 数据库监控
+Grafana --> Prometheus : 数据可视化
+AlertManager --> Prometheus : 告警管理
+
+ELKStack --> AppServer1 : 日志收集
+ELKStack --> AppServer2 : 日志收集
+ELKStack --> NeonDB : 数据库日志
+LogAggregator --> LogStorage : 日志存储
+
+' 安全连接
+WAF --> LoadBalancer : 流量过滤
+IDS --> LoadBalancer : 入侵检测
+SecurityScan --> AppServer1 : 安全扫描
+SecurityScan --> AppServer2 : 安全扫描
+
+SSLCert --> CDN : 证书管理
+KeyManagement --> AppServer1 : 密钥分发
+KeyManagement --> AppServer2 : 密钥分发
+AuditLog --> AppServer1 : 审计记录
+AuditLog --> AppServer2 : 审计记录
+
+' 外部服务连接
+AppServer1 --> EmailService : 邮件发送
+AppServer2 --> EmailService : 邮件发送
+AppServer1 --> SMSService : 短信发送
+AppServer2 --> SMSService : 短信发送
+AppServer1 --> ThirdPartyAuth : 认证集成
+AppServer2 --> ThirdPartyAuth : 认证集成
+
+' 开发环境连接
+ReplitDev --> LocalDev : 代码同步
+LocalDev --> TestEnv : 测试部署
+TestEnv --> AppServer1 : 生产部署
+TestEnv --> AppServer2 : 生产部署
+
+' 数据流标注
+note right of LoadBalancer
+  负载均衡策略:
+  - 轮询分发请求
+  - 健康检查自动剔除
+  - 会话保持支持
+  - 故障自动切换
+end note
+
+note right of RedisCluster
+  缓存策略:
+  - 主从复制高可用
+  - 哨兵自动故障检测
+  - 分布式缓存支持
+  - 数据持久化
+end note
+
+note right of NeonDB
+  数据库策略:
+  - 主从读写分离
+  - 连接池优化
+  - 自动备份恢复
+  - 云原生扩展
+end note
+
+note right of MonitoringPlatform
+  监控策略:
+  - 实时性能监控
+  - 自动告警通知
+  - 历史数据分析
+  - 容量规划支持
+end note
+
+' MVP部署特点
+note top of CDN
+  MVP部署特点:
+  ✅ 高可用架构设计
+  ✅ 自动扩展支持
+  ✅ 多层安全防护
+  ✅ 完整监控体系
+  ✅ 云原生部署
+  ✅ 灾难恢复能力
+end note
+
+note bottom of AppServer1
+  技术部署特点:
+  ✅ 容器化部署支持
+  ✅ 微服务架构
+  ✅ 自动化运维
+  ✅ 蓝绿部署支持
+  ✅ 回滚机制
+  ✅ 性能优化
+end note
+
+' 部署环境说明
+note left of ReplitDev
+  开发环境:
+  - Replit云端开发
+  - Git版本控制
+  - 实时协作
+  - 快速原型
+end note
+
+note right of LocalDev
+  本地环境:
+  - 本地开发工具
+  - 数据库连接
+  - 调试支持
+  - 单元测试
+end note
+
+note bottom of TestEnv
+  测试环境:
+  - 集成测试
+  - 性能测试
+  - 安全测试
+  - 用户验收测试
+end note
+
+@enduml
