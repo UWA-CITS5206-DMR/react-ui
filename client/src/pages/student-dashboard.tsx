@@ -13,13 +13,19 @@ import type { Patient, Session } from "@shared/schema";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
-  const [currentMode, setCurrentMode] = useState<"student" | "instructor">("student");
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    type: "success" | "warning" | "error";
-    message: string;
-  }>>([]);
+  const [selectedPatientId, setSelectedPatientId] = useState<
+    string | undefined
+  >();
+  const [currentMode, setCurrentMode] = useState<"student" | "instructor">(
+    "student"
+  );
+  const [notifications, setNotifications] = useState<
+    Array<{
+      id: string;
+      type: "success" | "warning" | "error";
+      message: string;
+    }>
+  >([]);
 
   // For demo purposes, using a hardcoded session ID
   const sessionId = "session-1";
@@ -49,7 +55,7 @@ export default function StudentDashboard() {
   };
 
   const dismissNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   if (!selectedPatient) {
@@ -59,7 +65,9 @@ export default function StudentDashboard() {
           currentMode={currentMode}
           onModeChange={setCurrentMode}
           sessionName={session?.name}
-          timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
+          timeRemaining={
+            session?.timeRemaining ? `${session.timeRemaining}:00` : undefined
+          }
         />
         <div className="flex flex-1 min-h-0">
           
@@ -71,7 +79,9 @@ export default function StudentDashboard() {
           />
 +       </div>
           <div className="flex-1 flex items-center justify-center bg-bg-light">
-            <p className="text-gray-500">Select a patient to view their records</p>
+            <p className="text-gray-500">
+              Select a patient to view their records
+            </p>
           </div>
         </div>
       </div>
@@ -84,7 +94,9 @@ export default function StudentDashboard() {
         currentMode={currentMode}
         onModeChange={setCurrentMode}
         sessionName={session?.name}
-        timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
+        timeRemaining={
+          session?.timeRemaining ? `${session.timeRemaining}:00` : undefined
+        }
       />
       
       <div className="flex flex-1 min-h-0">
@@ -129,7 +141,7 @@ export default function StudentDashboard() {
                     <h2 className="text-lg font-semibold text-gray-900 mb-6">
                       Patient Assessment & Orders
                     </h2>
-                    
+
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                       <SoapNotesForm patientId={selectedPatient.id} />
                       <OrdersForm patientId={selectedPatient.id} />
@@ -141,7 +153,7 @@ export default function StudentDashboard() {
           </Tabs>
         </main>
       </div>
-      
+
       <NotificationToast
         notifications={notifications}
         onDismiss={dismissNotification}
