@@ -61,12 +61,15 @@ export default function StudentDashboard() {
           sessionName={session?.name}
           timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
         />
-        <div className="flex flex-1">
-          <PatientList
+        <div className="flex flex-1 min-h-0">
+          
+          <div className="w-80 shrink-0 overflow-y-auto border-r">
++         <PatientList
             patients={patients}
             selectedPatientId={selectedPatientId}
             onPatientSelect={handlePatientSelect}
           />
++       </div>
           <div className="flex-1 flex items-center justify-center bg-bg-light">
             <p className="text-gray-500">Select a patient to view their records</p>
           </div>
@@ -84,17 +87,18 @@ export default function StudentDashboard() {
         timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
       />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 min-h-0">
+        <div className="w-80 shrink-0 overflow-y-auto border-r">
         <PatientList
           patients={patients}
           selectedPatientId={selectedPatientId}
           onPatientSelect={handlePatientSelect}
         />
-        
-        <main className="flex-1 flex flex-col overflow-hidden">
+        </div>
+        <main className="flex-1 flex flex-col min-h-0">
           <PatientHeader patient={selectedPatient} />
           
-          <Tabs defaultValue="overview" className="flex-1 flex flex-col">
+          <Tabs defaultValue="overview" className="flex-1 flex flex-col min-h-0">
             <div className="bg-white border-b border-gray-200">
               <TabsList className="h-auto p-0 bg-transparent">
                 <div className="flex space-x-8 px-6">
@@ -114,11 +118,11 @@ export default function StudentDashboard() {
               </TabsList>
             </div>
             
-            <TabsContent value="overview" className="flex-1 overflow-auto m-0">
+            <TabsContent value="overview" className="flex-1 min-h-0 overflow-auto m-0">
               <PatientOverview patient={selectedPatient} />
             </TabsContent>
             
-            <TabsContent value="assessment" className="flex-1 overflow-auto m-0">
+            <TabsContent value="assessment" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <div className="max-w-7xl mx-auto">
                   <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
