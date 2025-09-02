@@ -200,6 +200,7 @@ export const mockLabResults: LabResult[] = [
     referenceRange: '<6.3',
     status: 'pending',
     orderedAt: new Date('2024-01-10T08:00:00'),
+    completedAt: null,
     orderedBy: 'user-2',
   },
 ];
@@ -266,7 +267,9 @@ export const mockOrders: Order[] = [
     type: 'lab',
     orderText: '肌钙蛋白I、CK-MB、心肌酶谱',
     orderedBy: 'user-2',
-    createdAt: new Date('2024-01-10T08:00:00'),
+    orderedAt: new Date('2024-01-10T08:00:00'),
+    completedAt: null,
+    status: 'pending',
   },
   {
     id: 'order-2',
@@ -274,7 +277,9 @@ export const mockOrders: Order[] = [
     type: 'imaging',
     orderText: '胸部X线片',
     orderedBy: 'user-2',
-    createdAt: new Date('2024-01-10T08:15:00'),
+    orderedAt: new Date('2024-01-10T08:15:00'),
+    completedAt: null,
+    status: 'pending',
   },
 ];
 
@@ -283,12 +288,14 @@ export const mockGroups: Group[] = [
   {
     id: 'group-1',
     name: '第一组',
+    description: '第一个学习小组',
     sessionId: 'session-1',
     createdAt: new Date('2024-01-10'),
   },
   {
     id: 'group-2',
     name: '第二组',
+    description: '第二个学习小组',
     sessionId: 'session-1',
     createdAt: new Date('2024-01-10'),
   },
@@ -309,20 +316,20 @@ export const mockAssets: Asset[] = [
   {
     id: 'asset-1',
     sessionId: 'session-1',
-    name: '心电图报告',
+    filename: 'ecg-001.pdf',
     type: 'document',
-    category: 'imaging',
     filePath: '/assets/ecg-001.pdf',
-    createdAt: new Date('2024-01-10'),
+    uploadedBy: 'user-2',
+    uploadedAt: new Date('2024-01-10'),
   },
   {
     id: 'asset-2',
     sessionId: 'session-1',
-    name: '胸部X线片',
+    filename: 'chest-xray-001.jpg',
     type: 'image',
-    category: 'imaging',
     filePath: '/assets/chest-xray-001.jpg',
-    createdAt: new Date('2024-01-10'),
+    uploadedBy: 'user-2',
+    uploadedAt: new Date('2024-01-10'),
   },
 ];
 
@@ -346,9 +353,10 @@ export const mockDocuments: Document[] = [
     patientId: 'patient-1',
     category: 'lab',
     originalName: '检验报告.pdf',
+    filename: 'lab-report-001.pdf',
     filePath: '/uploads/lab-report-001.pdf',
     fileSize: 1024000,
-    mimeType: 'application/pdf',
+    fileType: 'pdf',
     uploadedBy: 'user-4',
     uploadedAt: new Date('2024-01-10'),
   },
@@ -364,7 +372,8 @@ export const mockDocumentReleases: DocumentRelease[] = [
     scheduledAt: new Date('2024-01-10T14:00:00'),
     releasedAt: null,
     releasedBy: null,
-    createdAt: new Date('2024-01-10'),
+    status: 'pending',
+    notes: null,
   },
 ];
 
@@ -372,11 +381,14 @@ export const mockDocumentReleases: DocumentRelease[] = [
 export const mockSimulationWeeks: SimulationWeek[] = [
   {
     id: 'week-1',
+    name: '第一周模拟训练',
     sessionId: 'session-1',
     weekNumber: 1,
     startDate: new Date('2024-01-10'),
     endDate: new Date('2024-01-16'),
     active: true,
+    timeline: null,
+    createdBy: 'user-2',
     createdAt: new Date('2024-01-10'),
   },
 ];
@@ -389,6 +401,7 @@ export const mockDataVersions: DataVersion[] = [
     name: '基础数据集v1.0',
     description: '包含基本患者信息和检验数据',
     version: '1.0.0',
+    createdBy: 'user-1',
     createdAt: new Date('2024-01-10'),
   },
 ];
@@ -401,6 +414,7 @@ export const mockGroupAccounts: GroupAccount[] = [
     username: 'group1_user',
     password: 'group123',
     active: true,
+    createdBy: 'user-1',
     createdAt: new Date('2024-01-10'),
   },
 ];
@@ -412,9 +426,9 @@ export const mockAuditLogs: AuditLog[] = [
     entityType: 'patient',
     entityId: 'patient-1',
     action: 'update',
-    changes: { status: 'critical' },
+    details: 'Updated patient status to critical',
     performedBy: 'user-2',
-    performedAt: new Date('2024-01-10T10:30:00'),
+    timestamp: new Date('2024-01-10T10:30:00'),
   },
 ];
 

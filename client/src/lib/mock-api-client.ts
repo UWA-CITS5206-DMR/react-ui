@@ -234,11 +234,13 @@ class MockDataStore {
     return this.orders.filter(order => order.patientId === patientId);
   }
 
-  createOrder(orderData: Omit<Order, 'id' | 'createdAt'>): Order {
+  createOrder(orderData: Omit<Order, 'id'>): Order {
     const order: Order = {
       ...orderData,
       id: this.generateId(),
-      createdAt: new Date(),
+      status: orderData.status || 'pending',
+      orderedAt: orderData.orderedAt || new Date(),
+      completedAt: orderData.completedAt || null,
     };
     this.orders.push(order);
     return order;
@@ -285,11 +287,11 @@ class MockDataStore {
     return this.assets.filter(asset => asset.sessionId === sessionId);
   }
 
-  createAsset(assetData: Omit<Asset, 'id' | 'createdAt'>): Asset {
+  createAsset(assetData: Omit<Asset, 'id'>): Asset {
     const asset: Asset = {
       ...assetData,
       id: this.generateId(),
-      createdAt: new Date(),
+      uploadedAt: assetData.uploadedAt || new Date(),
     };
     this.assets.push(asset);
     return asset;
@@ -379,7 +381,7 @@ export const mockApiClient = {
       }
 
       const { password: _, ...userWithoutPassword } = user;
-      return { user: userWithoutPassword };
+      return { user: userWithoutPassword as User };
     },
 
     async session(): Promise<{ user: User } | null> {
@@ -388,13 +390,13 @@ export const mockApiClient = {
       simulateRandomError({ skipAuth: true });
 
       // Mock模式下，假设用户已登录，返回第一个用户
-      const user = mockStore.users[0];
+      const user = mockStore.getAllUsers()[0];
       if (!user) {
         return null;
       }
 
       const { password: _, ...userWithoutPassword } = user;
-      return { user: userWithoutPassword };
+      return { user: userWithoutPassword as User };
     },
   },
 
@@ -450,7 +452,7 @@ export const mockApiClient = {
       return mockStore.getAssetsBySession(sessionId);
     },
 
-    async createAsset(sessionId: string, assetData: Omit<Asset, 'id' | 'sessionId' | 'createdAt'>): Promise<Asset> {
+    async createAsset(sessionId: string, assetData: Omit<Asset, 'id' | 'sessionId'>): Promise<Asset> {
       logMockRequest('POST', `/sessions/${sessionId}/assets`, assetData);
       await simulateDelay();
       simulateRandomError();
@@ -533,7 +535,7 @@ export const mockApiClient = {
       return mockStore.getOrdersByPatient(patientId);
     },
 
-    async createOrder(patientId: string, orderData: Omit<Order, 'id' | 'patientId' | 'createdAt'>): Promise<Order> {
+    async createOrder(patientId: string, orderData: Omit<Order, 'id' | 'patientId'>): Promise<Order> {
       logMockRequest('POST', `/patients/${patientId}/orders`, orderData);
       await simulateDelay();
       simulateRandomError();
@@ -574,6 +576,13 @@ export const mockApiClient = {
 
     async getVisibleAssets(groupId: string): Promise<Asset[]> {
       logMockRequest('GET', `/groups/${groupId}/visible-assets`);
+      await simulateDelay();
+      simulateRandomError();
+      return mockStore.getVisibleAssetsForGroup(groupId);
+    },
+
+    async getAssets(groupId: string): Promise<Asset[]> {
+      logMockRequest('GET', `/groups/${groupId}/assets`);
       await simulateDelay();
       simulateRandomError();
       return mockStore.getVisibleAssetsForGroup(groupId);
@@ -774,9 +783,10 @@ export const mockApiClient = {
           patientId: documentData.patientId,
           category: documentData.category,
           originalName: documentData.originalName || 'uploaded-file.pdf',
+          filename: documentData.originalName || 'uploaded-file.pdf',
           filePath: `/uploads/${Date.now()}-${documentData.originalName || 'file.pdf'}`,
           fileSize: documentData.fileSize || 1024,
-          mimeType: documentData.mimeType || 'application/pdf',
+          fileType: 'pdf',
           uploadedBy: 'coordinator-1',
           uploadedAt: new Date(),
         };

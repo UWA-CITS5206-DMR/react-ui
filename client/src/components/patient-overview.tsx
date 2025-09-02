@@ -11,7 +11,7 @@ interface PatientOverviewProps {
 export default function PatientOverview({ patient }: PatientOverviewProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
-  const { data: vitals } = useQuery<VitalSigns>({
+  const { data: vitals } = useQuery<VitalSigns[]>({
     queryKey: ["patients", patient.id, "vitals"],
     queryFn: () => api.patients.getVitals(patient.id),
   });
@@ -123,39 +123,41 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                     </span>
                   </div>
                   <div className="space-y-4">
-                    {vitals && (
+                    {vitals && vitals.length > 0 ? (
                       <>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">Blood Pressure</span>
                           <span className="text-sm font-semibold text-critical-red">
-                            {vitals.bloodPressure}
+                            {vitals[0].bloodPressure}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">Heart Rate</span>
-                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals.heartRate, { max: 100 }))}`}>
-                            {vitals.heartRate} bpm
+                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals[0].heartRate, { max: 100 }))}`}>
+                            {vitals[0].heartRate} bpm
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">Respiratory Rate</span>
-                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals.respiratoryRate, { max: 20 }))}`}>
-                            {vitals.respiratoryRate}/min
+                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals[0].respiratoryRate, { max: 20 }))}`}>
+                            {vitals[0].respiratoryRate}/min
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">Temperature</span>
                           <span className="text-sm font-semibold text-gray-900">
-                            {vitals.temperature}
+                            {vitals[0].temperature}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">SpO2</span>
-                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals.oxygenSaturation, { min: 95 }))}`}>
-                            {vitals.oxygenSaturation}%
+                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals[0].oxygenSaturation, { min: 95 }))}`}>
+                            {vitals[0].oxygenSaturation}%
                           </span>
                         </div>
                       </>
+                    ) : (
+                      <div className="text-sm text-gray-500">No vital signs data available</div>
                     )}
                   </div>
                 </div>
@@ -256,7 +258,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           <span className="text-sm font-medium text-gray-700">Blood Pressure</span>
                           <span className="text-xs text-gray-500">mmHg</span>
                         </div>
-                        <div className="text-2xl font-bold text-critical-red">{vitals.bloodPressure}</div>
+                        <div className="text-2xl font-bold text-critical-red">{vitals && vitals.length > 0 ? vitals[0].bloodPressure : 'N/A'}</div>
                         <div className="text-xs text-gray-500 mt-1">Hypertensive Range</div>
                       </div>
                       <div className="bg-gray-50 p-4 rounded-lg">
@@ -264,8 +266,8 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           <span className="text-sm font-medium text-gray-700">Heart Rate</span>
                           <span className="text-xs text-gray-500">bpm</span>
                         </div>
-                        <div className={`text-2xl font-bold ${getVitalColor(getVitalStatus(vitals.heartRate, { max: 100 }))}`}>
-                          {vitals.heartRate}
+                        <div className={`text-2xl font-bold ${getVitalColor(getVitalStatus(vitals && vitals.length > 0 ? vitals[0].heartRate : 0, { max: 100 }))}`}>
+                          {vitals && vitals.length > 0 ? vitals[0].heartRate : 0}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">Tachycardic</div>
                       </div>
@@ -274,8 +276,8 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           <span className="text-sm font-medium text-gray-700">Respiratory Rate</span>
                           <span className="text-xs text-gray-500">/min</span>
                         </div>
-                        <div className={`text-2xl font-bold ${getVitalColor(getVitalStatus(vitals.respiratoryRate, { max: 20 }))}`}>
-                          {vitals.respiratoryRate}
+                        <div className={`text-2xl font-bold ${getVitalColor(getVitalStatus(vitals && vitals.length > 0 ? vitals[0].respiratoryRate : 0, { max: 20 }))}`}>
+                          {vitals && vitals.length > 0 ? vitals[0].respiratoryRate : 0}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">Tachypneic</div>
                       </div>
@@ -284,7 +286,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           <span className="text-sm font-medium text-gray-700">Temperature</span>
                           <span className="text-xs text-gray-500">°F</span>
                         </div>
-                        <div className="text-2xl font-bold text-gray-900">{vitals.temperature}</div>
+                        <div className="text-2xl font-bold text-gray-900">{vitals && vitals.length > 0 ? vitals[0].temperature : 'N/A'}</div>
                         <div className="text-xs text-gray-500 mt-1">Normal</div>
                       </div>
                       <div className="bg-gray-50 p-4 rounded-lg">
@@ -292,8 +294,8 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           <span className="text-sm font-medium text-gray-700">Oxygen Saturation</span>
                           <span className="text-xs text-gray-500">%</span>
                         </div>
-                        <div className={`text-2xl font-bold ${getVitalColor(getVitalStatus(vitals.oxygenSaturation, { min: 95 }))}`}>
-                          {vitals.oxygenSaturation}
+                        <div className={`text-2xl font-bold ${getVitalColor(getVitalStatus(vitals && vitals.length > 0 ? vitals[0].oxygenSaturation : 0, { min: 95 }))}`}>
+                          {vitals && vitals.length > 0 ? vitals[0].oxygenSaturation : 0}
                         </div>
                         <div className="text-xs text-gray-500 mt-1">Hypoxic</div>
                       </div>
@@ -472,7 +474,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                             </div>
                             <div className="flex items-center space-x-2 text-sm text-gray-500">
                               <Calendar className="h-4 w-4" />
-                              <span>{new Date(note.createdAt).toLocaleString()}</span>
+                              <span>{note.createdAt ? new Date(note.createdAt).toLocaleString() : 'N/A'}</span>
                             </div>
                           </div>
                           

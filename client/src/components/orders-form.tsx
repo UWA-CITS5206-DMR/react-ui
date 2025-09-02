@@ -54,6 +54,9 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
       type: string;
       orderText: string;
       orderedBy: string;
+      status: string;
+      orderedAt: Date;
+      completedAt: Date | null;
     }) => {
       return api.patients.createOrder(patientId, data);
     },
@@ -98,6 +101,9 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
         type: "lab",
         orderText: order,
         orderedBy: user.id,
+        status: 'pending',
+        orderedAt: new Date(),
+        completedAt: null,
       });
     });
 
@@ -107,6 +113,9 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
         type: "imaging",
         orderText: order,
         orderedBy: user.id,
+        status: 'pending',
+        orderedAt: new Date(),
+        completedAt: null,
       });
     });
 
@@ -119,6 +128,9 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
         type: "medication",
         orderText: medicationOrder,
         orderedBy: user.id,
+        status: 'pending',
+        orderedAt: new Date(),
+        completedAt: null,
       });
     }
 

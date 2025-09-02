@@ -10,6 +10,7 @@ import InstructorDashboard from "@/pages/instructor-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CoordinatorDashboard from "@/pages/coordinator-dashboard";
 import GroupManager from "@/pages/group-manager";
+import ApiExplorer from "@/components/api-explorer";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
@@ -56,6 +57,7 @@ function AppRouter() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/coordinator" component={CoordinatorDashboard} />
       <Route path="/group-manager" component={GroupManager} />
+      <Route path="/api-explorer" component={ApiExplorer} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Medical Simulation Platform - API Documentation</title>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-bundle.js"></script>
+    <script src="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui-standalone-preset.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@5.10.3/swagger-ui.css" />
+    <style>
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+        }
+        .header {
+            background: #1f2937;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 2rem;
+        }
+        .header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+        }
+        .tabs {
+            display: flex;
+            background: #f3f4f6;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 16px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+        .tab:hover {
+            background: #e5e7eb;
+        }
+        .tab.active {
+            background: white;
+            border-bottom-color: #3b82f6;
+            color: #3b82f6;
+        }
+        .content {
+            display: none;
+            padding: 20px;
+        }
+        .content.active {
+            display: block;
+        }
+        #swagger-ui {
+            max-width: none;
+        }
+        .api-explorer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .links {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .link-card {
+            padding: 20px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.2s;
+        }
+        .link-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .link-card h3 {
+            margin: 0 0 10px 0;
+            color: #3b82f6;
+        }
+        .link-card p {
+            margin: 0;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Medical Simulation Platform</h1>
+        <p>API Documentation & Schema Explorer</p>
+    </div>
+
+    <div class="tabs">
+        <button class="tab active" onclick="showTab('overview')">概览</button>
+        <button class="tab" onclick="showTab('swagger')">Swagger UI</button>
+        <button class="tab" onclick="showTab('interactive')">交互式浏览器</button>
+        <button class="tab" onclick="showTab('typedoc')">TypeDoc</button>
+    </div>
+
+    <div id="overview" class="content active">
+        <div class="api-explorer-content">
+            <h2>API 文档概览</h2>
+            <p>欢迎使用医疗模拟平台的 API 文档。这里提供了多种方式来浏览和理解我们的 API。</p>
+            
+            <div class="links">
+                <div class="link-card">
+                    <h3>🔧 Swagger UI</h3>
+                    <p>基于 OpenAPI 3.0 规范的交互式 API 文档，支持在线测试</p>
+                </div>
+                
+                <div class="link-card">
+                    <h3>🎯 交互式浏览器</h3>
+                    <p>自定义的 React 组件，提供更好的用户体验</p>
+                </div>
+                
+                <div class="link-card">
+                    <h3>📚 TypeDoc</h3>
+                    <p>从 TypeScript 代码自动生成的详细类型文档</p>
+                </div>
+                
+                <div class="link-card">
+                    <h3>📊 JSON Schema</h3>
+                    <p><a href="./api-schema.json" target="_blank">下载 API Schema JSON</a></p>
+                </div>
+                
+                <div class="link-card">
+                    <h3>🔗 OpenAPI JSON</h3>
+                    <p><a href="./openapi.json" target="_blank">下载 OpenAPI 规范</a></p>
+                </div>
+            </div>
+
+            <h3>快速开始</h3>
+            <pre><code># 获取患者列表
+GET /api/sessions/session-1/patients
+
+# 获取患者详情
+GET /api/patients/{patientId}
+
+# 创建 SOAP 笔记
+POST /api/patients/{patientId}/soap-notes</code></pre>
+        </div>
+    </div>
+
+    <div id="swagger" class="content">
+        <div id="swagger-ui"></div>
+    </div>
+
+    <div id="interactive" class="content">
+        <div class="api-explorer-content">
+            <h2>交互式 API 浏览器</h2>
+            <p>访问: <a href="http://localhost:5175/api-explorer" target="_blank">http://localhost:5175/api-explorer</a></p>
+            <p>这是一个自定义的 React 组件，提供了更直观的 API 浏览体验。</p>
+        </div>
+    </div>
+
+    <div id="typedoc" class="content">
+        <div class="api-explorer-content">
+            <h2>TypeScript 类型文档</h2>
+            <p>运行以下命令生成 TypeDoc 文档：</p>
+            <pre><code>npm run docs:generate</code></pre>
+            <p>然后访问: <a href="./api/index.html" target="_blank">./api/index.html</a></p>
+        </div>
+    </div>
+
+    <script>
+        function showTab(tabName) {
+            // 隐藏所有内容
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // 移除所有标签的激活状态
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // 显示选中的内容和标签
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // 初始化 Swagger UI
+            if (tabName === 'swagger') {
+                initSwaggerUI();
+            }
+        }
+
+        function initSwaggerUI() {
+            if (document.getElementById('swagger-ui').innerHTML !== '') {
+                return; // 已经初始化过了
+            }
+
+            SwaggerUIBundle({
+                url: './openapi.json',
+                dom_id: '#swagger-ui',
+                deepLinking: true,
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                plugins: [
+                    SwaggerUIBundle.plugins.DownloadUrl
+                ],
+                layout: "StandaloneLayout"
+            });
+        }
+    </script>
+</body>
+</html>

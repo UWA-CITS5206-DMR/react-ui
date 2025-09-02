@@ -1,0 +1,187 @@
+{
+  "endpoints": [
+    {
+      "method": "GET",
+      "path": "/sessions/instructor/{instructorId}",
+      "description": "获取教师会话列表",
+      "responseType": "Session[]",
+      "group": "Sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/sessions/{sessionId}",
+      "description": "获取会话详情",
+      "responseType": "Session",
+      "group": "Sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/sessions/{sessionId}/patients",
+      "description": "获取会话患者",
+      "responseType": "Patient[]",
+      "group": "Sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/sessions/{sessionId}/groups",
+      "description": "获取会话小组",
+      "responseType": "Group[]",
+      "group": "Sessions"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patientId}",
+      "description": "获取患者信息",
+      "responseType": "Patient",
+      "group": "Patients"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patientId}/vitals",
+      "description": "获取生命体征",
+      "responseType": "VitalSigns",
+      "group": "Patients"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patientId}/labs",
+      "description": "获取实验室结果",
+      "responseType": "LabResult[]",
+      "group": "Patients"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patientId}/history",
+      "description": "获取病史",
+      "responseType": "MedicalHistory[]",
+      "group": "Patients"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patientId}/medications",
+      "description": "获取用药信息",
+      "responseType": "Medication[]",
+      "group": "Patients"
+    },
+    {
+      "method": "GET",
+      "path": "/patients/{patientId}/soap-notes",
+      "description": "获取SOAP笔记",
+      "responseType": "SoapNote[]",
+      "group": "Patients"
+    },
+    {
+      "method": "POST",
+      "path": "/patients/{patientId}/soap-notes",
+      "description": "创建SOAP笔记",
+      "responseType": "SoapNote",
+      "group": "Patients"
+    },
+    {
+      "method": "GET",
+      "path": "/coordinator/documents",
+      "description": "获取文档列表",
+      "responseType": "Document[]",
+      "group": "Coordinator"
+    },
+    {
+      "method": "POST",
+      "path": "/coordinator/documents/upload",
+      "description": "上传文档",
+      "responseType": "Document",
+      "group": "Coordinator"
+    },
+    {
+      "method": "GET",
+      "path": "/coordinator/document-releases",
+      "description": "获取发布计划",
+      "responseType": "DocumentRelease[]",
+      "group": "Coordinator"
+    },
+    {
+      "method": "POST",
+      "path": "/coordinator/document-releases",
+      "description": "创建发布计划",
+      "responseType": "DocumentRelease",
+      "group": "Coordinator"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/users",
+      "description": "获取用户列表",
+      "responseType": "User[]",
+      "group": "Admin"
+    },
+    {
+      "method": "POST",
+      "path": "/admin/users",
+      "description": "创建用户",
+      "responseType": "User",
+      "group": "Admin"
+    },
+    {
+      "method": "DELETE",
+      "path": "/admin/users/{id}",
+      "description": "删除用户",
+      "responseType": "void",
+      "group": "Admin"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/data-versions",
+      "description": "获取数据版本",
+      "responseType": "DataVersion[]",
+      "group": "Admin"
+    },
+    {
+      "method": "GET",
+      "path": "/admin/audit-logs",
+      "description": "获取审计日志",
+      "responseType": "AuditLog[]",
+      "group": "Admin"
+    }
+  ],
+  "types": {
+    "User": "来自 shared/schema.ts 的类型定义",
+    "InsertUser": "来自 shared/schema.ts 的类型定义",
+    "Session": "来自 shared/schema.ts 的类型定义",
+    "InsertSession": "来自 shared/schema.ts 的类型定义",
+    "Patient": "来自 shared/schema.ts 的类型定义",
+    "InsertPatient": "来自 shared/schema.ts 的类型定义",
+    "VitalSigns": "来自 shared/schema.ts 的类型定义",
+    "InsertVitalSigns": "来自 shared/schema.ts 的类型定义",
+    "LabResult": "来自 shared/schema.ts 的类型定义",
+    "InsertLabResult": "来自 shared/schema.ts 的类型定义",
+    "SoapNote": "来自 shared/schema.ts 的类型定义",
+    "InsertSoapNote": "来自 shared/schema.ts 的类型定义",
+    "Order": "来自 shared/schema.ts 的类型定义",
+    "InsertOrder": "来自 shared/schema.ts 的类型定义",
+    "MedicalHistory": "来自 shared/schema.ts 的类型定义",
+    "InsertMedicalHistory": "来自 shared/schema.ts 的类型定义",
+    "Medication": "来自 shared/schema.ts 的类型定义",
+    "InsertMedication": "来自 shared/schema.ts 的类型定义",
+    "Group": "来自 shared/schema.ts 的类型定义",
+    "InsertGroup": "来自 shared/schema.ts 的类型定义",
+    "GroupMember": "来自 shared/schema.ts 的类型定义",
+    "InsertGroupMember": "来自 shared/schema.ts 的类型定义",
+    "Asset": "来自 shared/schema.ts 的类型定义",
+    "InsertAsset": "来自 shared/schema.ts 的类型定义",
+    "AssetGroupVisibility": "来自 shared/schema.ts 的类型定义",
+    "InsertAssetGroupVisibility": "来自 shared/schema.ts 的类型定义",
+    "DataVersion": "来自 shared/schema.ts 的类型定义",
+    "InsertDataVersion": "来自 shared/schema.ts 的类型定义",
+    "GroupDataAssignment": "来自 shared/schema.ts 的类型定义",
+    "InsertGroupDataAssignment": "来自 shared/schema.ts 的类型定义",
+    "GroupAccount": "来自 shared/schema.ts 的类型定义",
+    "InsertGroupAccount": "来自 shared/schema.ts 的类型定义",
+    "Document": "来自 shared/schema.ts 的类型定义",
+    "InsertDocument": "来自 shared/schema.ts 的类型定义",
+    "DocumentRelease": "来自 shared/schema.ts 的类型定义",
+    "InsertDocumentRelease": "来自 shared/schema.ts 的类型定义",
+    "SimulationWeek": "来自 shared/schema.ts 的类型定义",
+    "InsertSimulationWeek": "来自 shared/schema.ts 的类型定义",
+    "AuditLog": "来自 shared/schema.ts 的类型定义",
+    "InsertAuditLog": "来自 shared/schema.ts 的类型定义"
+  },
+  "lastUpdated": "2025-09-02T09:36:30.597Z"
+}

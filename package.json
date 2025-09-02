@@ -12,10 +12,13 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "db:init": "tsx scripts/init-db.ts"
+    "db:init": "tsx scripts/init-db.ts",
+    "docs:generate": "typedoc",
+    "docs:schema": "tsx scripts/generate-api-schema.ts",
+    "docs:serve": "cd docs/api && python3 -m http.server 3001",
+    "docs:all": "npm run docs:schema && npm run docs:generate"
   },
   "dependencies": {
-    "axios": "^1.6.2",
     "@google-cloud/storage": "^7.16.0",
     "@hookform/resolvers": "^3.10.0",
     "@jridgewell/trace-mapping": "^0.3.25",
@@ -55,6 +58,7 @@
     "@uppy/file-input": "^4.2.2",
     "@uppy/progress-bar": "^4.3.2",
     "@uppy/react": "^4.5.2",
+    "axios": "^1.6.2",
     "better-sqlite3": "^11.3.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -101,6 +105,8 @@
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.1",
+    "typedoc": "^0.28.12",
+    "typedoc-plugin-markdown": "^4.8.1",
     "typescript": "5.6.3",
     "vite": "^5.4.19"
   },

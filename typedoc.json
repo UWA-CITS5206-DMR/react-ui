@@ -1,0 +1,29 @@
+{
+  "entryPoints": ["./shared/schema.ts", "./client/src/lib/api-client.ts"],
+  "out": "./docs/api",
+  "plugin": ["typedoc-plugin-markdown"],
+  "theme": "markdown",
+  "readme": "none",
+  "excludePrivate": true,
+  "excludeProtected": true,
+  "excludeExternals": true,
+  "categorizeByGroup": true,
+  "categoryOrder": [
+    "Database Schema",
+    "API Client",
+    "Types",
+    "*"
+  ],
+  "sort": ["source-order"],
+  "kindSortOrder": [
+    "Module",
+    "Interface",
+    "TypeAlias",
+    "Variable",
+    "Function",
+    "Class",
+    "Constructor",
+    "Property",
+    "Method"
+  ]
+}

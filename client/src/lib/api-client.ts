@@ -249,7 +249,9 @@ apiClient.interceptors.response.use(
           } else if (url.includes('/patients/') && url.match(/\/patients\/[^\/]+$/)) {
             const patientId = url.split('/').pop();
             console.log(`🔍 拦截患者详情请求, patientId: ${patientId}`);
-            mockResult = await mockApiClient.patients.getById(patientId);
+            if (patientId) {
+              mockResult = await mockApiClient.patients.getById(patientId);
+            }
           }
           
           if (mockResult !== undefined) {
