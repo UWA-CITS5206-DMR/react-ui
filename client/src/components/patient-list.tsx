@@ -8,6 +8,14 @@ interface PatientListProps {
 }
 
 export default function PatientList({ patients, selectedPatientId, onPatientSelect }: PatientListProps) {
+  // 确保patients始终是数组，提供防护措施
+  const safePatients = Array.isArray(patients) ? patients : [];
+  
+  // 如果数据格式异常，记录错误信息
+  if (!Array.isArray(patients) && patients !== undefined) {
+    console.error('⚠️ PatientList组件接收到的patients不是数组:', typeof patients, patients);
+  }
+  
   const getStatusColor = (status: string) => {
     switch (status) {
       case "critical":
@@ -53,7 +61,7 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
       </div>
       
       <div className="flex-1 overflow-y-auto">
-        {patients.map((patient) => (
+        {safePatients.length > 0 ? safePatients.map((patient) => (
           <div
             key={patient.id}
             onClick={() => onPatientSelect(patient.id)}
@@ -90,7 +98,18 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
               </div>
             </div>
           </div>
-        ))}
+        )) : (
+          <div className="p-4 text-center text-gray-500">
+            {!Array.isArray(patients) && patients !== undefined ? (
+              <div>
+                <p>数据格式错误 (接收到的数据类型: {typeof patients})</p>
+                <p className="text-xs mt-1">请联系管理员检查数据源</p>
+              </div>
+            ) : (
+              <p>暂无患者数据</p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

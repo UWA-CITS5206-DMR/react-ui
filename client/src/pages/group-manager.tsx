@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -43,13 +43,7 @@ export default function GroupManager() {
   // Update asset visibility mutation
   const updateVisibilityMutation = useMutation({
     mutationFn: async ({ assetId, groupId, visible }: { assetId: string; groupId: string; visible: boolean }) => {
-      const response = await fetch(`/api/assets/${assetId}/visibility/${groupId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ visible, changedBy: user?.id }),
-      });
-      if (!response.ok) throw new Error("Failed to update visibility");
-      return response.json();
+      return api.assets.updateVisibility(assetId, groupId, visible, user?.id || '');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/assets"] });
@@ -70,13 +64,7 @@ export default function GroupManager() {
   // Bulk update visibility mutation
   const bulkUpdateMutation = useMutation({
     mutationFn: async ({ assetIds, groupId, visible }: { assetIds: string[]; groupId: string; visible: boolean }) => {
-      const response = await fetch(`/api/assets/bulk-visibility/${groupId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assetIds, visible, changedBy: user?.id }),
-      });
-      if (!response.ok) throw new Error("Failed to bulk update visibility");
-      return response.json();
+      return api.assets.bulkUpdateVisibility(assetIds, groupId, visible, user?.id || '');
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/assets"] });

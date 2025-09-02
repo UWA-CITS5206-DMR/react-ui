@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Save } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api-client";
 
 interface SoapNotesFormProps {
   patientId: string;
@@ -30,8 +30,7 @@ export default function SoapNotesForm({ patientId }: SoapNotesFormProps) {
       plan: string;
       authorId: string;
     }) => {
-      const response = await apiRequest("POST", `/api/patients/${patientId}/soap-notes`, data);
-      return response.json();
+      return api.patients.createSoapNote(patientId, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "soap-notes"] });

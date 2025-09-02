@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { User } from "@shared/schema";
+import { api } from "@/lib/api-client";
 
 interface AuthContextType {
   user: User | null;
@@ -37,23 +38,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const { user } = await response.json();
-        setUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
-        setIsLoading(false);
-        return true;
-      }
+      const { user } = await api.auth.login(username, password);
+      setUser(user);
+      localStorage.setItem("user", JSON.stringify(user));
       setIsLoading(false);
-      return false;
+      return true;
     } catch (error) {
       console.error("Login error:", error);
       setIsLoading(false);

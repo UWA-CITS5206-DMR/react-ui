@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Clock, AlertTriangle, CheckCircle, User, Calendar } from "lucide-react";
+import { api } from "@/lib/api-client";
 import type { Patient, VitalSigns, LabResult, MedicalHistory, Medication, SoapNote } from "@shared/schema";
 
 interface PatientOverviewProps {
@@ -11,23 +12,28 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
   const { data: vitals } = useQuery<VitalSigns>({
-    queryKey: ["/api/patients", patient.id, "vitals"],
+    queryKey: ["patients", patient.id, "vitals"],
+    queryFn: () => api.patients.getVitals(patient.id),
   });
 
-  const { data: labResults } = useQuery<LabResult[]>({
-    queryKey: ["/api/patients", patient.id, "labs"],
+  const { data: labResults = [] } = useQuery<LabResult[]>({
+    queryKey: ["patients", patient.id, "labs"],
+    queryFn: () => api.patients.getLabs(patient.id),
   });
 
-  const { data: medicalHistory } = useQuery<MedicalHistory[]>({
-    queryKey: ["/api/patients", patient.id, "history"],
+  const { data: medicalHistory = [] } = useQuery<MedicalHistory[]>({
+    queryKey: ["patients", patient.id, "history"],
+    queryFn: () => api.patients.getHistory(patient.id),
   });
 
-  const { data: medications } = useQuery<Medication[]>({
-    queryKey: ["/api/patients", patient.id, "medications"],
+  const { data: medications = [] } = useQuery<Medication[]>({
+    queryKey: ["patients", patient.id, "medications"],
+    queryFn: () => api.patients.getMedications(patient.id),
   });
 
-  const { data: soapNotes } = useQuery<SoapNote[]>({
-    queryKey: ["/api/patients", patient.id, "soap-notes"],
+  const { data: soapNotes = [] } = useQuery<SoapNote[]>({
+    queryKey: ["patients", patient.id, "soap-notes"],
+    queryFn: () => api.patients.getSoapNotes(patient.id),
   });
 
   const getVitalStatus = (value: number | string | null, normal: { min?: number; max?: number }) => {
@@ -164,22 +170,26 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                 <div className="p-6">
                   <h2 className="text-lg font-semibold text-gray-900 mb-4">Medical History</h2>
                   <div className="space-y-3">
-                    {medicalHistory?.map((history) => (
+                    {Array.isArray(medicalHistory) && medicalHistory.length > 0 ? medicalHistory.map((history) => (
                       <div key={history.id} className="flex items-center justify-between">
                         <span className="text-sm text-gray-800">{history.condition}</span>
                         <span className="text-xs text-gray-500">{history.diagnosedYear}</span>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-sm text-gray-500">No medical history available</div>
+                    )}
                   </div>
                   
                   <div className="mt-6">
                     <h3 className="text-sm font-medium text-gray-700 mb-2">Current Medications</h3>
                     <div className="space-y-2">
-                      {medications?.map((medication) => (
+                      {Array.isArray(medications) && medications.length > 0 ? medications.map((medication) => (
                         <div key={medication.id} className="text-sm text-gray-600">
                           • {medication.name} {medication.dosage} {medication.frequency}
                         </div>
-                      ))}
+                      )) : (
+                        <div className="text-sm text-gray-500">No current medications</div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -198,7 +208,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                     )}
                   </div>
                   <div className="space-y-3">
-                    {labResults?.map((lab) => (
+                    {Array.isArray(labResults) && labResults.length > 0 ? labResults.map((lab) => (
                       <div key={lab.id}>
                         {lab.status === 'completed' ? (
                           <div className="flex items-center justify-between">
@@ -219,7 +229,9 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           </div>
                         )}
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-sm text-gray-500">No lab results available</div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -307,7 +319,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                     )}
                   </div>
                   <div className="space-y-4">
-                    {labResults?.map((lab) => (
+                    {Array.isArray(labResults) && labResults.length > 0 ? labResults.map((lab) => (
                       <div key={lab.id} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-gray-900">{lab.testName}</h3>
@@ -344,7 +356,11 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           </div>
                         )}
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No lab results available
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -361,7 +377,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                     <span className="text-sm text-gray-500">{medications?.length || 0} active medications</span>
                   </div>
                   <div className="space-y-4">
-                    {medications?.map((medication) => (
+                    {Array.isArray(medications) && medications.length > 0 ? medications.map((medication) => (
                       <div key={medication.id} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-gray-900">{medication.name}</h3>
@@ -385,7 +401,11 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           </div>
                         )}
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No medications prescribed
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -395,7 +415,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                 <div className="p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-6">Medical History</h2>
                   <div className="space-y-4">
-                    {medicalHistory?.map((history) => (
+                    {Array.isArray(medicalHistory) && medicalHistory.length > 0 ? medicalHistory.map((history) => (
                       <div key={history.id} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <h3 className="font-medium text-gray-900">{history.condition}</h3>
@@ -405,7 +425,11 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                           <p className="text-sm text-gray-600">{history.notes}</p>
                         )}
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No medical history available
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>

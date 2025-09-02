@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { api } from "@/lib/api-client";
 import TopNavigation from "@/components/top-navigation";
 import PatientList from "@/components/patient-list";
 import PatientHeader from "@/components/patient-header";
@@ -31,15 +32,18 @@ export default function StudentDashboard() {
   const sessionId = "session-1";
 
   const { data: session } = useQuery<Session>({
-    queryKey: ["/api/sessions", sessionId],
+    queryKey: ["sessions", sessionId],
+    queryFn: () => api.sessions.getById(sessionId),
   });
 
   const { data: patients = [] } = useQuery<Patient[]>({
-    queryKey: ["/api/sessions", sessionId, "patients"],
+    queryKey: ["sessions", sessionId, "patients"],
+    queryFn: () => api.sessions.getPatients(sessionId),
   });
 
   const { data: selectedPatient } = useQuery<Patient>({
-    queryKey: ["/api/patients", selectedPatientId],
+    queryKey: ["patients", selectedPatientId],
+    queryFn: () => api.patients.getById(selectedPatientId!),
     enabled: !!selectedPatientId,
   });
 

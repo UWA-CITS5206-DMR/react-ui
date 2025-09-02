@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Send } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api-client";
 
 interface OrdersFormProps {
   patientId: string;
@@ -55,8 +55,7 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
       orderText: string;
       orderedBy: string;
     }) => {
-      const response = await apiRequest("POST", `/api/patients/${patientId}/orders`, data);
-      return response.json();
+      return api.patients.createOrder(patientId, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "orders"] });

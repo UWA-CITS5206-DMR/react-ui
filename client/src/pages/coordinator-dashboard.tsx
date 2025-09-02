@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api-client";
 import { 
   Upload, 
   Calendar, 
@@ -69,29 +69,38 @@ export default function CoordinatorDashboard() {
   const [selectedMode, setSelectedMode] = useState<"student" | "instructor">("instructor");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
+  // For now, using a default session ID. In production, this should come from auth context
+  const defaultSessionId = 'session-1';
+  
   // Queries
   const { data: sessions = [] } = useQuery({
-    queryKey: ["/api/sessions"],
+    queryKey: ["sessions", "instructor"],
+    queryFn: () => api.sessions.getByInstructor('user-2'), // Using default instructor ID
   });
 
   const { data: patients = [] } = useQuery({
-    queryKey: ["/api/patients"],
+    queryKey: ["sessions", defaultSessionId, "patients"],
+    queryFn: () => api.sessions.getPatients(defaultSessionId),
   });
 
   const { data: groups = [] } = useQuery({
-    queryKey: ["/api/groups"],
+    queryKey: ["sessions", defaultSessionId, "groups"], 
+    queryFn: () => api.sessions.getGroups(defaultSessionId),
   });
 
   const { data: documents = [] } = useQuery({
-    queryKey: ["/api/coordinator/documents"],
+    queryKey: ["coordinator", "documents"],
+    queryFn: () => api.coordinator.documents.getAll(),
   });
 
   const { data: documentReleases = [] } = useQuery({
-    queryKey: ["/api/coordinator/document-releases"],
+    queryKey: ["coordinator", "document-releases"],
+    queryFn: () => api.coordinator.documentReleases.getAll(),
   });
 
   const { data: simulationWeeks = [] } = useQuery({
-    queryKey: ["/api/coordinator/simulation-weeks"],
+    queryKey: ["coordinator", "simulation-weeks"],
+    queryFn: () => api.coordinator.simulationWeeks.getAll(),
   });
 
   // Forms
@@ -134,13 +143,17 @@ export default function CoordinatorDashboard() {
         formData.append('patientId', data.patientId);
       }
 
-      return fetch('/api/coordinator/documents/upload', {
-        method: 'POST',
-        body: formData,
-      }).then(res => res.json());
+      return api.coordinator.documents.upload({
+        sessionId: formData.get('sessionId') as string,
+        patientId: formData.get('patientId') as string || undefined,
+        category: formData.get('category') as string,
+        originalName: formData.get('originalName') as string,
+        fileSize: parseInt(formData.get('fileSize') as string) || 1024,
+        mimeType: formData.get('mimeType') as string || 'application/pdf',
+      });
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/coordinator/documents"] });
+      queryClient.invalidateQueries({ queryKey: ["coordinator", "documents"] });
       uploadForm.reset();
       setSelectedFile(null);
       toast({
@@ -159,11 +172,18 @@ export default function CoordinatorDashboard() {
 
   const scheduleReleaseMutation = useMutation({
     mutationFn: async (data: ScheduleReleaseForm) => {
-      const response = await apiRequest("POST", "/api/coordinator/document-releases", data);
-      return response.json();
+      const releaseData = {
+        ...data,
+        status: 'pending' as const,
+        releasedAt: null,
+        releasedBy: null,
+        scheduledAt: data.scheduledAt ? new Date(data.scheduledAt) : null,
+        notes: data.notes || null,
+      };
+      return api.coordinator.documentReleases.create(releaseData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/coordinator/document-releases"] });
+      queryClient.invalidateQueries({ queryKey: ["coordinator", "document-releases"] });
       releaseForm.reset();
       toast({
         title: "Success",
@@ -181,11 +201,18 @@ export default function CoordinatorDashboard() {
 
   const createSimulationWeekMutation = useMutation({
     mutationFn: async (data: SimulationWeekForm) => {
-      const response = await apiRequest("POST", "/api/coordinator/simulation-weeks", data);
-      return response.json();
+      const weekData = {
+        ...data,
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        createdBy: 'user-4', // Default coordinator user ID, should come from auth context
+        timeline: null,
+        active: false,
+      };
+      return api.coordinator.simulationWeeks.create(weekData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/coordinator/simulation-weeks"] });
+      queryClient.invalidateQueries({ queryKey: ["coordinator", "simulation-weeks"] });
       weekForm.reset();
       toast({
         title: "Success",
@@ -203,11 +230,10 @@ export default function CoordinatorDashboard() {
 
   const releaseDocumentMutation = useMutation({
     mutationFn: async (releaseId: string) => {
-      const response = await apiRequest("POST", `/api/coordinator/document-releases/${releaseId}/release`);
-      return response.json();
+      return api.coordinator.documentReleases.release(releaseId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/coordinator/document-releases"] });
+      queryClient.invalidateQueries({ queryKey: ["coordinator", "document-releases"] });
       toast({
         title: "Success",
         description: "Document released successfully",
@@ -306,7 +332,7 @@ export default function CoordinatorDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {documents?.map((doc: any) => (
+                      {Array.isArray(documents) && documents.length > 0 ? documents.map((doc: any) => (
                         <div key={doc.id} className="flex items-center justify-between p-4 border rounded-lg">
                           <div className="flex items-center gap-3">
                             {getDocumentIcon(doc.category)}
@@ -332,7 +358,11 @@ export default function CoordinatorDashboard() {
                             </Button>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="text-center py-8 text-gray-500">
+                          No documents uploaded yet
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -462,7 +492,7 @@ export default function CoordinatorDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {documentReleases?.map((release: any) => (
+                      {Array.isArray(documentReleases) && documentReleases.length > 0 ? documentReleases.map((release: any) => (
                         <div key={release.id} className="p-4 border rounded-lg">
                           <div className="flex items-center justify-between mb-2">
                             <div className="flex items-center gap-2">
@@ -505,7 +535,11 @@ export default function CoordinatorDashboard() {
                             </Button>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="text-center py-8 text-gray-500">
+                          No document releases scheduled yet
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -643,7 +677,7 @@ export default function CoordinatorDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {simulationWeeks?.map((week: any) => (
+                    {Array.isArray(simulationWeeks) && simulationWeeks.length > 0 ? simulationWeeks.map((week: any) => (
                       <div key={week.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between mb-2">
                           <div className="font-medium">{week.name}</div>
@@ -664,7 +698,11 @@ export default function CoordinatorDashboard() {
                           </Button>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No simulation weeks created yet
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>

@@ -14,7 +14,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api-client";
 import { 
   Users, 
   Database, 
@@ -64,24 +64,29 @@ export default function AdminDashboard() {
   const [selectedMode, setSelectedMode] = useState<"student" | "instructor">("instructor");
 
   // Queries
-  const { data: sessions } = useQuery({
-    queryKey: ["/api/sessions"],
+  const { data: sessions = [] } = useQuery({
+    queryKey: ["sessions", "instructor"],
+    queryFn: () => api.sessions.getByInstructor('user-2'), // Using default instructor ID for session list
   });
 
   const { data: users = [] } = useQuery({
-    queryKey: ["/api/admin/users"],
+    queryKey: ["admin", "users"],
+    queryFn: () => api.admin.users.getAll(),
   });
 
   const { data: dataVersions = [] } = useQuery({
-    queryKey: ["/api/admin/data-versions"],
+    queryKey: ["admin", "data-versions"],
+    queryFn: () => api.admin.dataVersions.getAll(),
   });
 
   const { data: groupAccounts = [] } = useQuery({
-    queryKey: ["/api/admin/group-accounts"],
+    queryKey: ["admin", "group-accounts"],
+    queryFn: () => api.admin.groupAccounts.getAll(),
   });
 
   const { data: auditLogs = [] } = useQuery({
-    queryKey: ["/api/admin/audit-logs"],
+    queryKey: ["admin", "audit-logs"],
+    queryFn: () => api.admin.auditLogs.getAll(),
   });
 
   // Forms
@@ -118,11 +123,15 @@ export default function AdminDashboard() {
   // Mutations
   const createDataVersionMutation = useMutation({
     mutationFn: async (data: CreateDataVersionForm) => {
-      const response = await apiRequest("POST", "/api/admin/data-versions", data);
-      return response.json();
+      const versionData = {
+        ...data,
+        createdBy: 'user-1', // Default admin user ID, should come from auth context
+        description: data.description || null,
+      };
+      return api.admin.dataVersions.create(versionData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/data-versions"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "data-versions"] });
       dataVersionForm.reset();
       toast({
         title: "Success",
@@ -140,11 +149,15 @@ export default function AdminDashboard() {
 
   const createGroupAccountMutation = useMutation({
     mutationFn: async (data: CreateGroupAccountForm) => {
-      const response = await apiRequest("POST", "/api/admin/group-accounts", data);
-      return response.json();
+      const accountData = {
+        ...data,
+        createdBy: 'user-1', // Default admin user ID, should come from auth context
+        active: true,
+      };
+      return api.admin.groupAccounts.create(accountData);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/group-accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "group-accounts"] });
       groupAccountForm.reset();
       toast({
         title: "Success",
@@ -162,11 +175,10 @@ export default function AdminDashboard() {
 
   const createUserMutation = useMutation({
     mutationFn: async (data: CreateUserForm) => {
-      const response = await apiRequest("POST", "/api/admin/users", data);
-      return response.json();
+      return api.admin.users.create(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       userForm.reset();
       toast({
         title: "Success",
@@ -184,12 +196,10 @@ export default function AdminDashboard() {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
-      return apiRequest(`/api/admin/users/${userId}`, {
-        method: "DELETE",
-      });
+      return api.admin.users.deleteById(userId);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin", "users"] });
       toast({
         title: "Success",
         description: "User deleted successfully",
@@ -273,7 +283,7 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {users?.map((user: any) => (
+                      {Array.isArray(users) && users.length > 0 ? users.map((user: any) => (
                         <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
                           <div>
                             <div className="font-medium">{user.firstName} {user.lastName}</div>
@@ -300,7 +310,11 @@ export default function AdminDashboard() {
                             </Button>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="text-center py-8 text-gray-500">
+                          No users found
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -413,7 +427,7 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {dataVersions?.map((version: any) => (
+                      {Array.isArray(dataVersions) && dataVersions.length > 0 ? dataVersions.map((version: any) => (
                         <div key={version.id} className="p-4 border rounded-lg">
                           <div className="flex items-center justify-between mb-2">
                             <div className="font-medium">{version.name}</div>
@@ -424,7 +438,11 @@ export default function AdminDashboard() {
                             Created: {new Date(version.createdAt).toLocaleDateString()}
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="text-center py-8 text-gray-500">
+                          No data versions found
+                        </div>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -525,7 +543,7 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    {groupAccounts?.map((account: any) => (
+                    {Array.isArray(groupAccounts) && groupAccounts.length > 0 ? groupAccounts.map((account: any) => (
                       <div key={account.id} className="p-4 border rounded-lg">
                         <div className="flex items-center justify-between">
                           <div>
@@ -540,7 +558,11 @@ export default function AdminDashboard() {
                           </Button>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <div className="text-center py-8 text-gray-500">
+                        No group accounts found
+                      </div>
+                    )}
                   </div>
 
                   <div>
@@ -667,7 +689,7 @@ export default function AdminDashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {auditLogs?.slice(0, 10).map((log: any) => (
+                  {Array.isArray(auditLogs) && auditLogs.length > 0 ? auditLogs.slice(0, 10).map((log: any) => (
                     <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg">
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
@@ -687,7 +709,11 @@ export default function AdminDashboard() {
                         </div>
                       </div>
                     </div>
-                  ))}
+                  )) : (
+                    <div className="text-center py-8 text-gray-500">
+                      No audit logs found
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

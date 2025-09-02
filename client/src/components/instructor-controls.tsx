@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { X, Plus, Clock } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { api } from "@/lib/api-client";
 
 interface InstructorControlsProps {
   patientId: string;
@@ -21,11 +21,10 @@ export default function InstructorControls({ patientId, isVisible, onClose }: In
   const releaseTroponinMutation = useMutation({
     mutationFn: async () => {
       // Find the pending troponin lab result and release it
-      const response = await apiRequest("PATCH", "/api/lab-results/lab-2", {
+      return api.labResults.updateById("lab-2", {
         value: "0.08",
         status: "completed",
       });
-      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "labs"] });
@@ -39,10 +38,7 @@ export default function InstructorControls({ patientId, isVisible, onClose }: In
 
   const updatePatientMutation = useMutation({
     mutationFn: async (status: string) => {
-      const response = await apiRequest("PATCH", `/api/patients/${patientId}`, {
-        status,
-      });
-      return response.json();
+      return api.patients.updateById(patientId, { status });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId] });
