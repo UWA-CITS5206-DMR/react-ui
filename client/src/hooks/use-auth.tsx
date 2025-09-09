@@ -34,10 +34,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const login = async (username: string, password: string): Promise<boolean> => {
+  const login = async (
+    username: string,
+    password: string
+  ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("http://localhost:8000/api/auth/login/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
