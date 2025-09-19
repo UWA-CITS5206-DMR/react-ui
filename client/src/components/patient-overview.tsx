@@ -18,6 +18,7 @@ import type {
 import VitalsPaperChart from "@/components/vitals-paper-chart";
 import CurrentObservations from "@/components/current-observations";
 import ObservationChart from "@/components/observation-chart";
+import DischargeSummary from "@/components/discharge-summary";
 
 interface PatientOverviewProps {
   patient: Patient;
@@ -75,6 +76,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
     { id: "medications", label: "Current Medications" },
     { id: "history", label: "Medical History" },
     { id: "notes", label: "Notes" },
+    { id: "discharge-summary", label: "Discharge Summary" },
   ];
 
   function VitalsGrid({ vitals }: { vitals: VitalSigns | undefined }) {
@@ -794,6 +796,11 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Discharge Summary Tab */}
+          {activeTab === "discharge-summary" && (
+            <DischargeSummary patient={patient} />
           )}
         </div>
       </div>
