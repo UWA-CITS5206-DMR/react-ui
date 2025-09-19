@@ -6,6 +6,7 @@ import {
   CheckCircle,
   User,
   Calendar,
+  Heart,
 } from "lucide-react";
 import type {
   Patient,
@@ -19,6 +20,7 @@ import VitalsPaperChart from "@/components/vitals-paper-chart";
 import CurrentObservations from "@/components/current-observations";
 import ObservationChart from "@/components/observation-chart";
 import DischargeSummary from "@/components/discharge-summary";
+import { Badge } from "@/components/ui/badge";
 
 interface PatientOverviewProps {
   patient: Patient;
@@ -73,6 +75,7 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
     { id: "current-observations", label: "Current Observations" },
     { id: "observation-chart", label: "Observation Chart" },
     { id: "labs", label: "Laboratory Results" },
+    { id: "diagnostics", label: "Diagnostics" },
     { id: "medications", label: "Current Medications" },
     { id: "history", label: "Medical History" },
     { id: "notes", label: "Notes" },
@@ -437,6 +440,31 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
                         )}
                       </div>
                     ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === "diagnostics" && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Diagnostic Documents
+                </h3>
+                <div className="space-y-4">
+                  {/* ECG */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Heart className="h-5 w-5 text-red-500" />
+                      <div>
+                        <div className="font-medium">12-Lead ECG</div>
+                        <div className="text-sm text-gray-500">
+                          Available for review
+                        </div>
+                      </div>
+                    </div>
+                    <Badge variant="default">View</Badge>
                   </div>
                 </div>
               </div>
