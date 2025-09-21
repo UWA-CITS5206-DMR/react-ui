@@ -32,34 +32,53 @@ class ApiError extends Error {
 
 // Add interfaces for vital signs
 interface BloodPressureData {
-  patient: number;
-  user: number;
+  patient: string;
+  user?: number;
   systolic: number;
   diastolic: number;
 }
 
 interface HeartRateData {
-  patient: number;
-  user: number;
+  patient: string;
+  user?: number;
   heart_rate: number;
 }
 
 interface BodyTemperatureData {
-  patient: number;
-  user: number;
+  patient: string;
+  user?: number;
   temperature: number;
 }
 
 interface NoteData {
-  patient: number;
-  user: number;
+  patient: string;
+  user?: number;
   content: string;
 }
 
-interface ObservationData {
+interface RespiratoryRateData {
+  patient: string;
+  respiratory_rate: number;
+}
+
+interface BloodSugarData {
+  patient: string;
+  sugar_level: number; // Backend uses mg/dL
+}
+
+interface OxygenSaturationData {
+  patient: string;
+  saturation_percentage: number;
+}
+
+// Combined observations data (matches backend ObservationsSerializer)
+interface ObservationsData {
   blood_pressure?: BloodPressureData;
   heart_rate?: HeartRateData;
   body_temperature?: BodyTemperatureData;
+  respiratory_rate?: RespiratoryRateData;
+  blood_sugar?: BloodSugarData;
+  oxygen_saturation?: OxygenSaturationData;
 }
 
 class ApiClient {
@@ -130,25 +149,18 @@ class ApiClient {
   }
 
   // Enhanced Observations endpoints (matching Django backend)
-  async createObservations(observationData: ObservationData): Promise<any> {
+  async createObservations(data: ObservationsData): Promise<any> {
     return this.request("/api/student-groups/observations/", {
       method: "POST",
-      body: JSON.stringify(observationData),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
     });
   }
 
-  async getObservations(userId?: string, patientId?: string): Promise<any> {
-    let endpoint = "/api/student-groups/observations/";
-    const params = new URLSearchParams();
-
-    if (userId) params.append("user", userId);
-    if (patientId) params.append("patient", patientId);
-
-    if (params.toString()) {
-      endpoint += `?${params.toString()}`;
-    }
-
-    return this.request(endpoint);
+  async getObservations(userId: string, patientId: string): Promise<any> {
+    return this.request(
+      `/api/student-groups/observations/?user=${userId}&patient=${patientId}`
+    );
   }
 
   // Individual vital signs endpoints
@@ -218,5 +230,5 @@ export type {
   HeartRateData,
   BodyTemperatureData,
   NoteData,
-  ObservationData,
+  ObservationsData,
 };

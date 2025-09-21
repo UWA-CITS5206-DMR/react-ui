@@ -1,8 +1,26 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Clock, AlertTriangle, CheckCircle, User, Calendar } from "lucide-react";
-import type { Patient, VitalSigns, LabResult, MedicalHistory, Medication, SoapNote } from "@shared/schema";
+import {
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  User,
+  Calendar,
+  Heart,
+} from "lucide-react";
+import type {
+  Patient,
+  VitalSigns,
+  LabResult,
+  MedicalHistory,
+  Medication,
+  SoapNote,
+} from "@shared/schema";
 import VitalsPaperChart from "@/components/vitals-paper-chart";
+import CurrentObservations from "@/components/current-observations";
+import ObservationChart from "@/components/observation-chart";
+import DischargeSummary from "@/components/discharge-summary";
+import { Badge } from "@/components/ui/badge";
 
 interface PatientOverviewProps {
   patient: Patient;
@@ -31,7 +49,10 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
     queryKey: ["/api/patients", patient.id, "soap-notes"],
   });
 
-  const getVitalStatus = (value: number | string | null, normal: { min?: number; max?: number }) => {
+  const getVitalStatus = (
+    value: number | string | null,
+    normal: { min?: number; max?: number }
+  ) => {
     if (typeof value !== "number") return "normal";
     if (normal.min && value < normal.min) return "low";
     if (normal.max && value > normal.max) return "high";
@@ -51,81 +72,154 @@ export default function PatientOverview({ patient }: PatientOverviewProps) {
 
   const tabs = [
     { id: "overview", label: "Overview" },
-    { id: "vitals", label: "Vitals & Monitoring" },
-    // { id: "vitals-data", label: "Vital & monitoring data" }, 
+    { id: "current-observations", label: "Current Observations" },
+    { id: "observation-chart", label: "Observation Chart" },
     { id: "labs", label: "Laboratory Results" },
-    { id: "medications", label: "Medications" },
-    { id: "orders", label: "Orders" },
+    { id: "diagnostics", label: "Diagnostics" },
+    { id: "medications", label: "Current Medications" },
+    { id: "history", label: "Medical History" },
     { id: "notes", label: "Notes" },
-    { id: "imaging", label: "Imaging" },
+    { id: "discharge-summary", label: "Discharge Summary" },
   ];
 
-function VitalsGrid({ vitals }: { vitals: VitalSigns | undefined }) {
-  if (!vitals) return null;
- // --- 血压：颜色与状态 ---
-  const [sys, dia] = String(vitals.bloodPressure).split("/").map(n => parseInt(n, 10));
-  const bpColor =
-    Number.isFinite(sys) && Number.isFinite(dia)
-      ? (sys > 140 || dia > 90) ? "text-critical-red" : (sys < 90 || dia < 60) ? "text-amber-600" : "text-gray-900"
-      : "text-gray-900";
-  const bpText =
-    Number.isFinite(sys) && Number.isFinite(dia)
-      ? (sys > 140 || dia > 90) ? "Hypertensive Range" : (sys < 90 || dia < 60) ? "Hypotension" : "Normal"
-      : "Normal";
+  function VitalsGrid({ vitals }: { vitals: VitalSigns | undefined }) {
+    if (!vitals) return null;
+    // --- 血压：颜色与状态 ---
+    const [sys, dia] = String(vitals.bloodPressure)
+      .split("/")
+      .map((n) => parseInt(n, 10));
+    const bpColor =
+      Number.isFinite(sys) && Number.isFinite(dia)
+        ? sys > 140 || dia > 90
+          ? "text-critical-red"
+          : sys < 90 || dia < 60
+          ? "text-amber-600"
+          : "text-gray-900"
+        : "text-gray-900";
+    const bpText =
+      Number.isFinite(sys) && Number.isFinite(dia)
+        ? sys > 140 || dia > 90
+          ? "Hypertensive Range"
+          : sys < 90 || dia < 60
+          ? "Hypotension"
+          : "Normal"
+        : "Normal";
 
-  // --- 心率（可能为 null） ---
-  const hr = vitals.heartRate ?? null;
-  const hrStatus = hr == null ? "unknown" : getVitalStatus(hr, { max: 100 });
-  const hrColor  = hrStatus === "unknown" ? "text-gray-400" : getVitalColor(hrStatus);
-  const hrText   = hr == null ? "No data" : hr > 100 ? "Tachycardic" : hr < 60 ? "Bradycardic" : "Normal";
+    // --- 心率（可能为 null） ---
+    const hr = vitals.heartRate ?? null;
+    const hrStatus = hr == null ? "unknown" : getVitalStatus(hr, { max: 100 });
+    const hrColor =
+      hrStatus === "unknown" ? "text-gray-400" : getVitalColor(hrStatus);
+    const hrText =
+      hr == null
+        ? "No data"
+        : hr > 100
+        ? "Tachycardic"
+        : hr < 60
+        ? "Bradycardic"
+        : "Normal";
 
-  // --- 呼吸频率（可能为 null） ---
-  const rr = vitals.respiratoryRate ?? null;
-  const rrStatus = rr == null ? "unknown" : getVitalStatus(rr, { max: 20 });
-  const rrColor  = rrStatus === "unknown" ? "text-gray-400" : getVitalColor(rrStatus);
-  const rrText   = rr == null ? "No data" : rr > 20 ? "Tachypneic" : rr < 12 ? "Bradypneic" : "Normal";
+    // --- 呼吸频率（可能为 null） ---
+    const rr = vitals.respiratoryRate ?? null;
+    const rrStatus = rr == null ? "unknown" : getVitalStatus(rr, { max: 20 });
+    const rrColor =
+      rrStatus === "unknown" ? "text-gray-400" : getVitalColor(rrStatus);
+    const rrText =
+      rr == null
+        ? "No data"
+        : rr > 20
+        ? "Tachypneic"
+        : rr < 12
+        ? "Bradypneic"
+        : "Normal";
 
-  // --- SpO₂（可能为 null） ---
-  const spo2 = vitals.oxygenSaturation ?? null;
-  const spo2Status = spo2 == null ? "unknown" : getVitalStatus(spo2, { min: 95 });
-  const spo2Color  = spo2Status === "unknown" ? "text-gray-400" : getVitalColor(spo2Status);
-  const spo2Text   = spo2 == null ? "No data" : spo2 < 95 ? "Hypoxic" : "Normal";
- return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-      <div className="p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold text-gray-900">Vital Signs Monitoring</h2>
-          <span className="text-xs bg-success-green/10 text-green-800 px-3 py-1 rounded-full">Live Monitoring</span>
-        </div>
+    // --- SpO₂（可能为 null） ---
+    const spo2 = vitals.oxygenSaturation ?? null;
+    const spo2Status =
+      spo2 == null ? "unknown" : getVitalStatus(spo2, { min: 95 });
+    const spo2Color =
+      spo2Status === "unknown" ? "text-gray-400" : getVitalColor(spo2Status);
+    const spo2Text =
+      spo2 == null ? "No data" : spo2 < 95 ? "Hypoxic" : "Normal";
+    return (
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-xl font-semibold text-gray-900">
+              Vital Signs Monitoring
+            </h2>
+            <span className="text-xs bg-success-green/10 text-green-800 px-3 py-1 rounded-full">
+              Live Monitoring
+            </span>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <VitalCard label="Blood Pressure" unit="mmHg" value={vitals.bloodPressure} colorClass={bpColor} statusText={bpText} />
-          <VitalCard label="Heart Rate" unit="bpm" value={hr ?? "—"} colorClass={hrColor} statusText={hrText} />
-          <VitalCard label="Respiratory Rate" unit="/min" value={rr ?? "—"} colorClass={rrColor} statusText={rrText} />
-          <VitalCard label="Temperature" unit="°F" value={vitals.temperature} statusText="Normal" />
-          <VitalCard label="Oxygen Saturation" unit="%" value={spo2 ?? "—"} colorClass={spo2Color} statusText={spo2Text} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <VitalCard
+              label="Blood Pressure"
+              unit="mmHg"
+              value={vitals.bloodPressure}
+              colorClass={bpColor}
+              statusText={bpText}
+            />
+            <VitalCard
+              label="Heart Rate"
+              unit="bpm"
+              value={hr ?? "—"}
+              colorClass={hrColor}
+              statusText={hrText}
+            />
+            <VitalCard
+              label="Respiratory Rate"
+              unit="/min"
+              value={rr ?? "—"}
+              colorClass={rrColor}
+              statusText={rrText}
+            />
+            <VitalCard
+              label="Temperature"
+              unit="°F"
+              value={vitals.temperature}
+              statusText="Normal"
+            />
+            <VitalCard
+              label="Oxygen Saturation"
+              unit="%"
+              value={spo2 ?? "—"}
+              colorClass={spo2Color}
+              statusText={spo2Text}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
 
-}
-
-function VitalCard({
-  label, unit, value, colorClass = "text-gray-900", statusText,
-}: { label: string; unit?: string; value: React.ReactNode; colorClass?: string; statusText?: string; }) {
-  return (
-    <div className="bg-gray-50 rounded-lg p-4">
-      <div className="flex items-center justify-between mb-2">
-        <span className="text-sm text-gray-600">{label}</span>
-        {unit ? <span className="text-xs text-gray-400">{unit}</span> : null}
+  function VitalCard({
+    label,
+    unit,
+    value,
+    colorClass = "text-gray-900",
+    statusText,
+  }: {
+    label: string;
+    unit?: string;
+    value: React.ReactNode;
+    colorClass?: string;
+    statusText?: string;
+  }) {
+    return (
+      <div className="bg-gray-50 rounded-lg p-4">
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-sm text-gray-600">{label}</span>
+          {unit ? <span className="text-xs text-gray-400">{unit}</span> : null}
+        </div>
+        <div className={`text-3xl font-bold ${colorClass}`}>{value}</div>
+        {statusText ? (
+          <div className="text-xs text-gray-500 mt-1">{statusText}</div>
+        ) : null}
       </div>
-      <div className={`text-3xl font-bold ${colorClass}`}>{value}</div>
-      {statusText ? <div className="text-xs text-gray-500 mt-1">{statusText}</div> : null}
-    </div>
-  );
-}
-
+    );
+  }
 
   return (
     <div className="flex-1 flex flex-col min-h-0">
@@ -157,18 +251,28 @@ function VitalCard({
               <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900">Chief Complaint</h2>
-                    <span className="text-sm text-gray-500">Today, 2:45 PM</span>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Chief Complaint
+                    </h2>
+                    <span className="text-sm text-gray-500">
+                      Today, 2:45 PM
+                    </span>
                   </div>
                   <div className="space-y-3">
                     <p className="text-gray-800">{patient.chiefComplaint}</p>
                     <div className="grid grid-cols-2 gap-4 mt-4">
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Onset</label>
-                        <p className="text-sm text-gray-600">2 hours ago, sudden</p>
+                        <label className="text-sm font-medium text-gray-700">
+                          Onset
+                        </label>
+                        <p className="text-sm text-gray-600">
+                          2 hours ago, sudden
+                        </p>
                       </div>
                       <div>
-                        <label className="text-sm font-medium text-gray-700">Pain Scale</label>
+                        <label className="text-sm font-medium text-gray-700">
+                          Pain Scale
+                        </label>
                         <p className="text-sm text-gray-600">8/10</p>
                       </div>
                     </div>
@@ -180,7 +284,9 @@ function VitalCard({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900">Current Vitals</h2>
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Current Vitals
+                    </h2>
                     <span className="text-xs bg-success-green/10 text-green-800 px-2 py-1 rounded-full">
                       Updated 5 min ago
                     </span>
@@ -189,32 +295,56 @@ function VitalCard({
                     {vitals && (
                       <>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Blood Pressure</span>
+                          <span className="text-sm text-gray-600">
+                            Blood Pressure
+                          </span>
                           <span className="text-sm font-semibold text-critical-red">
                             {vitals.bloodPressure}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Heart Rate</span>
-                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals.heartRate, { max: 100 }))}`}>
+                          <span className="text-sm text-gray-600">
+                            Heart Rate
+                          </span>
+                          <span
+                            className={`text-sm font-semibold ${getVitalColor(
+                              getVitalStatus(vitals.heartRate, { max: 100 })
+                            )}`}
+                          >
                             {vitals.heartRate} bpm
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Respiratory Rate</span>
-                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals.respiratoryRate, { max: 20 }))}`}>
+                          <span className="text-sm text-gray-600">
+                            Respiratory Rate
+                          </span>
+                          <span
+                            className={`text-sm font-semibold ${getVitalColor(
+                              getVitalStatus(vitals.respiratoryRate, {
+                                max: 20,
+                              })
+                            )}`}
+                          >
                             {vitals.respiratoryRate}/min
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-gray-600">Temperature</span>
+                          <span className="text-sm text-gray-600">
+                            Temperature
+                          </span>
                           <span className="text-sm font-semibold text-gray-900">
                             {vitals.temperature}
                           </span>
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-gray-600">SpO2</span>
-                          <span className={`text-sm font-semibold ${getVitalColor(getVitalStatus(vitals.oxygenSaturation, { min: 95 }))}`}>
+                          <span
+                            className={`text-sm font-semibold ${getVitalColor(
+                              getVitalStatus(vitals.oxygenSaturation, {
+                                min: 95,
+                              })
+                            )}`}
+                          >
                             {vitals.oxygenSaturation}%
                           </span>
                         </div>
@@ -231,22 +361,37 @@ function VitalCard({
               {/* Medical History */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-lg font-semibold text-gray-900 mb-4">Medical History</h2>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                    Medical History
+                  </h2>
                   <div className="space-y-3">
                     {medicalHistory?.map((history) => (
-                      <div key={history.id} className="flex items-center justify-between">
-                        <span className="text-sm text-gray-800">{history.condition}</span>
-                        <span className="text-xs text-gray-500">{history.diagnosedYear}</span>
+                      <div
+                        key={history.id}
+                        className="flex items-center justify-between"
+                      >
+                        <span className="text-sm text-gray-800">
+                          {history.condition}
+                        </span>
+                        <span className="text-xs text-gray-500">
+                          {history.diagnosedYear}
+                        </span>
                       </div>
                     ))}
                   </div>
-                  
+
                   <div className="mt-6">
-                    <h3 className="text-sm font-medium text-gray-700 mb-2">Current Medications</h3>
+                    <h3 className="text-sm font-medium text-gray-700 mb-2">
+                      Current Medications
+                    </h3>
                     <div className="space-y-2">
                       {medications?.map((medication) => (
-                        <div key={medication.id} className="text-sm text-gray-600">
-                          • {medication.name} {medication.dosage} {medication.frequency}
+                        <div
+                          key={medication.id}
+                          className="text-sm text-gray-600"
+                        >
+                          • {medication.name} {medication.dosage}{" "}
+                          {medication.frequency}
                         </div>
                       ))}
                     </div>
@@ -258,8 +403,10 @@ function VitalCard({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-semibold text-gray-900">Recent Lab Results</h2>
-                    {labResults?.some(lab => lab.status === 'pending') && (
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Recent Lab Results
+                    </h2>
+                    {labResults?.some((lab) => lab.status === "pending") && (
                       <span className="text-xs bg-alert-yellow/20 text-orange-800 px-2 py-1 rounded-full flex items-center">
                         <Clock className="h-3 w-3 mr-1" />
                         Pending: Troponin
@@ -269,9 +416,11 @@ function VitalCard({
                   <div className="space-y-3">
                     {labResults?.map((lab) => (
                       <div key={lab.id}>
-                        {lab.status === 'completed' ? (
+                        {lab.status === "completed" ? (
                           <div className="flex items-center justify-between">
-                            <span className="text-sm text-gray-600">{lab.testName}</span>
+                            <span className="text-sm text-gray-600">
+                              {lab.testName}
+                            </span>
                             <span className="text-sm font-semibold text-gray-900">
                               {lab.value} {lab.unit}
                             </span>
@@ -284,7 +433,9 @@ function VitalCard({
                                 {lab.testName} results pending
                               </span>
                             </div>
-                            <p className="text-xs text-orange-700 mt-1">Expected in 15 minutes</p>
+                            <p className="text-xs text-orange-700 mt-1">
+                              Expected in 15 minutes
+                            </p>
                           </div>
                         )}
                       </div>
@@ -295,15 +446,40 @@ function VitalCard({
             </div>
           )}
 
-          {/* Vitals & Monitoring Tab */}
-          
-          {activeTab === "vitals" && (
-  <>
-    <VitalsPaperChart />
-    {/* <VitalsGrid vitals={vitals} />  // 需要时再打开 */}
-  </>
-)}
+          {activeTab === "diagnostics" && (
+            <div className="space-y-6">
+              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Diagnostic Documents
+                </h3>
+                <div className="space-y-4">
+                  {/* ECG */}
+                  <div className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <Heart className="h-5 w-5 text-red-500" />
+                      <div>
+                        <div className="font-medium">12-Lead ECG</div>
+                        <div className="text-sm text-gray-500">
+                          Available for review
+                        </div>
+                      </div>
+                    </div>
+                    <Badge variant="default">View</Badge>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
 
+          {/* Current Observations Tab */}
+          {activeTab === "current-observations" && (
+            <CurrentObservations patient={patient} />
+          )}
+
+          {/* Observation Chart Tab */}
+          {activeTab === "observation-chart" && (
+            <ObservationChart patient={patient} />
+          )}
 
           {/* Laboratory Results Tab */}
           {activeTab === "labs" && (
@@ -311,8 +487,10 @@ function VitalCard({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Laboratory Results</h2>
-                    {labResults?.some(lab => lab.status === 'pending') && (
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Laboratory Results
+                    </h2>
+                    {labResults?.some((lab) => lab.status === "pending") && (
                       <span className="text-sm bg-alert-yellow/20 text-orange-800 px-3 py-1 rounded-full flex items-center">
                         <Clock className="h-4 w-4 mr-1" />
                         Pending Results
@@ -323,30 +501,41 @@ function VitalCard({
                     {labResults?.map((lab) => (
                       <div key={lab.id} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-gray-900">{lab.testName}</h3>
-                          <span className={`px-2 py-1 text-xs rounded-full ${
-                            lab.status === 'completed' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-yellow-100 text-yellow-800'
-                          }`}>
+                          <h3 className="font-medium text-gray-900">
+                            {lab.testName}
+                          </h3>
+                          <span
+                            className={`px-2 py-1 text-xs rounded-full ${
+                              lab.status === "completed"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-yellow-100 text-yellow-800"
+                            }`}
+                          >
                             {lab.status}
                           </span>
                         </div>
-                        {lab.status === 'completed' ? (
+                        {lab.status === "completed" ? (
                           <div className="space-y-2">
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-600">Result:</span>
+                              <span className="text-sm text-gray-600">
+                                Result:
+                              </span>
                               <span className="text-sm font-semibold text-gray-900">
                                 {lab.value} {lab.unit}
                               </span>
                             </div>
                             <div className="flex items-center justify-between">
-                              <span className="text-sm text-gray-600">Reference Range:</span>
-                              <span className="text-sm text-gray-600">{lab.referenceRange}</span>
+                              <span className="text-sm text-gray-600">
+                                Reference Range:
+                              </span>
+                              <span className="text-sm text-gray-600">
+                                {lab.referenceRange}
+                              </span>
                             </div>
                             {lab.completedAt && (
                               <div className="text-xs text-gray-500">
-                                Completed: {new Date(lab.completedAt).toLocaleString()}
+                                Completed:{" "}
+                                {new Date(lab.completedAt).toLocaleString()}
                               </div>
                             )}
                           </div>
@@ -370,31 +559,51 @@ function VitalCard({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Current Medications</h2>
-                    <span className="text-sm text-gray-500">{medications?.length || 0} active medications</span>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Current Medications
+                    </h2>
+                    <span className="text-sm text-gray-500">
+                      {medications?.length || 0} active medications
+                    </span>
                   </div>
                   <div className="space-y-4">
                     {medications?.map((medication) => (
-                      <div key={medication.id} className="border rounded-lg p-4">
+                      <div
+                        key={medication.id}
+                        className="border rounded-lg p-4"
+                      >
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-gray-900">{medication.name}</h3>
+                          <h3 className="font-medium text-gray-900">
+                            {medication.name}
+                          </h3>
                           <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                             Active
                           </span>
                         </div>
                         <div className="grid grid-cols-2 gap-4">
                           <div>
-                            <span className="text-sm text-gray-600">Dosage:</span>
-                            <span className="text-sm font-medium text-gray-900 ml-2">{medication.dosage}</span>
+                            <span className="text-sm text-gray-600">
+                              Dosage:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900 ml-2">
+                              {medication.dosage}
+                            </span>
                           </div>
                           <div>
-                            <span className="text-sm text-gray-600">Frequency:</span>
-                            <span className="text-sm font-medium text-gray-900 ml-2">{medication.frequency}</span>
+                            <span className="text-sm text-gray-600">
+                              Frequency:
+                            </span>
+                            <span className="text-sm font-medium text-gray-900 ml-2">
+                              {medication.frequency}
+                            </span>
                           </div>
                         </div>
                         {medication.prescribedAt && (
                           <div className="text-xs text-gray-500 mt-2">
-                            Prescribed: {new Date(medication.prescribedAt).toLocaleDateString()}
+                            Prescribed:{" "}
+                            {new Date(
+                              medication.prescribedAt
+                            ).toLocaleDateString()}
                           </div>
                         )}
                       </div>
@@ -406,16 +615,24 @@ function VitalCard({
               {/* Medical History */}
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Medical History</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                    Medical History
+                  </h2>
                   <div className="space-y-4">
                     {medicalHistory?.map((history) => (
                       <div key={history.id} className="border rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
-                          <h3 className="font-medium text-gray-900">{history.condition}</h3>
-                          <span className="text-sm text-gray-500">{history.diagnosedYear}</span>
+                          <h3 className="font-medium text-gray-900">
+                            {history.condition}
+                          </h3>
+                          <span className="text-sm text-gray-500">
+                            {history.diagnosedYear}
+                          </span>
                         </div>
                         {history.notes && (
-                          <p className="text-sm text-gray-600">{history.notes}</p>
+                          <p className="text-sm text-gray-600">
+                            {history.notes}
+                          </p>
                         )}
                       </div>
                     ))}
@@ -430,10 +647,16 @@ function VitalCard({
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Current Orders</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                    Current Orders
+                  </h2>
                   <div className="text-center py-8">
-                    <p className="text-gray-500">No active orders at this time</p>
-                    <p className="text-sm text-gray-400 mt-2">Orders will appear here when placed by clinical staff</p>
+                    <p className="text-gray-500">
+                      No active orders at this time
+                    </p>
+                    <p className="text-sm text-gray-400 mt-2">
+                      Orders will appear here when placed by clinical staff
+                    </p>
                   </div>
                 </div>
               </div>
@@ -446,52 +669,75 @@ function VitalCard({
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
                   <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-xl font-semibold text-gray-900">Clinical Notes</h2>
-                    <span className="text-sm text-gray-500">{soapNotes?.length || 0} SOAP notes</span>
+                    <h2 className="text-xl font-semibold text-gray-900">
+                      Clinical Notes
+                    </h2>
+                    <span className="text-sm text-gray-500">
+                      {soapNotes?.length || 0} SOAP notes
+                    </span>
                   </div>
-                  
+
                   {soapNotes && soapNotes.length > 0 ? (
                     <div className="space-y-4">
                       {soapNotes.map((note) => (
-                        <div key={note.id} className="border rounded-lg p-6 bg-gray-50">
+                        <div
+                          key={note.id}
+                          className="border rounded-lg p-6 bg-gray-50"
+                        >
                           <div className="flex items-center justify-between mb-4">
                             <div className="flex items-center space-x-2">
                               <User className="h-4 w-4 text-gray-500" />
-                              <span className="text-sm font-medium text-gray-700">Clinical Assessment</span>
+                              <span className="text-sm font-medium text-gray-700">
+                                Clinical Assessment
+                              </span>
                             </div>
                             <div className="flex items-center space-x-2 text-sm text-gray-500">
                               <Calendar className="h-4 w-4" />
-                              <span>{new Date(note.createdAt).toLocaleString()}</span>
+                              <span>
+                                {note.createdAt
+                                  ? new Date(note.createdAt).toLocaleString()
+                                  : "No date"}
+                              </span>
                             </div>
                           </div>
-                          
+
                           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <div className="space-y-4">
                               <div>
-                                <h4 className="text-sm font-semibold text-gray-900 mb-2">Subjective</h4>
+                                <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                                  Subjective
+                                </h4>
                                 <div className="bg-white p-3 rounded border text-sm text-gray-700">
-                                  {note.subjective || "No subjective data recorded"}
+                                  {note.subjective ||
+                                    "No subjective data recorded"}
                                 </div>
                               </div>
-                              
+
                               <div>
-                                <h4 className="text-sm font-semibold text-gray-900 mb-2">Objective</h4>
+                                <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                                  Objective
+                                </h4>
                                 <div className="bg-white p-3 rounded border text-sm text-gray-700">
-                                  {note.objective || "No objective data recorded"}
+                                  {note.objective ||
+                                    "No objective data recorded"}
                                 </div>
                               </div>
                             </div>
-                            
+
                             <div className="space-y-4">
                               <div>
-                                <h4 className="text-sm font-semibold text-gray-900 mb-2">Assessment</h4>
+                                <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                                  Assessment
+                                </h4>
                                 <div className="bg-white p-3 rounded border text-sm text-gray-700">
                                   {note.assessment || "No assessment recorded"}
                                 </div>
                               </div>
-                              
+
                               <div>
-                                <h4 className="text-sm font-semibold text-gray-900 mb-2">Plan</h4>
+                                <h4 className="text-sm font-semibold text-gray-900 mb-2">
+                                  Plan
+                                </h4>
                                 <div className="bg-white p-3 rounded border text-sm text-gray-700">
                                   {note.plan || "No plan recorded"}
                                 </div>
@@ -503,8 +749,12 @@ function VitalCard({
                     </div>
                   ) : (
                     <div className="text-center py-8">
-                      <p className="text-gray-500">No clinical notes recorded</p>
-                      <p className="text-sm text-gray-400 mt-2">SOAP notes will appear here when submitted</p>
+                      <p className="text-gray-500">
+                        No clinical notes recorded
+                      </p>
+                      <p className="text-sm text-gray-400 mt-2">
+                        SOAP notes will appear here when submitted
+                      </p>
                     </div>
                   )}
                 </div>
@@ -517,44 +767,56 @@ function VitalCard({
             <div className="space-y-6">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-xl font-semibold text-gray-900 mb-6">Imaging Studies</h2>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-6">
+                    Imaging Studies
+                  </h2>
                   <div className="space-y-4">
                     <div className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-gray-900">Chest X-Ray</h3>
+                        <h3 className="font-medium text-gray-900">
+                          Chest X-Ray
+                        </h3>
                         <span className="px-2 py-1 text-xs bg-green-100 text-green-800 rounded-full">
                           Available
                         </span>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm text-gray-600">
-                          <strong>Study Date:</strong> {new Date().toLocaleDateString()}
+                          <strong>Study Date:</strong>{" "}
+                          {new Date().toLocaleDateString()}
                         </div>
                         <div className="text-sm text-gray-600">
-                          <strong>Indication:</strong> Chest pain, rule out pneumonia
+                          <strong>Indication:</strong> Chest pain, rule out
+                          pneumonia
                         </div>
                         <div className="text-sm text-gray-600">
-                          <strong>Preliminary Findings:</strong> No acute cardiopulmonary abnormalities. Heart size normal. Lungs clear bilaterally.
+                          <strong>Preliminary Findings:</strong> No acute
+                          cardiopulmonary abnormalities. Heart size normal.
+                          Lungs clear bilaterally.
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="border rounded-lg p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-gray-900">ECG (12-Lead)</h3>
+                        <h3 className="font-medium text-gray-900">
+                          ECG (12-Lead)
+                        </h3>
                         <span className="px-2 py-1 text-xs bg-yellow-100 text-yellow-800 rounded-full">
                           Pending Review
                         </span>
                       </div>
                       <div className="space-y-2">
                         <div className="text-sm text-gray-600">
-                          <strong>Study Date:</strong> {new Date().toLocaleDateString()}
+                          <strong>Study Date:</strong>{" "}
+                          {new Date().toLocaleDateString()}
                         </div>
                         <div className="text-sm text-gray-600">
                           <strong>Indication:</strong> Chest pain, rule out MI
                         </div>
                         <div className="text-sm text-orange-600">
-                          <strong>Status:</strong> Awaiting cardiologist interpretation
+                          <strong>Status:</strong> Awaiting cardiologist
+                          interpretation
                         </div>
                       </div>
                     </div>
@@ -562,6 +824,11 @@ function VitalCard({
                 </div>
               </div>
             </div>
+          )}
+
+          {/* Discharge Summary Tab */}
+          {activeTab === "discharge-summary" && (
+            <DischargeSummary patient={patient} />
           )}
         </div>
       </div>
