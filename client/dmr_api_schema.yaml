@@ -1,0 +1,4404 @@
+openapi: 3.0.3
+info:
+  title: DMR API
+  version: 0.0.1
+  description: DMR API documentation
+paths:
+  /api/auth/login/:
+    post:
+      operationId: auth_login_create
+      description: Authenticate user and return access token
+      summary: User login
+      tags:
+      - auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            examples:
+              LoginRequest:
+                value:
+                  username: student1
+                  password: password123
+                summary: Login Request
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthToken'
+              examples:
+                LoginRequest:
+                  value:
+                    username: student1
+                    password: password123
+                  summary: Login Request
+          description: ''
+  /api/auth/logout/:
+    post:
+      operationId: auth_logout_create
+      description: Logout user by invalidating the current token
+      summary: User logout
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                description: Successfully logged out
+          description: ''
+  /api/auth/profile/:
+    get:
+      operationId: auth_profile_retrieve
+      description: Retrieve current authenticated user's profile information
+      summary: Get user profile
+      tags:
+      - auth
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+          description: ''
+  /api/instructors/blood-test-requests/:
+    get:
+      operationId: instructors_blood_test_requests_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBloodTestRequestList'
+          description: ''
+    post:
+      operationId: instructors_blood_test_requests_create
+      tags:
+      - instructors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequest'
+          description: ''
+  /api/instructors/blood-test-requests/{id}/:
+    get:
+      operationId: instructors_blood_test_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Test Request.
+        required: true
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequest'
+          description: ''
+    put:
+      operationId: instructors_blood_test_requests_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Test Request.
+        required: true
+      tags:
+      - instructors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestStatusUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestStatusUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestStatusUpdateRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequestStatusUpdate'
+          description: ''
+    patch:
+      operationId: instructors_blood_test_requests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Test Request.
+        required: true
+      tags:
+      - instructors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodTestRequestStatusUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodTestRequestStatusUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodTestRequestStatusUpdateRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequestStatusUpdate'
+          description: ''
+    delete:
+      operationId: instructors_blood_test_requests_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Test Request.
+        required: true
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/instructors/blood-test-requests/pending/:
+    get:
+      operationId: instructors_blood_test_requests_pending_retrieve
+      description: Get all blood test requests with pending status
+      summary: List pending blood test requests
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequest'
+          description: ''
+  /api/instructors/blood-test-requests/stats/:
+    get:
+      operationId: instructors_blood_test_requests_stats_retrieve
+      description: Get counts of blood test requests by status
+      summary: Get blood test request statistics
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequest'
+          description: ''
+  /api/instructors/dashboard/:
+    get:
+      operationId: instructors_dashboard_retrieve
+      description: Get overview statistics for instructor dashboard
+      summary: Get dashboard overview
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          description: No response body
+  /api/instructors/imaging-requests/:
+    get:
+      operationId: instructors_imaging_requests_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedImagingRequestList'
+          description: ''
+    post:
+      operationId: instructors_imaging_requests_create
+      tags:
+      - instructors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequest'
+          description: ''
+  /api/instructors/imaging-requests/{id}/:
+    get:
+      operationId: instructors_imaging_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Imaging Request.
+        required: true
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequest'
+          description: ''
+    put:
+      operationId: instructors_imaging_requests_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Imaging Request.
+        required: true
+      tags:
+      - instructors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestStatusUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestStatusUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestStatusUpdateRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequestStatusUpdate'
+          description: ''
+    patch:
+      operationId: instructors_imaging_requests_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Imaging Request.
+        required: true
+      tags:
+      - instructors
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedImagingRequestStatusUpdateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedImagingRequestStatusUpdateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedImagingRequestStatusUpdateRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequestStatusUpdate'
+          description: ''
+    delete:
+      operationId: instructors_imaging_requests_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Imaging Request.
+        required: true
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/instructors/imaging-requests/pending/:
+    get:
+      operationId: instructors_imaging_requests_pending_retrieve
+      description: Get all imaging requests with pending status
+      summary: List pending imaging requests
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequest'
+          description: ''
+  /api/instructors/imaging-requests/stats/:
+    get:
+      operationId: instructors_imaging_requests_stats_retrieve
+      description: Get counts of imaging requests by status
+      summary: Get imaging request statistics
+      tags:
+      - instructors
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequest'
+          description: ''
+  /api/patients/patients/:
+    get:
+      operationId: patients_patients_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPatientList'
+          description: ''
+    post:
+      operationId: patients_patients_create
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+  /api/patients/patients/{patient_pk}/files/:
+    get:
+      operationId: patients_patients_files_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedFileList'
+          description: ''
+    post:
+      operationId: patients_patients_files_create
+      parameters:
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+  /api/patients/patients/{patient_pk}/files/{id}/:
+    get:
+      operationId: patients_patients_files_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          title: File ID
+        description: A UUID string identifying this File.
+        required: true
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+    put:
+      operationId: patients_patients_files_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          title: File ID
+        description: A UUID string identifying this File.
+        required: true
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+    patch:
+      operationId: patients_patients_files_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          title: File ID
+        description: A UUID string identifying this File.
+        required: true
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedFileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedFileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedFileRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+    delete:
+      operationId: patients_patients_files_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          title: File ID
+        description: A UUID string identifying this File.
+        required: true
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/patients/patients/{patient_pk}/files/{id}/view/:
+    get:
+      operationId: patients_patients_files_view_retrieve
+      description: Allows users with permission to view a file's content. For paginated
+        PDFs, a 'page' or 'range' query parameter can be used.
+      summary: View a specific file
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: string
+          format: uuid
+          title: File ID
+        description: A UUID string identifying this File.
+        required: true
+      - in: path
+        name: patient_pk
+        schema:
+          type: integer
+        required: true
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+  /api/patients/patients/{id}/:
+    get:
+      operationId: patients_patients_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Patient.
+        required: true
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    put:
+      operationId: patients_patients_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Patient.
+        required: true
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatientRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    patch:
+      operationId: patients_patients_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Patient.
+        required: true
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPatientRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+          description: ''
+    delete:
+      operationId: patients_patients_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Patient.
+        required: true
+      tags:
+      - patients
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/patients/patients/{id}/upload_file/:
+    post:
+      operationId: patients_patients_upload_file_create
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Patient.
+        required: true
+      tags:
+      - patients
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/FileRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/File'
+          description: ''
+  /api/student-groups/blood-test-requests/:
+    get:
+      operationId: student_groups_blood_test_requests_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBloodTestRequestList'
+          description: ''
+    post:
+      operationId: student_groups_blood_test_requests_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodTestRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequest'
+          description: ''
+  /api/student-groups/blood-test-requests/{id}/:
+    get:
+      operationId: student_groups_blood_test_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Test Request.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodTestRequest'
+          description: ''
+  /api/student-groups/discharge-summaries/:
+    get:
+      operationId: student_groups_discharge_summaries_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedDischargeSummaryList'
+          description: ''
+    post:
+      operationId: student_groups_discharge_summaries_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DischargeSummaryRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/DischargeSummaryRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/DischargeSummaryRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DischargeSummary'
+          description: ''
+  /api/student-groups/discharge-summaries/{id}/:
+    get:
+      operationId: student_groups_discharge_summaries_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Discharge Summary.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DischargeSummary'
+          description: ''
+  /api/student-groups/imaging-requests/:
+    get:
+      operationId: student_groups_imaging_requests_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedImagingRequestList'
+          description: ''
+    post:
+      operationId: student_groups_imaging_requests_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ImagingRequestRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequest'
+          description: ''
+  /api/student-groups/imaging-requests/{id}/:
+    get:
+      operationId: student_groups_imaging_requests_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Imaging Request.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImagingRequest'
+          description: ''
+  /api/student-groups/medication-orders/:
+    get:
+      operationId: student_groups_medication_orders_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedMedicationOrderList'
+          description: ''
+    post:
+      operationId: student_groups_medication_orders_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MedicationOrderRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/MedicationOrderRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/MedicationOrderRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicationOrder'
+          description: ''
+  /api/student-groups/medication-orders/{id}/:
+    get:
+      operationId: student_groups_medication_orders_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Medication Order.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicationOrder'
+          description: ''
+  /api/student-groups/notes/:
+    get:
+      operationId: student_groups_notes_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedNoteList'
+          description: ''
+    post:
+      operationId: student_groups_notes_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+          description: ''
+  /api/student-groups/notes/{id}/:
+    get:
+      operationId: student_groups_notes_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Note.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+          description: ''
+    put:
+      operationId: student_groups_notes_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Note.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/NoteRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+          description: ''
+    patch:
+      operationId: student_groups_notes_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Note.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedNoteRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedNoteRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedNoteRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Note'
+          description: ''
+    delete:
+      operationId: student_groups_notes_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Note.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/:
+    get:
+      operationId: student_groups_observations_list
+      description: Retrieve observations for a specific user and patient
+      summary: List observations
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      - in: query
+        name: patient
+        schema:
+          type: integer
+        description: Patient ID
+        required: true
+      - in: query
+        name: user
+        schema:
+          type: integer
+        description: User ID
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedObservationDataList'
+          description: ''
+    post:
+      operationId: student_groups_observations_create
+      description: Create one or more observation records (blood pressure, heart rate,
+        body temperature, respiratory rate, blood sugar, oxygen saturation)
+      summary: Create observations
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ObservationsRequest'
+            examples:
+              BloodPressureOnly:
+                value:
+                  blood_pressure:
+                    patient: 1
+                    user: 1
+                    systolic: 120
+                    diastolic: 80
+                summary: Blood Pressure Only
+              MultipleObservations:
+                value:
+                  blood_pressure:
+                    patient: 1
+                    user: 1
+                    systolic: 120
+                    diastolic: 80
+                  heart_rate:
+                    patient: 1
+                    user: 1
+                    heart_rate: 72
+                  respiratory_rate:
+                    patient: 1
+                    user: 1
+                    respiratory_rate: 16
+                  blood_sugar:
+                    patient: 1
+                    user: 1
+                    sugar_level: 120.0
+                  oxygen_saturation:
+                    patient: 1
+                    user: 1
+                    saturation_percentage: 98
+                summary: Multiple Observations
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/ObservationsRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/ObservationsRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ObservationData'
+              examples:
+                BloodPressureOnly:
+                  value:
+                    blood_pressure:
+                      patient: 1
+                      user: 1
+                      systolic: 120
+                      diastolic: 80
+                  summary: Blood Pressure Only
+                MultipleObservations:
+                  value:
+                    blood_pressure:
+                      patient: 1
+                      user: 1
+                      systolic: 120
+                      diastolic: 80
+                    heart_rate:
+                      patient: 1
+                      user: 1
+                      heart_rate: 72
+                    respiratory_rate:
+                      patient: 1
+                      user: 1
+                      respiratory_rate: 16
+                    blood_sugar:
+                      patient: 1
+                      user: 1
+                      sugar_level: 120.0
+                    oxygen_saturation:
+                      patient: 1
+                      user: 1
+                      saturation_percentage: 98
+                  summary: Multiple Observations
+          description: ''
+  /api/student-groups/observations/blood-pressures/:
+    get:
+      operationId: student_groups_observations_blood_pressures_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBloodPressureList'
+          description: ''
+    post:
+      operationId: student_groups_observations_blood_pressures_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodPressureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodPressureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodPressureRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodPressure'
+          description: ''
+  /api/student-groups/observations/blood-pressures/{id}/:
+    get:
+      operationId: student_groups_observations_blood_pressures_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Pressure.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodPressure'
+          description: ''
+    put:
+      operationId: student_groups_observations_blood_pressures_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Pressure.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodPressureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodPressureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodPressureRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodPressure'
+          description: ''
+    patch:
+      operationId: student_groups_observations_blood_pressures_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Pressure.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodPressureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodPressureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodPressureRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodPressure'
+          description: ''
+    delete:
+      operationId: student_groups_observations_blood_pressures_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Pressure.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/blood-sugars/:
+    get:
+      operationId: student_groups_observations_blood_sugars_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBloodSugarList'
+          description: ''
+    post:
+      operationId: student_groups_observations_blood_sugars_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodSugarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodSugarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodSugarRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodSugar'
+          description: ''
+  /api/student-groups/observations/blood-sugars/{id}/:
+    get:
+      operationId: student_groups_observations_blood_sugars_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Sugar.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodSugar'
+          description: ''
+    put:
+      operationId: student_groups_observations_blood_sugars_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Sugar.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BloodSugarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BloodSugarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BloodSugarRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodSugar'
+          description: ''
+    patch:
+      operationId: student_groups_observations_blood_sugars_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Sugar.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodSugarRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodSugarRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBloodSugarRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BloodSugar'
+          description: ''
+    delete:
+      operationId: student_groups_observations_blood_sugars_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Blood Sugar.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/body-temperatures/:
+    get:
+      operationId: student_groups_observations_body_temperatures_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedBodyTemperatureList'
+          description: ''
+    post:
+      operationId: student_groups_observations_body_temperatures_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BodyTemperatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BodyTemperatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BodyTemperatureRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BodyTemperature'
+          description: ''
+  /api/student-groups/observations/body-temperatures/{id}/:
+    get:
+      operationId: student_groups_observations_body_temperatures_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Body Temperature.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BodyTemperature'
+          description: ''
+    put:
+      operationId: student_groups_observations_body_temperatures_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Body Temperature.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BodyTemperatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/BodyTemperatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/BodyTemperatureRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BodyTemperature'
+          description: ''
+    patch:
+      operationId: student_groups_observations_body_temperatures_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Body Temperature.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedBodyTemperatureRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedBodyTemperatureRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedBodyTemperatureRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BodyTemperature'
+          description: ''
+    delete:
+      operationId: student_groups_observations_body_temperatures_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Body Temperature.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/heart-rates/:
+    get:
+      operationId: student_groups_observations_heart_rates_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedHeartRateList'
+          description: ''
+    post:
+      operationId: student_groups_observations_heart_rates_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartRateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HeartRateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HeartRateRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRate'
+          description: ''
+  /api/student-groups/observations/heart-rates/{id}/:
+    get:
+      operationId: student_groups_observations_heart_rates_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Heart Rate.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRate'
+          description: ''
+    put:
+      operationId: student_groups_observations_heart_rates_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Heart Rate.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HeartRateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/HeartRateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/HeartRateRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRate'
+          description: ''
+    patch:
+      operationId: student_groups_observations_heart_rates_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Heart Rate.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedHeartRateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedHeartRateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedHeartRateRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HeartRate'
+          description: ''
+    delete:
+      operationId: student_groups_observations_heart_rates_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Heart Rate.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/oxygen-saturations/:
+    get:
+      operationId: student_groups_observations_oxygen_saturations_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedOxygenSaturationList'
+          description: ''
+    post:
+      operationId: student_groups_observations_oxygen_saturations_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OxygenSaturationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OxygenSaturationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OxygenSaturationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OxygenSaturation'
+          description: ''
+  /api/student-groups/observations/oxygen-saturations/{id}/:
+    get:
+      operationId: student_groups_observations_oxygen_saturations_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Oxygen Saturation.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OxygenSaturation'
+          description: ''
+    put:
+      operationId: student_groups_observations_oxygen_saturations_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Oxygen Saturation.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OxygenSaturationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/OxygenSaturationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/OxygenSaturationRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OxygenSaturation'
+          description: ''
+    patch:
+      operationId: student_groups_observations_oxygen_saturations_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Oxygen Saturation.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedOxygenSaturationRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedOxygenSaturationRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedOxygenSaturationRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OxygenSaturation'
+          description: ''
+    delete:
+      operationId: student_groups_observations_oxygen_saturations_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Oxygen Saturation.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/pain-scores/:
+    get:
+      operationId: student_groups_observations_pain_scores_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedPainScoreList'
+          description: ''
+    post:
+      operationId: student_groups_observations_pain_scores_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PainScoreRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PainScoreRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PainScoreRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PainScore'
+          description: ''
+  /api/student-groups/observations/pain-scores/{id}/:
+    get:
+      operationId: student_groups_observations_pain_scores_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Pain Score.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PainScore'
+          description: ''
+    put:
+      operationId: student_groups_observations_pain_scores_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Pain Score.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PainScoreRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PainScoreRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PainScoreRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PainScore'
+          description: ''
+    patch:
+      operationId: student_groups_observations_pain_scores_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Pain Score.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedPainScoreRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedPainScoreRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedPainScoreRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PainScore'
+          description: ''
+    delete:
+      operationId: student_groups_observations_pain_scores_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Pain Score.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+  /api/student-groups/observations/respiratory-rates/:
+    get:
+      operationId: student_groups_observations_respiratory_rates_list
+      parameters:
+      - name: page
+        required: false
+        in: query
+        description: A page number within the paginated result set.
+        schema:
+          type: integer
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaginatedRespiratoryRateList'
+          description: ''
+    post:
+      operationId: student_groups_observations_respiratory_rates_create
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RespiratoryRateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RespiratoryRateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RespiratoryRateRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespiratoryRate'
+          description: ''
+  /api/student-groups/observations/respiratory-rates/{id}/:
+    get:
+      operationId: student_groups_observations_respiratory_rates_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Respiratory Rate.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespiratoryRate'
+          description: ''
+    put:
+      operationId: student_groups_observations_respiratory_rates_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Respiratory Rate.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RespiratoryRateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/RespiratoryRateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/RespiratoryRateRequest'
+        required: true
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespiratoryRate'
+          description: ''
+    patch:
+      operationId: student_groups_observations_respiratory_rates_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Respiratory Rate.
+        required: true
+      tags:
+      - student-groups
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRespiratoryRateRequest'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRespiratoryRateRequest'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRespiratoryRateRequest'
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespiratoryRate'
+          description: ''
+    delete:
+      operationId: student_groups_observations_respiratory_rates_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this Respiratory Rate.
+        required: true
+      tags:
+      - student-groups
+      security:
+      - tokenAuth: []
+      - cookieAuth: []
+      responses:
+        '204':
+          description: No response body
+components:
+  schemas:
+    ApprovedFile:
+      type: object
+      description: |-
+        Unified serializer for ApprovedFile with context-aware field selection.
+        Use context={'for_student': True} to get student-friendly view.
+        Use context={'for_instructor': True} to get instructor management view.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        file_id:
+          type: string
+          format: uuid
+        display_name:
+          type: string
+          readOnly: true
+        page_range:
+          type: string
+          nullable: true
+          description: e.g., '1-5', '7', '10-12'. Only for paginated files.
+          maxLength: 100
+        requires_pagination:
+          type: boolean
+          readOnly: true
+      required:
+      - display_name
+      - file_id
+      - id
+      - requires_pagination
+    ApprovedFileRequest:
+      type: object
+      description: |-
+        Unified serializer for ApprovedFile with context-aware field selection.
+        Use context={'for_student': True} to get student-friendly view.
+        Use context={'for_instructor': True} to get instructor management view.
+      properties:
+        file_id:
+          type: string
+          format: uuid
+        page_range:
+          type: string
+          nullable: true
+          description: e.g., '1-5', '7', '10-12'. Only for paginated files.
+          maxLength: 100
+      required:
+      - file_id
+    AuthToken:
+      type: object
+      properties:
+        token:
+          type: string
+        user:
+          allOf:
+          - $ref: '#/components/schemas/User'
+          readOnly: true
+      required:
+      - token
+      - user
+    BloodPressure:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        systolic:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Systolic Pressure
+        diastolic:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Diastolic Pressure
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - diastolic
+      - id
+      - patient
+      - systolic
+      - user
+    BloodPressureOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        systolic:
+          type: integer
+          description: Systolic blood pressure (mmHg)
+        diastolic:
+          type: integer
+          description: Diastolic blood pressure (mmHg)
+      required:
+      - created_at
+      - diastolic
+      - id
+      - patient
+      - systolic
+      - user
+    BloodPressureRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        systolic:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Systolic Pressure
+        diastolic:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Diastolic Pressure
+      required:
+      - diastolic
+      - patient
+      - systolic
+      - user
+    BloodSugar:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        sugar_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          title: Blood Sugar Level (mg/dL)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - patient
+      - sugar_level
+      - user
+    BloodSugarOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        sugar_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          description: Blood sugar level (mg/dL)
+      required:
+      - created_at
+      - id
+      - patient
+      - sugar_level
+      - user
+    BloodSugarRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        sugar_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          title: Blood Sugar Level (mg/dL)
+      required:
+      - patient
+      - sugar_level
+      - user
+    BloodTestRequest:
+      type: object
+      description: Serializer for instructors to create/manage blood test requests.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        test_type:
+          $ref: '#/components/schemas/TestType881Enum'
+        reason:
+          type: string
+          title: Reason for Request
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        name:
+          type: string
+          maxLength: 100
+        role:
+          type: string
+          maxLength: 50
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFile'
+      required:
+      - created_at
+      - id
+      - name
+      - patient
+      - reason
+      - role
+      - test_type
+      - updated_at
+      - user
+    BloodTestRequestRequest:
+      type: object
+      description: Serializer for instructors to create/manage blood test requests.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        test_type:
+          $ref: '#/components/schemas/TestType881Enum'
+        reason:
+          type: string
+          minLength: 1
+          title: Reason for Request
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        role:
+          type: string
+          minLength: 1
+          maxLength: 50
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFileRequest'
+      required:
+      - name
+      - patient
+      - reason
+      - role
+      - test_type
+      - user
+    BloodTestRequestStatusUpdate:
+      type: object
+      description: Serializer for instructor to update only the status field of BloodTestRequest.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFile'
+      required:
+      - id
+      - updated_at
+    BloodTestRequestStatusUpdateRequest:
+      type: object
+      description: Serializer for instructor to update only the status field of BloodTestRequest.
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFileRequest'
+    BodyTemperature:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          title: Temperature (°C)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - patient
+      - temperature
+      - user
+    BodyTemperatureOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          description: Body temperature (°C)
+      required:
+      - created_at
+      - id
+      - patient
+      - temperature
+      - user
+    BodyTemperatureRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          title: Temperature (°C)
+      required:
+      - patient
+      - temperature
+      - user
+    CategoryEnum:
+      enum:
+      - Admission
+      - Pathology
+      - Imaging
+      - Diagnostics
+      - Lab Results
+      - Other
+      type: string
+      description: |-
+        * `Admission` - Admission
+        * `Pathology` - Pathology
+        * `Imaging` - Imaging
+        * `Diagnostics` - Diagnostics
+        * `Lab Results` - Lab Results
+        * `Other` - Other
+    DischargeSummary:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        diagnosis:
+          type: string
+        plan:
+          type: string
+        free_text:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        role:
+          type: string
+          maxLength: 50
+        patient:
+          type: integer
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - created_at
+      - diagnosis
+      - id
+      - name
+      - patient
+      - plan
+      - role
+      - updated_at
+      - user
+    DischargeSummaryRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        diagnosis:
+          type: string
+          minLength: 1
+        plan:
+          type: string
+          minLength: 1
+        free_text:
+          type: string
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        role:
+          type: string
+          minLength: 1
+          maxLength: 50
+        patient:
+          type: integer
+      required:
+      - diagnosis
+      - name
+      - patient
+      - plan
+      - role
+    File:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          title: File ID
+        patient:
+          type: integer
+          readOnly: true
+        display_name:
+          type: string
+          readOnly: true
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        file:
+          type: string
+          format: uri
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - display_name
+      - file
+      - id
+      - patient
+    FileRequest:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        file:
+          type: string
+          format: binary
+      required:
+      - file
+    HeartRate:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        heart_rate:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Heart Rate (bpm)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - heart_rate
+      - id
+      - patient
+      - user
+    HeartRateOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        heart_rate:
+          type: integer
+          description: Heart rate (beats per minute)
+      required:
+      - created_at
+      - heart_rate
+      - id
+      - patient
+      - user
+    HeartRateRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        heart_rate:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Heart Rate (bpm)
+      required:
+      - heart_rate
+      - patient
+      - user
+    ImagingRequest:
+      type: object
+      description: |-
+        Serializer for instructors to create/manage imaging requests.
+        Allows instructors to set the user field when creating requests.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        test_type:
+          $ref: '#/components/schemas/TestTypeB75Enum'
+        reason:
+          type: string
+          title: Reason for Request
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        name:
+          type: string
+          maxLength: 100
+        role:
+          type: string
+          maxLength: 50
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFile'
+      required:
+      - created_at
+      - id
+      - name
+      - patient
+      - reason
+      - role
+      - test_type
+      - updated_at
+      - user
+    ImagingRequestRequest:
+      type: object
+      description: |-
+        Serializer for instructors to create/manage imaging requests.
+        Allows instructors to set the user field when creating requests.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        test_type:
+          $ref: '#/components/schemas/TestTypeB75Enum'
+        reason:
+          type: string
+          minLength: 1
+          title: Reason for Request
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        role:
+          type: string
+          minLength: 1
+          maxLength: 50
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFileRequest'
+      required:
+      - name
+      - patient
+      - reason
+      - role
+      - test_type
+      - user
+    ImagingRequestStatusUpdate:
+      type: object
+      description: |-
+        Serializer for instructor to update only the status field of ImagingRequest.
+        Used to enforce that instructors can only change status from pending to completed.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFile'
+      required:
+      - id
+      - updated_at
+    ImagingRequestStatusUpdateRequest:
+      type: object
+      description: |-
+        Serializer for instructor to update only the status field of ImagingRequest.
+        Used to enforce that instructors can only change status from pending to completed.
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFileRequest'
+    LoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 1
+        password:
+          type: string
+          minLength: 1
+      required:
+      - password
+      - username
+    MedicationOrder:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        medication_name:
+          type: string
+          maxLength: 255
+        dosage:
+          type: string
+          maxLength: 100
+        instructions:
+          type: string
+        name:
+          type: string
+          maxLength: 100
+        role:
+          type: string
+          maxLength: 50
+        patient:
+          type: integer
+        user:
+          type: integer
+          readOnly: true
+      required:
+      - created_at
+      - dosage
+      - id
+      - instructions
+      - medication_name
+      - name
+      - patient
+      - role
+      - updated_at
+      - user
+    MedicationOrderRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        medication_name:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dosage:
+          type: string
+          minLength: 1
+          maxLength: 100
+        instructions:
+          type: string
+          minLength: 1
+        name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        role:
+          type: string
+          minLength: 1
+          maxLength: 50
+        patient:
+          type: integer
+      required:
+      - dosage
+      - instructions
+      - medication_name
+      - name
+      - patient
+      - role
+    Note:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+          title: Doctor Name
+          maxLength: 100
+        role:
+          type: string
+          maxLength: 50
+        content:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - content
+      - created_at
+      - id
+      - name
+      - patient
+      - role
+      - updated_at
+      - user
+    NoteRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+          title: Doctor Name
+          maxLength: 100
+        role:
+          type: string
+          minLength: 1
+          maxLength: 50
+        content:
+          type: string
+          minLength: 1
+      required:
+      - content
+      - name
+      - patient
+      - role
+    ObservationData:
+      type: object
+      properties:
+        blood_pressures:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloodPressureOutput'
+          description: List of blood pressure records
+        heart_rates:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeartRateOutput'
+          description: List of heart rate records
+        body_temperatures:
+          type: array
+          items:
+            $ref: '#/components/schemas/BodyTemperatureOutput'
+          description: List of body temperature records
+        respiratory_rates:
+          type: array
+          items:
+            $ref: '#/components/schemas/RespiratoryRateOutput'
+          description: List of respiratory rate records
+        blood_sugars:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloodSugarOutput'
+          description: List of blood sugar records
+        oxygen_saturations:
+          type: array
+          items:
+            $ref: '#/components/schemas/OxygenSaturationOutput'
+          description: List of oxygen saturation records
+        pain_scores:
+          type: array
+          items:
+            $ref: '#/components/schemas/PainScoreOutput'
+          description: List of pain score records
+      required:
+      - blood_pressures
+      - blood_sugars
+      - body_temperatures
+      - heart_rates
+      - oxygen_saturations
+      - pain_scores
+      - respiratory_rates
+    ObservationsRequest:
+      type: object
+      properties:
+        blood_pressure:
+          allOf:
+          - $ref: '#/components/schemas/BloodPressureRequest'
+          description: Blood pressure data
+        heart_rate:
+          allOf:
+          - $ref: '#/components/schemas/HeartRateRequest'
+          description: Heart rate data
+        body_temperature:
+          allOf:
+          - $ref: '#/components/schemas/BodyTemperatureRequest'
+          description: Body temperature data
+        respiratory_rate:
+          allOf:
+          - $ref: '#/components/schemas/RespiratoryRateRequest'
+          description: Respiratory rate data
+        blood_sugar:
+          allOf:
+          - $ref: '#/components/schemas/BloodSugarRequest'
+          description: Blood sugar data
+        oxygen_saturation:
+          allOf:
+          - $ref: '#/components/schemas/OxygenSaturationRequest'
+          description: Oxygen saturation data
+        pain_score:
+          allOf:
+          - $ref: '#/components/schemas/PainScoreRequest'
+          description: Pain score data
+    OxygenSaturation:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        saturation_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Oxygen Saturation (%)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - patient
+      - saturation_percentage
+      - user
+    OxygenSaturationOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        saturation_percentage:
+          type: integer
+          description: Oxygen saturation (%)
+      required:
+      - created_at
+      - id
+      - patient
+      - saturation_percentage
+      - user
+    OxygenSaturationRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        saturation_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Oxygen Saturation (%)
+      required:
+      - patient
+      - saturation_percentage
+      - user
+    PaginatedBloodPressureList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloodPressure'
+    PaginatedBloodSugarList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloodSugar'
+    PaginatedBloodTestRequestList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BloodTestRequest'
+    PaginatedBodyTemperatureList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/BodyTemperature'
+    PaginatedDischargeSummaryList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/DischargeSummary'
+    PaginatedFileList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+    PaginatedHeartRateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/HeartRate'
+    PaginatedImagingRequestList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImagingRequest'
+    PaginatedMedicationOrderList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedicationOrder'
+    PaginatedNoteList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+    PaginatedObservationDataList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/ObservationData'
+    PaginatedOxygenSaturationList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/OxygenSaturation'
+    PaginatedPainScoreList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/PainScore'
+    PaginatedPatientList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/Patient'
+    PaginatedRespiratoryRateList:
+      type: object
+      required:
+      - count
+      - results
+      properties:
+        count:
+          type: integer
+          example: 123
+        next:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=4
+        previous:
+          type: string
+          nullable: true
+          format: uri
+          example: http://api.example.org/accounts/?page=2
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/RespiratoryRate'
+    PainScore:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pain Score (0-10)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - patient
+      - score
+      - user
+    PainScoreOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        score:
+          type: integer
+          description: Pain score (0-10)
+      required:
+      - created_at
+      - id
+      - patient
+      - score
+      - user
+    PainScoreRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pain Score (0-10)
+      required:
+      - patient
+      - score
+      - user
+    PatchedBloodPressureRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        systolic:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Systolic Pressure
+        diastolic:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Diastolic Pressure
+    PatchedBloodSugarRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        sugar_level:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,4}(?:\.\d{0,1})?$
+          title: Blood Sugar Level (mg/dL)
+    PatchedBloodTestRequestStatusUpdateRequest:
+      type: object
+      description: Serializer for instructor to update only the status field of BloodTestRequest.
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFileRequest'
+    PatchedBodyTemperatureRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        temperature:
+          type: string
+          format: decimal
+          pattern: ^-?\d{0,3}(?:\.\d{0,1})?$
+          title: Temperature (°C)
+    PatchedFileRequest:
+      type: object
+      properties:
+        category:
+          $ref: '#/components/schemas/CategoryEnum'
+        file:
+          type: string
+          format: binary
+    PatchedHeartRateRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        heart_rate:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Heart Rate (bpm)
+    PatchedImagingRequestStatusUpdateRequest:
+      type: object
+      description: |-
+        Serializer for instructor to update only the status field of ImagingRequest.
+        Used to enforce that instructors can only change status from pending to completed.
+      properties:
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+        approved_files:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovedFileRequest'
+    PatchedNoteRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        name:
+          type: string
+          minLength: 1
+          title: Doctor Name
+          maxLength: 100
+        role:
+          type: string
+          minLength: 1
+          maxLength: 50
+        content:
+          type: string
+          minLength: 1
+    PatchedOxygenSaturationRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        saturation_percentage:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Oxygen Saturation (%)
+    PatchedPainScoreRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        score:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Pain Score (0-10)
+    PatchedPatientRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        date_of_birth:
+          type: string
+          format: date
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email Address
+          maxLength: 254
+        phone_number:
+          type: string
+          maxLength: 15
+    PatchedRespiratoryRateRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        respiratory_rate:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Respiratory Rate (breaths/min)
+    Patient:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        first_name:
+          type: string
+          maxLength: 100
+        last_name:
+          type: string
+          maxLength: 100
+        date_of_birth:
+          type: string
+          format: date
+        email:
+          type: string
+          format: email
+          title: Email Address
+          maxLength: 254
+        phone_number:
+          type: string
+          maxLength: 15
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          readOnly: true
+        files:
+          type: array
+          items:
+            $ref: '#/components/schemas/File'
+          readOnly: true
+      required:
+      - created_at
+      - date_of_birth
+      - email
+      - files
+      - first_name
+      - id
+      - last_name
+      - updated_at
+    PatientRequest:
+      type: object
+      properties:
+        first_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        last_name:
+          type: string
+          minLength: 1
+          maxLength: 100
+        date_of_birth:
+          type: string
+          format: date
+        email:
+          type: string
+          format: email
+          minLength: 1
+          title: Email Address
+          maxLength: 254
+        phone_number:
+          type: string
+          maxLength: 15
+      required:
+      - date_of_birth
+      - email
+      - first_name
+      - last_name
+    RespiratoryRate:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        patient:
+          type: integer
+        user:
+          type: integer
+        respiratory_rate:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Respiratory Rate (breaths/min)
+        created_at:
+          type: string
+          format: date-time
+          readOnly: true
+      required:
+      - created_at
+      - id
+      - patient
+      - respiratory_rate
+      - user
+    RespiratoryRateOutput:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Record ID
+        patient:
+          type: string
+          readOnly: true
+          description: Patient ID
+        user:
+          type: string
+          readOnly: true
+          description: User ID
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+        respiratory_rate:
+          type: integer
+          description: Respiratory rate (breaths per minute)
+      required:
+      - created_at
+      - id
+      - patient
+      - respiratory_rate
+      - user
+    RespiratoryRateRequest:
+      type: object
+      description: |-
+        Base serializer with common timestamp fields for all models.
+        Centralizes the handling of created_at and updated_at fields.
+      properties:
+        patient:
+          type: integer
+        user:
+          type: integer
+        respiratory_rate:
+          type: integer
+          maximum: 9223372036854775807
+          minimum: 0
+          format: int64
+          title: Respiratory Rate (breaths/min)
+      required:
+      - patient
+      - respiratory_rate
+      - user
+    StatusEnum:
+      enum:
+      - pending
+      - completed
+      type: string
+      description: |-
+        * `pending` - Pending
+        * `completed` - Completed
+    TestType881Enum:
+      enum:
+      - FBC
+      - EUC
+      - LFTs
+      - Coags
+      - CRP
+      - TFT
+      - Group and Hold
+      type: string
+      description: |-
+        * `FBC` - Full Blood Count
+        * `EUC` - Electrolytes, Urea, Creatinine
+        * `LFTs` - Liver Function Tests
+        * `Coags` - Coagulation Profile
+        * `CRP` - C-Reactive Protein
+        * `TFT` - Thyroid Function Tests
+        * `Group and Hold` - Group and Hold
+    TestTypeB75Enum:
+      enum:
+      - X-ray
+      - CT scan
+      - MRI scan
+      - Ultrasound scan
+      - Echocardiogram
+      type: string
+      description: |-
+        * `X-ray` - X-ray
+        * `CT scan` - CT scan
+        * `MRI scan` - MRI scan
+        * `Ultrasound scan` - Ultrasound scan
+        * `Echocardiogram` - Echocardiogram
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        username:
+          type: string
+          description: Required. 150 characters or fewer. Letters, digits and @/./+/-/_
+            only.
+          pattern: ^[\w.@+-]+$
+          maxLength: 150
+        email:
+          type: string
+          format: email
+          title: Email address
+          maxLength: 254
+        first_name:
+          type: string
+          maxLength: 150
+        last_name:
+          type: string
+          maxLength: 150
+        is_staff:
+          type: boolean
+          readOnly: true
+          title: Staff status
+          description: Designates whether the user can log into this admin site.
+        is_superuser:
+          type: boolean
+          readOnly: true
+          title: Superuser status
+          description: Designates that this user has all permissions without explicitly
+            assigning them.
+        role:
+          type: string
+          readOnly: true
+      required:
+      - id
+      - is_staff
+      - is_superuser
+      - role
+      - username
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
+    tokenAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: Token-based authentication with required prefix "Token"
