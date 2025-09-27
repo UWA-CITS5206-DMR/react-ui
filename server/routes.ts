@@ -12,7 +12,8 @@ import {
   insertLabResultSchema,
   insertGroupSchema,
   insertGroupMemberSchema,
-  insertAssetSchema
+  insertAssetSchema,
+  insertPatientSchema
 } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -87,6 +88,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch patient" });
     }
   });
+app.post("/api/patients", async (req, res) => {
+  try {
+    console.log('Received patient data:', req.body);
+    const patientData = insertPatientSchema.parse(req.body);
+    console.log('Parsed patient data:', patientData);
+    const patient = await storage.createPatient(patientData);
+    res.status(201).json(patient);
+  } catch (error) {
+    console.log('Validation error details:', error);
+    if (error instanceof Error) {
+      console.log('Error message:', error.message);
+      console.log('Error stack:', error.stack);
+    }
+    res.status(400).json({ 
+      message: "Invalid patient data",
+      error: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// Delete patient
+app.delete("/api/patients/:patientId", async (req, res) => {
+  try {
+    const { patientId } = req.params;
+    const deleted = await storage.deletePatient(patientId);
+    
+    if (!deleted) {
+      return res.status(404).json({ message: "Patient not found" });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({ message: "Failed to delete patient" });
+  }
+});
 
   // Get patient vitals
   app.get("/api/patients/:patientId/vitals", async (req, res) => {
