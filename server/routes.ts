@@ -90,6 +90,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 app.post("/api/patients", async (req, res) => {
   try {
+    // TODO: Remove debug log after patient creation is verified
     console.log('Received patient data:', req.body);
     const patientData = insertPatientSchema.parse(req.body);
     console.log('Parsed patient data:', patientData);
