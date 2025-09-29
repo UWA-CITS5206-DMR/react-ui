@@ -5,7 +5,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import type { Patient, VitalSigns } from "@shared/schema"; // Added VitalSigns import
+import { apiClientV2, type ObservationCreateBundle } from "@/lib/api-client-v2";
+import type { Patient, VitalSigns } from "@shared/schema";
 
 interface CurrentObservationsProps {
   patient: Patient;
@@ -17,7 +18,6 @@ export default function CurrentObservations({
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Form state - renamed to avoid conflict
   const [formData, setFormData] = useState({
     systolic: "",
     diastolic: "",
@@ -26,24 +26,66 @@ export default function CurrentObservations({
     respiratoryRate: "",
     oxygenSaturation: "",
     bloodSugar: "",
-    painScore: "", // Mock field for now
+    painScore: "",
   });
 
-  // Get latest observations from frontend mock data
   const { data: latestVitals } = useQuery<VitalSigns>({
     queryKey: ["/api/patients", patient.id, "vitals"],
   });
 
-  // Mock mutation for form submission (doesn't actually save)
   const createObservationsMutation = useMutation({
-    mutationFn: async (data: any) => {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Mock observation data:", data);
-      return { success: true };
+    mutationFn: async (newVitals: typeof formData) => {
+      if (!user) {
+        throw new Error("User not authenticated. Cannot record observations.");
+      }
+
+      const payload: ObservationCreateBundle = {
+        blood_pressure: (newVitals.systolic && newVitals.diastolic) ? {
+          systolic: Number(newVitals.systolic),
+          diastolic: Number(newVitals.diastolic),
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+        heart_rate: newVitals.heartRate ? {
+          heart_rate: Number(newVitals.heartRate),
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+        body_temperature: newVitals.temperature ? {
+          temperature: newVitals.temperature,
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+        respiratory_rate: newVitals.respiratoryRate ? {
+          respiratory_rate: Number(newVitals.respiratoryRate),
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+        blood_sugar: newVitals.bloodSugar ? {
+          sugar_level: newVitals.bloodSugar,
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+        oxygen_saturation: newVitals.oxygenSaturation ? {
+          saturation_percentage: Number(newVitals.oxygenSaturation),
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+        pain_score: newVitals.painScore ? {
+          score: Number(newVitals.painScore),
+          patient: Number(patient.id),
+          user: Number(user.id),
+        } : undefined,
+      };
+
+      const response = await apiClientV2.studentGroups.observations.createBundle(payload);
+      return response;
     },
     onSuccess: () => {
-      // Reset form
+      queryClient.invalidateQueries({
+        queryKey: ["/api/patients", patient.id, "vitals"],
+      });
+
       setFormData({
         systolic: "",
         diastolic: "",
@@ -54,6 +96,10 @@ export default function CurrentObservations({
         bloodSugar: "",
         painScore: "",
       });
+    },
+    onError: (error: Error) => {
+      console.error("Failed to record new vitals:", error);
+      alert(`Error: ${error.message}`);
     },
   });
 
@@ -103,11 +149,15 @@ export default function CurrentObservations({
             </div>
             <div className="space-y-1">
               <Label className="text-sm text-gray-600">Blood Sugar</Label>
-              <p className="font-medium">N/A mg/dL</p>
+              <p className="font-medium">
+                {latestVitals?.bloodSugar || "N/A"} mg/dL
+              </p>
             </div>
             <div className="space-y-1">
               <Label className="text-sm text-gray-600">Pain Score</Label>
-              <p className="font-medium">N/A (Coming Soon)</p>
+              <p className="font-medium">
+                {latestVitals?.painScore || "N/A"}
+              </p>
             </div>
           </div>
         </CardContent>
@@ -133,7 +183,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="diastolic">Diastolic BP (mmHg)</Label>
                 <Input
@@ -146,7 +195,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="heartRate">Heart Rate (bpm)</Label>
                 <Input
@@ -159,7 +207,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="temperature">Temperature (°C)</Label>
                 <Input
@@ -173,7 +220,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="respiratoryRate">Respiratory Rate (/min)</Label>
                 <Input
@@ -189,7 +235,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="oxygenSaturation">O2 Saturation (%)</Label>
                 <Input
@@ -205,7 +250,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="bloodSugar">Blood Sugar (mg/dL)</Label>
                 <Input
@@ -219,7 +263,6 @@ export default function CurrentObservations({
                   }
                 />
               </div>
-
               <div className="space-y-2">
                 <Label htmlFor="painScore">Pain Score (0-10)</Label>
                 <Input

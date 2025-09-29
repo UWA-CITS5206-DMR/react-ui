@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
+import { apiClientV2 } from "@/lib/api-client-v2";
 import type { User } from "@shared/schema";
 
 interface AuthContextType {
@@ -16,17 +17,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const storedUser = localStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
-  const [isLoading, setIsLoading] = useState(false); // Start with false since we check localStorage immediately
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Listen for storage events from other tabs/windows
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "user") {
-        if (e.newValue) {
-          setUser(JSON.parse(e.newValue));
-        } else {
-          setUser(null);
-        }
+        setUser(e.newValue ? JSON.parse(e.newValue) : null);
       }
     };
 
@@ -34,27 +31,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
+  // --- 这是我们修改的核心部分 ---
   const login = async (
     username: string,
     password: string
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const response = await fetch("http://localhost:8000/api/auth/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (response.ok) {
-        const { user } = await response.json();
-        setUser(user);
-        localStorage.setItem("user", JSON.stringify(user));
+      // 调用 apiClientV2 的登录方法
+      const response = await apiClientV2.auth.login({ username, password });
+      
+      // 检查 response 和 response.user 是否存在
+      if (response && response.user) {
+        setUser(response.user);
+        localStorage.setItem("user", JSON.stringify(response.user));
         setIsLoading(false);
         return true;
       }
+      
+      // 如果 response 或 user 不存在，也视为失败
       setIsLoading(false);
       return false;
     } catch (error) {
@@ -64,9 +59,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("user");
+  const logout = async () => {
+    try {
+      // 同时调用后端的登出接口（好习惯）
+      await apiClientV2.auth.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // 无论后端是否成功，前端都清除用户信息
+      setUser(null);
+      localStorage.removeItem("user");
+      // 强制刷新页面以确保状态完全重置
+      window.location.reload();
+    }
   };
 
   return (
