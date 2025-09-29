@@ -232,12 +232,7 @@ export default function CurrentObservations({
                   onChange={(e) =>
                     setFormData({ ...formData, painScore: e.target.value })
                   }
-                  disabled
-                  className="opacity-50"
                 />
-                <p className="text-xs text-gray-500">
-                  Coming soon - backend support needed
-                </p>
               </div>
             </div>
 
