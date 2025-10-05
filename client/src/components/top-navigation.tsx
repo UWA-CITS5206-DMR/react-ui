@@ -70,7 +70,7 @@ export default function TopNavigation({
           <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
             <User className="h-4 w-4" />
           </div>
-          <span className="text-sm">{user?.firstName} {user?.lastName}</span>
+          <span className="text-sm">{user?.first_name} {user?.last_name}</span>
         </div>
         
         <Button 

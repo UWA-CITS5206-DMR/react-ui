@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { apiClientV2 } from "@/lib/api-client-v2";
-import type { User } from "@shared/schema";
+import { apiClientV2 } from "@/lib/queryClient";
+import type { User } from "@/lib/api-client-v2";
 
 interface AuthContextType {
   user: User | null;
@@ -31,25 +31,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // --- 这是我们修改的核心部分 ---
+  // --- English version of the login function ---
   const login = async (
     username: string,
     password: string
   ): Promise<boolean> => {
     try {
       setIsLoading(true);
-      // 调用 apiClientV2 的登录方法
+      // Call apiClientV2 login method
       const response = await apiClientV2.auth.login({ username, password });
       
-      // 检查 response 和 response.user 是否存在
-      if (response && response.user) {
+      // Check if response contains both user and token
+      if (response && response.user && response.token) {
+        // Store user info in component state
         setUser(response.user);
-        localStorage.setItem("user", JSON.stringify(response.user));
+        // Store complete auth data (user + token) in localStorage
+        localStorage.setItem("user", JSON.stringify({
+          ...response.user,
+          token: response.token
+        }));
         setIsLoading(false);
         return true;
       }
       
-      // 如果 response 或 user 不存在，也视为失败
+      // If response is missing user or token, treat as failure
       setIsLoading(false);
       return false;
     } catch (error) {
@@ -61,15 +66,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = async () => {
     try {
-      // 同时调用后端的登出接口（好习惯）
+      // Call backend logout endpoint (good practice)
       await apiClientV2.auth.logout();
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      // 无论后端是否成功，前端都清除用户信息
+      // Clear user info from frontend regardless of backend success
       setUser(null);
       localStorage.removeItem("user");
-      // 强制刷新页面以确保状态完全重置
+      // Force page refresh to ensure complete state reset
       window.location.reload();
     }
   };

@@ -1,11 +1,14 @@
 import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { X, Plus, Clock } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { apiClientV2 } from "@/lib/queryClient";
+import { X, FileCheck, Clock, CheckCircle, XCircle } from "lucide-react";
+import type { BloodTestRequest, ImagingRequest } from "@/lib/api-client-v2";
 
 interface InstructorControlsProps {
   patientId: string;
@@ -14,60 +17,100 @@ interface InstructorControlsProps {
 }
 
 export default function InstructorControls({ patientId, isVisible, onClose }: InstructorControlsProps) {
-  const [patientCondition, setPatientCondition] = useState("stable");
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const releaseTroponinMutation = useMutation({
-    mutationFn: async () => {
-      // Find the pending troponin lab result and release it
-      const response = await apiRequest("PATCH", "/api/lab-results/lab-2", {
-        value: "0.08",
-        status: "completed",
+  // Fetch pending blood test requests
+  const { data: pendingBloodTests = [] } = useQuery({
+    queryKey: ["instructors", "blood-test-requests", "pending"],
+    queryFn: () => apiClientV2.instructors.bloodTestRequests.pending().then(res => res.results || []),
+    enabled: isVisible,
+  });
+
+  // Fetch pending imaging requests
+  const { data: pendingImagingTests = [] } = useQuery({
+    queryKey: ["instructors", "imaging-requests", "pending"],
+    queryFn: () => apiClientV2.instructors.imagingRequests.pending().then(res => res.results || []),
+    enabled: isVisible,
+  });
+
+  // Update blood test request status
+  const updateBloodTestMutation = useMutation({
+    mutationFn: async ({ id, status, approved_files }: { 
+      id: number; 
+      status: "pending" | "completed"; 
+      approved_files?: Array<{ file_id: string; page_range?: string }>
+    }) => {
+      return apiClientV2.instructors.bloodTestRequests.updateStatus(id, { 
+        status, 
+        approved_files 
       });
-      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "labs"] });
+      queryClient.invalidateQueries({ queryKey: ["instructors", "blood-test-requests"] });
       toast({
-        title: "Lab Result Released",
-        description: "Troponin results are now available to students.",
-        variant: "default",
+        title: "Blood Test Request Updated",
+        description: "Request status and file access have been updated.",
       });
     },
   });
 
-  const updatePatientMutation = useMutation({
-    mutationFn: async (status: string) => {
-      const response = await apiRequest("PATCH", `/api/patients/${patientId}`, {
-        status,
+  // Update imaging request status
+  const updateImagingMutation = useMutation({
+    mutationFn: async ({ id, status, approved_files }: { 
+      id: number; 
+      status: "pending" | "completed"; 
+      approved_files?: Array<{ file_id: string; page_range?: string }>
+    }) => {
+      return apiClientV2.instructors.imagingRequests.updateStatus(id, { 
+        status, 
+        approved_files 
       });
-      return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId] });
+      queryClient.invalidateQueries({ queryKey: ["instructors", "imaging-requests"] });
       toast({
-        title: "Patient Status Updated",
-        description: "Patient condition has been updated.",
-        variant: "default",
+        title: "Imaging Request Updated",
+        description: "Request status and file access have been updated.",
       });
     },
   });
 
-  const handleConditionChange = (condition: string) => {
-    setPatientCondition(condition);
-    updatePatientMutation.mutate(condition);
+  const handleApproveBloodTest = (request: BloodTestRequest) => {
+    // Approve with mock approved files - in real implementation, this would be based on actual files
+    const approved_files = [
+      { file_id: `blood-result-${request.id}`, page_range: "1-2" }
+    ];
+    
+    updateBloodTestMutation.mutate({
+      id: request.id,
+      status: "completed",
+      approved_files
+    });
+  };
+
+  const handleApproveImaging = (request: ImagingRequest) => {
+    // Approve with mock approved files
+    const approved_files = [
+      { file_id: `imaging-result-${request.id}`, page_range: "1-3" }
+    ];
+    
+    updateImagingMutation.mutate({
+      id: request.id,
+      status: "completed",
+      approved_files
+    });
   };
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 w-80 z-50">
+    <div className="fixed bottom-6 right-6 w-96 z-50">
       <Card className="shadow-xl">
         <CardHeader className="pb-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-sm font-semibold text-gray-900">
-              Instructor Controls
+              Lab Request Management
             </CardTitle>
             <Button
               variant="ghost"
@@ -79,47 +122,99 @@ export default function InstructorControls({ patientId, isVisible, onClose }: In
             </Button>
           </div>
         </CardHeader>
-        <CardContent className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Release Troponin Results</span>
-            <Button
-              onClick={() => releaseTroponinMutation.mutate()}
-              disabled={releaseTroponinMutation.isPending}
-              size="sm"
-              className="bg-alert-yellow hover:bg-alert-yellow/90 text-white"
-            >
-              {releaseTroponinMutation.isPending ? "Releasing..." : "Release Now"}
-            </Button>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Patient Condition</span>
-            <Select value={patientCondition} onValueChange={handleConditionChange}>
-              <SelectTrigger className="w-28">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="stable">Stable</SelectItem>
-                <SelectItem value="critical">Critical</SelectItem>
-                <SelectItem value="monitoring">Monitoring</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-gray-600">Student Progress</span>
-            <span className="text-xs bg-success-green/10 text-green-800 px-2 py-1 rounded">
-              On Track
-            </span>
-          </div>
-          
-          <Button
-            className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
-            size="sm"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Scenario Event
-          </Button>
+        <CardContent>
+          <Tabs defaultValue="blood" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="blood" className="text-xs">
+                Blood Tests ({pendingBloodTests.length})
+              </TabsTrigger>
+              <TabsTrigger value="imaging" className="text-xs">
+                Imaging ({pendingImagingTests.length})
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="blood" className="mt-3">
+              <ScrollArea className="h-48">
+                {pendingBloodTests.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    No pending blood test requests
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {pendingBloodTests.map((request) => (
+                      <div key={request.id} className="border rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">
+                            {request.test_type}
+                          </span>
+                          <Badge variant="outline">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {request.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600">{request.reason}</p>
+                        <p className="text-xs text-gray-500">
+                          Requested by: {request.name} ({request.role})
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleApproveBloodTest(request)}
+                            disabled={updateBloodTestMutation.isPending}
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Approve
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </TabsContent>
+            
+            <TabsContent value="imaging" className="mt-3">
+              <ScrollArea className="h-48">
+                {pendingImagingTests.length === 0 ? (
+                  <p className="text-sm text-gray-500 text-center py-4">
+                    No pending imaging requests
+                  </p>
+                ) : (
+                  <div className="space-y-2">
+                    {pendingImagingTests.map((request) => (
+                      <div key={request.id} className="border rounded-lg p-3 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium">
+                            {request.test_type}
+                          </span>
+                          <Badge variant="outline">
+                            <Clock className="h-3 w-3 mr-1" />
+                            {request.status}
+                          </Badge>
+                        </div>
+                        <p className="text-xs text-gray-600">{request.reason}</p>
+                        <p className="text-xs text-gray-500">
+                          Requested by: {request.name} ({request.role})
+                        </p>
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            onClick={() => handleApproveImaging(request)}
+                            disabled={updateImagingMutation.isPending}
+                            className="flex-1 bg-green-600 hover:bg-green-700"
+                          >
+                            <CheckCircle className="h-3 w-3 mr-1" />
+                            Approve
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </ScrollArea>
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

@@ -1,57 +1,59 @@
-import { QueryClient, QueryFunction } from "@tanstack/react-query";
+import { QueryClient } from "@tanstack/react-query";
+import { ApiClientV2 } from "@/lib/api-client-v2";
 
-async function throwIfResNotOk(res: Response) {
-  if (!res.ok) {
-    const text = (await res.text()) || res.statusText;
-    throw new Error(`${res.status}: ${text}`);
-  }
-}
-
-export async function apiRequest(
-  method: string,
-  url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
-  const res = await fetch(url, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
-
-  await throwIfResNotOk(res);
-  return res;
-}
-
-type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
-  on401: UnauthorizedBehavior;
-}) => QueryFunction<T> =
-  ({ on401: unauthorizedBehavior }) =>
-  async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string, {
-      credentials: "include",
-    });
-
-    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
-      return null;
+// Function to get auth token from localStorage
+function getAuthToken(): string | null {
+  try {
+    const user = localStorage.getItem("user");
+    if (user) {
+      const userData = JSON.parse(user);
+      return userData.token || null;
     }
+  } catch (e) {
+    console.warn("Failed to parse user data from localStorage");
+  }
+  return null;
+}
 
-    await throwIfResNotOk(res);
-    return await res.json();
-  };
+// Custom fetcher that adds authentication token
+async function authenticatedFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+  const token = getAuthToken();
+  
+  // Don't add token for login requests
+  const url = typeof input === 'string' ? input : input.toString();
+  const isLoginRequest = url.includes('/auth/login');
+  
+  const headers = new Headers(init.headers);
+  
+  if (token && !isLoginRequest) {
+    headers.set('Authorization', `Token ${token}`);
+  }
+  
+  return fetch(input, {
+    ...init,
+    headers,
+  });
+}
 
+// Create API Client v2 instance with authenticated fetcher
+export const apiClientV2 = new ApiClientV2({
+  defaultHeaders: {
+    "Content-Type": "application/json",
+  },
+  fetcher: authenticatedFetch,
+});
+
+// New QueryClient using API Client v2
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: getQueryFn({ on401: "throw" }),
       refetchInterval: false,
       refetchOnWindowFocus: false,
-      staleTime: Infinity,
-      retry: false,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+      retry: 1,
     },
     mutations: {
-      retry: false,
+      retry: 1,
     },
   },
 });

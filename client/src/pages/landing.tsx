@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { FileText, Users, Clock, Shield, Stethoscope, GraduationCap, UserCog, BookOpen } from "lucide-react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 

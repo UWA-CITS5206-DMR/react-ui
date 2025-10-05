@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import VitalsPaperChart from "@/components/vitals-paper-chart";
-import type { Patient } from "@shared/schema";
+import type { Patient } from "@/lib/api-client-v2";
 
 interface ObservationChartProps {
   patient: Patient;

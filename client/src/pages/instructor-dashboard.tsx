@@ -1,19 +1,29 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/top-navigation";
 import PatientList from "@/components/patient-list";
 import PatientHeader from "@/components/patient-header";
 import PatientOverview from "@/components/patient-overview";
 import InstructorControls from "@/components/instructor-controls";
+import FileManagement from "@/components/file-management";
 import NotificationToast from "@/components/notification-toast";
-import type { Patient, Session } from "@shared/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Patient } from "@/lib/api-client-v2";
+
+// Local interface for session data (not available in API Client v2)
+interface Session {
+  id: string;
+  name: string;
+  timeRemaining?: number;
+}
 
 export default function InstructorDashboard() {
   const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [currentMode, setCurrentMode] = useState<"student" | "instructor">("instructor");
-  const [showInstructorControls, setShowInstructorControls] = useState(true);
+  const [activeTab, setActiveTab] = useState<"overview" | "files" | "requests">("overview");
   const [notifications, setNotifications] = useState<Array<{
     id: string;
     type: "success" | "warning" | "error";
@@ -23,23 +33,30 @@ export default function InstructorDashboard() {
   // For demo purposes, using a hardcoded session ID
   const sessionId = "session-1";
 
-  const { data: session } = useQuery<Session>({
-    queryKey: ["/api/sessions", sessionId],
+  // Mock session data (since Session API is not available in API Client v2)
+  const session: Session = {
+    id: sessionId,
+    name: "Ward Round Session",
+    timeRemaining: 42
+  };
+
+  const { data: patientsResponse } = useQuery({
+    queryKey: ["/api/patients"],
+    queryFn: () => apiClientV2.patients.list(),
   });
 
-  const { data: patients = [] } = useQuery<Patient[]>({
-    queryKey: ["/api/sessions", sessionId, "patients"],
-  });
+  const patients = patientsResponse?.results || [];
 
-  const { data: selectedPatient } = useQuery<Patient>({
+  const { data: selectedPatient } = useQuery({
     queryKey: ["/api/patients", selectedPatientId],
+    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(Number(selectedPatientId)) : null,
     enabled: !!selectedPatientId,
   });
 
   // Auto-select first patient if none selected
   useState(() => {
     if (patients.length > 0 && !selectedPatientId) {
-      setSelectedPatientId(patients[0].id);
+      setSelectedPatientId(patients[0].id.toString());
     }
   });
 
@@ -92,17 +109,38 @@ export default function InstructorDashboard() {
         
         <main className="flex-1 flex flex-col overflow-hidden">
           <PatientHeader patient={selectedPatient} />
-          <PatientOverview patient={selectedPatient} />
+          
+          <div className="flex-1 overflow-hidden">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "files" | "requests")} className="h-full flex flex-col">
+              <div className="px-4 border-b">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="overview">Patient Overview</TabsTrigger>
+                  <TabsTrigger value="files">File Management</TabsTrigger>
+                  <TabsTrigger value="requests">Lab Requests</TabsTrigger>
+                </TabsList>
+              </div>
+              
+              <div className="flex-1 overflow-hidden">
+                <TabsContent value="overview" className="h-full">
+                  <PatientOverview patient={selectedPatient} />
+                </TabsContent>
+                
+                <TabsContent value="files" className="h-full p-4">
+                  <FileManagement patientId={selectedPatient.id} />
+                </TabsContent>
+                
+                <TabsContent value="requests" className="h-full p-4">
+                  <InstructorControls
+                    patientId={selectedPatient.id.toString()}
+                    isVisible={true}
+                    onClose={() => {}}
+                  />
+                </TabsContent>
+              </div>
+            </Tabs>
+          </div>
         </main>
       </div>
-      
-      {currentMode === "instructor" && (
-        <InstructorControls
-          patientId={selectedPatient.id}
-          isVisible={showInstructorControls}
-          onClose={() => setShowInstructorControls(false)}
-        />
-      )}
       
       <NotificationToast
         notifications={notifications}

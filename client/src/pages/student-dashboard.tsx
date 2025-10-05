@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/top-navigation";
 import PatientList from "@/components/patient-list";
 import PatientHeader from "@/components/patient-header";
@@ -10,16 +11,19 @@ import InvestigationRequests from "@/components/investigation-requests";
 import MedicationOrders from "@/components/medication-orders";
 import NotificationToast from "@/components/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Patient, Session } from "@shared/schema";
+import type { Patient } from "@/lib/api-client-v2";
+
+// Mock session type for now since sessions API is not available in v2
+interface Session {
+  id: string;
+  name: string;
+  timeRemaining?: number;
+}
 
 export default function StudentDashboard() {
   const { user } = useAuth();
-  const [selectedPatientId, setSelectedPatientId] = useState<
-    string | undefined
-  >();
-  const [currentMode, setCurrentMode] = useState<"student" | "instructor">(
-    "student"
-  );
+  const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>();
+  const [currentMode, setCurrentMode] = useState<"student" | "instructor">("student");
   const [notifications, setNotifications] = useState<
     Array<{
       id: string;
@@ -28,19 +32,25 @@ export default function StudentDashboard() {
     }>
   >([]);
 
-  // For demo purposes, using a hardcoded session ID
-  const sessionId = "session-1";
+  // Mock session data - replace with actual session API when available
+  const mockSession: Session = {
+    id: "session-1",
+    name: "Clinical Training Session",
+    timeRemaining: 45,
+  };
 
-  const { data: session } = useQuery<Session>({
-    queryKey: ["/api/sessions", sessionId],
+  // Fetch patients using API Client v2
+  const { data: patientsResponse } = useQuery({
+    queryKey: ["patients"],
+    queryFn: () => apiClientV2.patients.list(),
   });
 
-  const { data: patients = [] } = useQuery<Patient[]>({
-    queryKey: ["/api/sessions", sessionId, "patients"],
-  });
+  const patients = patientsResponse?.results || [];
 
-  const { data: selectedPatient } = useQuery<Patient>({
-    queryKey: ["/api/patients", selectedPatientId],
+  // Fetch selected patient details
+  const { data: selectedPatient } = useQuery({
+    queryKey: ["patient", selectedPatientId],
+    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(selectedPatientId) : null,
     enabled: !!selectedPatientId,
   });
 
@@ -51,7 +61,7 @@ export default function StudentDashboard() {
     }
   });
 
-  const handlePatientSelect = (patientId: string) => {
+  const handlePatientSelect = (patientId: number) => {
     setSelectedPatientId(patientId);
   };
 
@@ -65,17 +75,17 @@ export default function StudentDashboard() {
         <TopNavigation
           currentMode={currentMode}
           onModeChange={setCurrentMode}
-          sessionName={session?.name}
+          sessionName={mockSession.name}
           timeRemaining={
-            session?.timeRemaining ? `${session.timeRemaining}:00` : undefined
+            mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined
           }
         />
         <div className="flex flex-1 min-h-0">
           <div className="w-80 shrink-0 overflow-y-auto border-r">
             <PatientList
               patients={patients}
-              selectedPatientId={selectedPatientId}
-              onPatientSelect={handlePatientSelect}
+              selectedPatientId={selectedPatientId?.toString()}
+              onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
             />
           </div>
           <div className="flex-1 flex items-center justify-center bg-bg-light">
@@ -93,9 +103,9 @@ export default function StudentDashboard() {
       <TopNavigation
         currentMode={currentMode}
         onModeChange={setCurrentMode}
-        sessionName={session?.name}
+        sessionName={mockSession.name}
         timeRemaining={
-          session?.timeRemaining ? `${session.timeRemaining}:00` : undefined
+          mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined
         }
       />
 
@@ -103,8 +113,8 @@ export default function StudentDashboard() {
         <div className="w-80 shrink-0 overflow-y-auto border-r">
           <PatientList
             patients={patients}
-            selectedPatientId={selectedPatientId}
-            onPatientSelect={handlePatientSelect}
+            selectedPatientId={selectedPatientId?.toString()}
+            onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
           />
         </div>
         <main className="flex-1 flex flex-col min-h-0">
@@ -163,15 +173,15 @@ export default function StudentDashboard() {
                       </TabsList>
 
                       <TabsContent value="soap">
-                        <SoapNotesForm patientId={selectedPatient.id} />
+                        <SoapNotesForm patientId={selectedPatient.id.toString()} />
                       </TabsContent>
 
                       <TabsContent value="investigations">
-                        <InvestigationRequests patientId={selectedPatient.id} />
+                        <InvestigationRequests patientId={selectedPatient.id.toString()} />
                       </TabsContent>
 
                       <TabsContent value="medications">
-                        <MedicationOrders patientId={selectedPatient.id} />
+                        <MedicationOrders patientId={selectedPatient.id.toString()} />
                       </TabsContent>
                     </Tabs>
                   </div>

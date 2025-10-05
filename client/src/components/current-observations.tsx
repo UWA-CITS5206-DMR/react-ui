@@ -5,8 +5,25 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import { apiClientV2, type ObservationCreateBundle } from "@/lib/api-client-v2";
-import type { Patient, VitalSigns } from "@shared/schema";
+import { apiClientV2 } from "@/lib/queryClient";
+import type { ObservationCreateBundle, Patient } from "@/lib/api-client-v2";
+
+// VitalSigns type for current implementation
+interface VitalSigns {
+  id?: string;
+  patientId?: string;
+  systolic?: number;
+  diastolic?: number;
+  heartRate?: number;
+  temperature?: string;
+  respiratoryRate?: number;
+  oxygenSaturation?: number;
+  bloodPressure?: string;
+  bloodSugar?: number;
+  painScore?: number;
+  recordedAt?: string;
+  recordedBy?: string;
+}
 
 interface CurrentObservationsProps {
   patient: Patient;
@@ -31,6 +48,22 @@ export default function CurrentObservations({
 
   const { data: latestVitals } = useQuery<VitalSigns>({
     queryKey: ["/api/patients", patient.id, "vitals"],
+    queryFn: async (): Promise<VitalSigns> => {
+      // Mock data for now - replace with actual API call when backend is ready
+      return {
+        id: `${patient.id}-vitals`,
+        patientId: patient.id.toString(),
+        heartRate: 72,
+        temperature: "98.6",
+        respiratoryRate: 16,
+        oxygenSaturation: 98,
+        bloodPressure: "120/80",
+        bloodSugar: 110,
+        painScore: 2,
+        recordedAt: new Date().toISOString(),
+        recordedBy: user?.id?.toString() || "unknown"
+      };
+    },
   });
 
   const createObservationsMutation = useMutation({

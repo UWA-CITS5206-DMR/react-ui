@@ -1,5 +1,5 @@
 import { User } from "lucide-react";
-import type { Patient } from "@shared/schema";
+import type { Patient } from "@/lib/api-client-v2";
 
 interface PatientListProps {
   patients: Patient[];
@@ -8,8 +8,8 @@ interface PatientListProps {
 }
 
 export default function PatientList({ patients, selectedPatientId, onPatientSelect }: PatientListProps) {
-  const getStatusColor = (status: string) => {
-    switch (status) {
+  const getStatusColor = (status?: string) => {
+    switch (status?.toLowerCase()) {
       case "critical":
         return "bg-critical-red/10 text-critical-red";
       case "stable":
@@ -21,17 +21,9 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
     }
   };
 
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "critical":
-        return "Critical";
-      case "stable":
-        return "Stable";
-      case "monitoring":
-        return "Monitoring";
-      default:
-        return status;
-    }
+  const getStatusLabel = (status?: string) => {
+    if (!status) return "Active";
+    return status.charAt(0).toUpperCase() + status.slice(1).toLowerCase();
   };
 
   const calculateAge = (dateOfBirth: string) => {
@@ -56,9 +48,9 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
         {patients.map((patient) => (
           <div
             key={patient.id}
-            onClick={() => onPatientSelect(patient.id)}
+            onClick={() => onPatientSelect(patient.id.toString())}
             className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-              selectedPatientId === patient.id ? "bg-hospital-blue/5 border-hospital-blue/20" : ""
+              selectedPatientId === patient.id.toString() ? "bg-hospital-blue/5 border-hospital-blue/20" : ""
             }`}
           >
             <div className="flex items-start space-x-3">
@@ -68,24 +60,21 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
               <div className="flex-1 min-w-0">
                 <div className="flex items-center justify-between">
                   <h3 className="text-sm font-medium text-gray-900 truncate">
-                    {patient.firstName} {patient.lastName}
+                    {patient.first_name} {patient.last_name}
                   </h3>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(patient.status)}`}>
-                    {getStatusLabel(patient.status)}
+                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+                    {getStatusLabel()}
                   </span>
                 </div>
-                <p className="text-xs text-gray-500">MRN: {patient.mrn}</p>
+                <p className="text-xs text-gray-500">ID: {patient.id}</p>
                 <div className="flex items-center space-x-4 mt-1">
-                  <span className="text-xs text-gray-500">{calculateAge(patient.dateOfBirth)}y</span>
-                  <span className="text-xs text-gray-500">{patient.gender}</span>
-                  <span className="text-xs text-gray-500">{patient.location}</span>
+                  <span className="text-xs text-gray-500">{calculateAge(patient.date_of_birth)}y</span>
+                  {patient.email && (
+                    <span className="text-xs text-gray-500 truncate">{patient.email}</span>
+                  )}
                 </div>
-                {patient.status === "critical" && (
-                  <div className="mt-2 flex items-center space-x-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-alert-yellow/20 text-orange-800">
-                      New Lab Results
-                    </span>
-                  </div>
+                {patient.phone_number && (
+                  <p className="text-xs text-gray-500 mt-1">{patient.phone_number}</p>
                 )}
               </div>
             </div>

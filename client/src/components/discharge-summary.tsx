@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
-import type { Patient } from "@shared/schema";
+import type { Patient } from "@/lib/api-client-v2";
 
 interface DischargeSummaryProps {
   patient: Patient;
@@ -20,8 +20,8 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
     freeText: "",
     plan: "",
     name:
-      user?.firstName && user?.lastName
-        ? `${user.firstName} ${user.lastName}`
+      user?.first_name && user?.last_name
+        ? `${user.first_name} ${user.last_name}`
         : "",
     role: user?.role || "student",
   });
@@ -41,8 +41,8 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         freeText: "",
         plan: "",
         name:
-          user?.firstName && user?.lastName
-            ? `${user.firstName} ${user.lastName}`
+          user?.first_name && user?.last_name
+            ? `${user.first_name} ${user.last_name}`
             : "",
         role: user?.role || "student",
       });
@@ -64,8 +64,8 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         <CardHeader>
           <CardTitle className="text-lg">Discharge Summary</CardTitle>
           <p className="text-sm text-gray-600">
-            Complete the discharge summary for {patient.firstName}{" "}
-            {patient.lastName}
+            Complete the discharge summary for {patient.first_name}{" "}
+            {patient.last_name}
           </p>
         </CardHeader>
         <CardContent>

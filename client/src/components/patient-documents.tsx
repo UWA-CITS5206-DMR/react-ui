@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Heart, TestTube, Camera } from "lucide-react";
-import type { Patient } from "@shared/schema";
+import type { Patient } from "@/lib/api-client-v2";
 
 interface PatientDocumentsProps {
   patient: Patient;

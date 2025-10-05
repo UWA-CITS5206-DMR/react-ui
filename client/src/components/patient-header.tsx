@@ -1,5 +1,5 @@
-import { MapPin, AlertCircle } from "lucide-react";
-import type { Patient } from "@shared/schema";
+import { Calendar, Phone, Mail } from "lucide-react";
+import type { Patient } from "@/lib/api-client-v2";
 
 interface PatientHeaderProps {
   patient: Patient;
@@ -18,72 +18,48 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      month: "2-digit",
-      day: "2-digit",
-      year: "numeric",
+    return new Date(dateString).toLocaleDateString('en-AU', {
+      day: '2-digit',
+      month: '2-digit', 
+      year: 'numeric'
     });
   };
 
-  const getStatusDisplay = (status: string) => {
-    switch (status) {
-      case "critical":
-        return {
-          label: "Critical Status",
-          className: "bg-critical-red/10 text-critical-red border-critical-red/20",
-          icon: AlertCircle,
-        };
-      case "stable":
-        return {
-          label: "Stable",
-          className: "bg-success-green/10 text-success-green border-success-green/20",
-          icon: null,
-        };
-      case "monitoring":
-        return {
-          label: "Monitoring",
-          className: "bg-alert-yellow/20 text-orange-800 border-orange-200",
-          icon: null,
-        };
-      default:
-        return {
-          label: status,
-          className: "bg-gray-100 text-gray-800 border-gray-200",
-          icon: null,
-        };
-    }
-  };
-
-  const statusDisplay = getStatusDisplay(patient.status);
-  const StatusIcon = statusDisplay.icon;
-
   return (
-    <div className="bg-white border-b border-gray-200 px-6 py-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <div>
-            <h1 className="text-xl font-semibold text-gray-900">
-              {patient.firstName} {patient.lastName}
+    <div className="bg-white border-b border-gray-200 px-6 py-6">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <div className="flex items-center space-x-3 mb-3">
+            <h1 className="text-2xl font-bold text-gray-900">
+              {patient.first_name} {patient.last_name}
             </h1>
-            <div className="flex items-center space-x-4 text-sm text-gray-500">
-              <span>MRN: {patient.mrn}</span>
-              <span>DOB: {formatDate(patient.dateOfBirth)}</span>
-              <span>{calculateAge(patient.dateOfBirth)} years old</span>
-              <span>{patient.gender}</span>
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+              Patient ID: {patient.id}
+            </span>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-4 w-4 text-gray-400" />
+              <span className="text-gray-600">DOB:</span>
+              <span className="font-medium">{formatDate(patient.date_of_birth)}</span>
+              <span className="text-gray-500">({calculateAge(patient.date_of_birth)}y)</span>
             </div>
+            
+            <div className="flex items-center space-x-2">
+              <Mail className="h-4 w-4 text-gray-400" />
+              <span className="text-gray-600">Email:</span>
+              <span className="font-medium">{patient.email}</span>
+            </div>
+            
+            {patient.phone_number && (
+              <div className="flex items-center space-x-2">
+                <Phone className="h-4 w-4 text-gray-400" />
+                <span className="text-gray-600">Phone:</span>
+                <span className="font-medium">{patient.phone_number}</span>
+              </div>
+            )}
           </div>
-        </div>
-        
-        <div className="flex items-center space-x-3">
-          <div className="flex items-center space-x-2 text-sm">
-            <MapPin className="h-4 w-4 text-gray-400" />
-            <span>{patient.location}</span>
-          </div>
-          <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium border ${statusDisplay.className}`}>
-            {StatusIcon && <StatusIcon className="h-4 w-4 mr-1" />}
-            {statusDisplay.label}
-          </span>
         </div>
       </div>
     </div>

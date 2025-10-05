@@ -2,205 +2,97 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { apiClientV2 } from "@/lib/queryClient";
+import type { MedicationOrderCreate } from "@/lib/api-client-v2";
 import { Send } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 
 interface OrdersFormProps {
   patientId: string;
 }
 
 export default function OrdersForm({ patientId }: OrdersFormProps) {
-  const [selectedLabOrders, setSelectedLabOrders] = useState<string[]>([]);
-  const [selectedImagingOrders, setSelectedImagingOrders] = useState<string[]>([]);
   const [selectedMedication, setSelectedMedication] = useState("");
-  const [medicationInstructions, setMedicationInstructions] = useState("");
+  const [dosage, setDosage] = useState("");
+  const [instructions, setInstructions] = useState("");
   
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const labOptions = [
-    "CBC with Differential",
-    "Basic Metabolic Panel",
-    "Arterial Blood Gas",
-    "Troponin I",
-    "D-Dimer",
-    "PT/INR",
-  ];
-
-  const imagingOptions = [
-    "Chest X-ray",
-    "ECG",
-    "CT Chest with contrast",
-    "Echocardiogram",
-    "CT Angiogram",
-  ];
-
   const medicationOptions = [
-    "Nitroglycerin 0.4mg SL PRN",
-    "Aspirin 325mg PO once",
-    "Metoprolol 25mg PO BID",
-    "Furosemide 40mg IV",
-    "Morphine 2mg IV PRN",
+    "Nitroglycerin",
+    "Aspirin",
+    "Metoprolol",
+    "Furosemide",
+    "Morphine",
+    "Lisinopril",
+    "Amlodipine",
+    "Metformin"
   ];
 
   const createOrderMutation = useMutation({
-    mutationFn: async (data: {
-      type: string;
-      orderText: string;
-      orderedBy: string;
-    }) => {
-      const response = await apiRequest("POST", `/api/patients/${patientId}/orders`, data);
-      return response.json();
+    mutationFn: async (data: MedicationOrderCreate) => {
+      return apiClientV2.studentGroups.medicationOrders.create(data);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "orders"] });
+      queryClient.invalidateQueries({ queryKey: ["student-groups-medication-orders"] });
+      toast({
+        title: "Success",
+        description: "Medication order submitted successfully!",
+        variant: "default",
+      });
+      // Clear form
+      setSelectedMedication("");
+      setDosage("");
+      setInstructions("");
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to submit order. Please try again.",
+        description: "Failed to submit medication order. Please try again.",
         variant: "destructive",
       });
     },
   });
-
-  const handleLabOrderChange = (orderText: string, checked: boolean) => {
-    if (checked) {
-      setSelectedLabOrders(prev => [...prev, orderText]);
-    } else {
-      setSelectedLabOrders(prev => prev.filter(order => order !== orderText));
-    }
-  };
-
-  const handleImagingOrderChange = (orderText: string, checked: boolean) => {
-    if (checked) {
-      setSelectedImagingOrders(prev => [...prev, orderText]);
-    } else {
-      setSelectedImagingOrders(prev => prev.filter(order => order !== orderText));
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) return;
 
-    const orders = [];
-
-    // Add lab orders
-    selectedLabOrders.forEach(order => {
-      orders.push({
-        type: "lab",
-        orderText: order,
-        orderedBy: user.id,
-      });
-    });
-
-    // Add imaging orders
-    selectedImagingOrders.forEach(order => {
-      orders.push({
-        type: "imaging",
-        orderText: order,
-        orderedBy: user.id,
-      });
-    });
-
-    // Add medication order
-    if (selectedMedication) {
-      const medicationOrder = medicationInstructions 
-        ? `${selectedMedication} - ${medicationInstructions}`
-        : selectedMedication;
-      orders.push({
-        type: "medication",
-        orderText: medicationOrder,
-        orderedBy: user.id,
-      });
-    }
-
-    if (orders.length === 0) {
+    if (!selectedMedication || !dosage) {
       toast({
-        title: "No Orders Selected",
-        description: "Please select at least one order to submit.",
+        title: "Missing Information",
+        description: "Please select a medication and specify dosage.",
         variant: "destructive",
       });
       return;
     }
 
-    try {
-      await Promise.all(orders.map(order => createOrderMutation.mutateAsync(order)));
-      
-      toast({
-        title: "Success",
-        description: `${orders.length} order(s) submitted successfully!`,
-        variant: "default",
-      });
+    const medicationOrder: MedicationOrderCreate = {
+      medication_name: selectedMedication,
+      dosage: dosage,
+      instructions: instructions,
+      name: user.first_name && user.last_name ? `${user.first_name} ${user.last_name}` : user.username || 'Unknown',
+      role: user.role || 'Student',
+      patient: Number(patientId),
+    };
 
-      // Clear form
-      setSelectedLabOrders([]);
-      setSelectedImagingOrders([]);
-      setSelectedMedication("");
-      setMedicationInstructions("");
-    } catch (error) {
-      // Error handling is done in the mutation
-    }
+    createOrderMutation.mutate(medicationOrder);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h3 className="text-md font-medium text-gray-800 mb-4">Place Orders</h3>
+      <h3 className="text-md font-medium text-gray-800 mb-4">Place Medication Orders</h3>
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Laboratory Orders */}
-        <div>
-          <Label className="text-sm font-medium text-gray-700 mb-2 block">
-            Laboratory Orders
-          </Label>
-          <div className="space-y-2">
-            {labOptions.map(option => (
-              <div key={option} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`lab-${option}`}
-                  checked={selectedLabOrders.includes(option)}
-                  onCheckedChange={(checked) => handleLabOrderChange(option, checked as boolean)}
-                />
-                <Label htmlFor={`lab-${option}`} className="text-sm text-gray-700">
-                  {option}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Imaging Orders */}
-        <div>
-          <Label className="text-sm font-medium text-gray-700 mb-2 block">
-            Imaging Orders
-          </Label>
-          <div className="space-y-2">
-            {imagingOptions.map(option => (
-              <div key={option} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`imaging-${option}`}
-                  checked={selectedImagingOrders.includes(option)}
-                  onCheckedChange={(checked) => handleImagingOrderChange(option, checked as boolean)}
-                />
-                <Label htmlFor={`imaging-${option}`} className="text-sm text-gray-700">
-                  {option}
-                </Label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Medication Orders */}
+        {/* Medication Selection */}
         <div>
           <Label className="text-sm font-medium text-gray-700 mb-1 block">
-            Medication Orders
+            Medication *
           </Label>
           <Select value={selectedMedication} onValueChange={setSelectedMedication}>
             <SelectTrigger className="w-full mb-2">
@@ -214,10 +106,31 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Dosage */}
+        <div>
+          <Label className="text-sm font-medium text-gray-700 mb-1 block">
+            Dosage *
+          </Label>
           <Input
-            value={medicationInstructions}
-            onChange={(e) => setMedicationInstructions(e.target.value)}
-            placeholder="Special instructions..."
+            value={dosage}
+            onChange={(e) => setDosage(e.target.value)}
+            placeholder="e.g., 25mg, 0.4mg SL, 40mg IV"
+            className="w-full"
+            required
+          />
+        </div>
+
+        {/* Instructions */}
+        <div>
+          <Label className="text-sm font-medium text-gray-700 mb-1 block">
+            Special Instructions
+          </Label>
+          <Input
+            value={instructions}
+            onChange={(e) => setInstructions(e.target.value)}
+            placeholder="e.g., PRN, BID, with meals, before bedtime"
             className="w-full"
           />
         </div>
@@ -228,7 +141,7 @@ export default function OrdersForm({ patientId }: OrdersFormProps) {
           disabled={createOrderMutation.isPending}
         >
           <Send className="h-4 w-4 mr-2" />
-          {createOrderMutation.isPending ? "Submitting..." : "Submit Orders"}
+          {createOrderMutation.isPending ? "Submitting..." : "Submit Medication Order"}
         </Button>
       </form>
     </div>

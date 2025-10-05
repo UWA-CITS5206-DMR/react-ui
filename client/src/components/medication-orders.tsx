@@ -1,207 +1,301 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { Send } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
+import { Plus, Trash2, Pill } from "lucide-react";
+
+interface MedicationOrder {
+  medication: string;
+  dosage: string;
+  frequency: string;
+  route: string;
+  duration: string;
+  indication: string;
+}
 
 interface MedicationOrdersProps {
   patientId: string;
 }
 
 export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
-  const [selectedMedication, setSelectedMedication] = useState("");
-  const [medicationInstructions, setMedicationInstructions] = useState("");
-  const [name, setName] = useState("");
-  const [role, setRole] = useState("");
-
+  const [medications, setMedications] = useState<MedicationOrder[]>([
+    {
+      medication: "",
+      dosage: "",
+      frequency: "",
+      route: "",
+      duration: "",
+      indication: ""
+    }
+  ]);
+  
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const medicationOptions = [
-    "Nitroglycerin 0.4mg SL PRN chest pain",
-    "Aspirin 325mg PO once daily",
-    "Metoprolol 25mg PO BID",
-    "Furosemide 40mg IV once daily",
-    "Morphine 2mg IV PRN severe pain",
-    "Paracetamol 1g PO QID PRN pain/fever",
-    "Omeprazole 40mg PO once daily",
-    "Heparin 5000 units SC BID",
+  const frequencyOptions = [
+    "Once daily (OD)",
+    "Twice daily (BD)",
+    "Three times daily (TDS)",
+    "Four times daily (QDS)",
+    "Every 4 hours",
+    "Every 6 hours",
+    "Every 8 hours",
+    "Every 12 hours",
+    "As needed (PRN)",
+    "At bedtime (ON)",
+    "Before meals (AC)",
+    "After meals (PC)"
   ];
 
-  const createMedicationOrderMutation = useMutation({
-    mutationFn: async (data: {
-      type: string;
-      medication: string;
-      instructions: string;
-      orderedBy: string;
-      name: string;
-      role: string;
-    }) => {
-      // Mock API call - log to console
-      console.log("Medication Order:", data);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      return { success: true };
+  const routeOptions = [
+    "Oral (PO)",
+    "Intravenous (IV)",
+    "Intramuscular (IM)",
+    "Subcutaneous (SC)",
+    "Topical",
+    "Inhaled",
+    "Sublingual (SL)",
+    "Rectal (PR)",
+    "Ophthalmic",
+    "Otic"
+  ];
+
+  const createMedicationOrdersMutation = useMutation({
+    mutationFn: async () => {
+      const orders = medications.filter(med => med.medication.trim() !== "");
+      const requests = orders.map(medication => 
+        apiClientV2.instructors.medicationOrders.create({
+          patient: parseInt(patientId),
+          medication_name: medication.medication,
+          dosage: medication.dosage,
+          frequency: medication.frequency,
+          route: medication.route,
+          duration: medication.duration,
+          indication: medication.indication,
+          status: "pending" as any
+        })
+      );
+      
+      return Promise.all(requests);
     },
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["medication-orders", patientId] });
       toast({
         title: "Success",
-        description: "Medication order submitted successfully!",
-        variant: "default",
+        description: "Medication orders submitted successfully!"
       });
-      // Clear form
-      setSelectedMedication("");
-      setMedicationInstructions("");
-      setName("");
-      setRole("");
+      // Reset form
+      setMedications([{
+        medication: "",
+        dosage: "",
+        frequency: "",
+        route: "",
+        duration: "",
+        indication: ""
+      }]);
     },
     onError: () => {
       toast({
         title: "Error",
-        description: "Failed to submit medication order. Please try again.",
-        variant: "destructive",
+        description: "Failed to submit medication orders. Please try again.",
+        variant: "destructive"
       });
-    },
+    }
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const updateMedication = (index: number, field: keyof MedicationOrder, value: string) => {
+    const updated = [...medications];
+    updated[index] = { ...updated[index], [field]: value };
+    setMedications(updated);
+  };
 
-    if (!user) return;
+  const addMedication = () => {
+    setMedications([...medications, {
+      medication: "",
+      dosage: "",
+      frequency: "",
+      route: "",
+      duration: "",
+      indication: ""
+    }]);
+  };
 
-    if (!selectedMedication) {
-      toast({
-        title: "No Medication Selected",
-        description: "Please select a medication to order.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (!name || !role) {
-      toast({
-        title: "Missing Sign-off",
-        description: "Please provide your name and role before submitting.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    const orderData = {
-      type: "medication",
-      medication: selectedMedication,
-      instructions: medicationInstructions,
-      orderedBy: user.id,
-      name,
-      role,
-    };
-
-    try {
-      await createMedicationOrderMutation.mutateAsync(orderData);
-    } catch (error) {
-      // Error handling is done in the mutation
+  const removeMedication = (index: number) => {
+    if (medications.length > 1) {
+      setMedications(medications.filter((_, i) => i !== index));
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    const validMedications = medications.filter(med => 
+      med.medication.trim() !== "" && 
+      med.dosage.trim() !== "" && 
+      med.frequency.trim() !== ""
+    );
+    
+    if (validMedications.length === 0) {
+      toast({
+        title: "Validation Error",
+        description: "Please add at least one complete medication order.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    createMedicationOrdersMutation.mutate();
+  };
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Medication Orders</CardTitle>
-        <p className="text-sm text-gray-600">
-          Order medications with specific instructions and sign-off
-        </p>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Medication Selection */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Select Medication *
-            </Label>
-            <Select
-              value={selectedMedication}
-              onValueChange={setSelectedMedication}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Choose a medication..." />
-              </SelectTrigger>
-              <SelectContent>
-                {medicationOptions.map((option) => (
-                  <SelectItem key={option} value={option}>
-                    {option}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+    <div className="space-y-6">
+      <form onSubmit={handleSubmit}>
+        {medications.map((medication, index) => (
+          <Card key={index} className="mb-4">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
+              <CardTitle className="text-lg">
+                Medication {index + 1}
+              </CardTitle>
+              {medications.length > 1 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => removeMedication(index)}
+                  className="text-red-600 hover:text-red-700"
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`medication-${index}`} className="text-sm font-medium">
+                    Medication Name *
+                  </Label>
+                  <Input
+                    id={`medication-${index}`}
+                    value={medication.medication}
+                    onChange={(e) => updateMedication(index, "medication", e.target.value)}
+                    placeholder="e.g., Paracetamol"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor={`dosage-${index}`} className="text-sm font-medium">
+                    Dosage *
+                  </Label>
+                  <Input
+                    id={`dosage-${index}`}
+                    value={medication.dosage}
+                    onChange={(e) => updateMedication(index, "dosage", e.target.value)}
+                    placeholder="e.g., 500mg"
+                    required
+                  />
+                </div>
+              </div>
 
-          {/* Special Instructions */}
-          <div>
-            <Label className="text-sm font-medium text-gray-700 mb-1 block">
-              Special Instructions
-            </Label>
-            <Textarea
-              value={medicationInstructions}
-              onChange={(e) => setMedicationInstructions(e.target.value)}
-              placeholder="Additional instructions, precautions, monitoring requirements..."
-              rows={4}
-            />
-          </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor={`frequency-${index}`} className="text-sm font-medium">
+                    Frequency *
+                  </Label>
+                  <Select
+                    value={medication.frequency}
+                    onValueChange={(value) => updateMedication(index, "frequency", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select frequency" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {frequencyOptions.map((freq) => (
+                        <SelectItem key={freq} value={freq}>
+                          {freq}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor={`route-${index}`} className="text-sm font-medium">
+                    Route
+                  </Label>
+                  <Select
+                    value={medication.route}
+                    onValueChange={(value) => updateMedication(index, "route", value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select route" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {routeOptions.map((route) => (
+                        <SelectItem key={route} value={route}>
+                          {route}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
 
-          {/* Sign-off Section */}
-          <div className="border-t pt-6">
-            <h3 className="text-md font-semibold text-gray-900 mb-4">
-              Sign-off
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="med-name">Name *</Label>
+              <div>
+                <Label htmlFor={`duration-${index}`} className="text-sm font-medium">
+                  Duration
+                </Label>
                 <Input
-                  id="med-name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  placeholder="Your full name"
-                  required
+                  id={`duration-${index}`}
+                  value={medication.duration}
+                  onChange={(e) => updateMedication(index, "duration", e.target.value)}
+                  placeholder="e.g., 7 days, 2 weeks"
                 />
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="med-role">Role *</Label>
-                <Input
-                  id="med-role"
-                  value={role}
-                  onChange={(e) => setRole(e.target.value)}
-                  placeholder="e.g., Medical Student, Resident"
-                  required
+
+              <div>
+                <Label htmlFor={`indication-${index}`} className="text-sm font-medium">
+                  Indication/Reasoning
+                </Label>
+                <Textarea
+                  id={`indication-${index}`}
+                  value={medication.indication}
+                  onChange={(e) => updateMedication(index, "indication", e.target.value)}
+                  placeholder="Clinical indication for this medication..."
+                  rows={2}
                 />
               </div>
-            </div>
-          </div>
+            </CardContent>
+          </Card>
+        ))}
 
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={addMedication}
+            className="flex-1"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Another Medication
+          </Button>
+          
           <Button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700"
-            disabled={createMedicationOrderMutation.isPending}
+            className="flex-1 bg-hospital-blue hover:bg-hospital-blue/90"
+            disabled={createMedicationOrdersMutation.isPending}
           >
-            <Send className="h-4 w-4 mr-2" />
-            {createMedicationOrderMutation.isPending
-              ? "Submitting..."
-              : "Submit Medication Order"}
+            <Pill className="h-4 w-4 mr-2" />
+            {createMedicationOrdersMutation.isPending ? "Submitting..." : "Submit Medication Orders"}
           </Button>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      </form>
+    </div>
   );
 }
