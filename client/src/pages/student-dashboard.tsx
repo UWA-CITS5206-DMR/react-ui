@@ -6,9 +6,12 @@ import TopNavigation from "@/components/top-navigation";
 import PatientList from "@/components/patient-list";
 import PatientHeader from "@/components/patient-header";
 import PatientOverview from "@/components/patient-overview";
+import CurrentObservationsDisplay from "@/components/current-observations-display";
+import AddObservations from "@/components/add-observations";
 import SoapNotesForm from "@/components/soap-notes-form";
 import InvestigationRequests from "@/components/investigation-requests";
 import MedicationOrders from "@/components/medication-orders";
+import DischargeSummary from "@/components/discharge-summary";
 import NotificationToast from "@/components/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
@@ -124,20 +127,44 @@ export default function StudentDashboard() {
             defaultValue="overview"
             className="flex-1 flex flex-col min-h-0"
           >
-            <div className="bg-white border-b border-gray-200">
-              <TabsList className="h-auto p-0 bg-transparent">
-                <div className="flex space-x-8 px-6">
+            <div className="bg-white border-b border-gray-200 overflow-x-auto">
+              <TabsList className="h-auto p-0 bg-transparent inline-flex min-w-full">
+                <div className="flex space-x-4 px-6">
                   <TabsTrigger
                     value="overview"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-1 rounded-none bg-transparent"
+                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
                   >
                     Overview
                   </TabsTrigger>
                   <TabsTrigger
-                    value="assessment"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-1 rounded-none bg-transparent"
+                    value="observations"
+                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
                   >
-                    Assessment & Orders
+                    Observations
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="soap"
+                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
+                  >
+                    SOAP Notes
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="investigations"
+                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
+                  >
+                    Investigation Requests
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="medications"
+                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
+                  >
+                    Medication Orders
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="discharge"
+                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
+                  >
+                    Discharge Summary
                   </TabsTrigger>
                 </div>
               </TabsList>
@@ -151,40 +178,67 @@ export default function StudentDashboard() {
             </TabsContent>
 
             <TabsContent
-              value="assessment"
+              value="observations"
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
                 <div className="max-w-7xl mx-auto">
-                  <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                      Patient Assessment & Orders
-                    </h2>
+                  <Tabs defaultValue="current" className="w-full">
+                    <TabsList className="grid w-full grid-cols-2 mb-6">
+                      <TabsTrigger value="current">Current Observations</TabsTrigger>
+                      <TabsTrigger value="add">Add Observations</TabsTrigger>
+                    </TabsList>
+                    <TabsContent value="current">
+                      <CurrentObservationsDisplay patient={selectedPatient} />
+                    </TabsContent>
+                    <TabsContent value="add">
+                      <AddObservations patient={selectedPatient} />
+                    </TabsContent>
+                  </Tabs>
+                </div>
+              </div>
+            </TabsContent>
 
-                    <Tabs defaultValue="soap" className="w-full">
-                      <TabsList className="grid w-full grid-cols-3">
-                        <TabsTrigger value="soap">SOAP Notes</TabsTrigger>
-                        <TabsTrigger value="investigations">
-                          Investigations
-                        </TabsTrigger>
-                        <TabsTrigger value="medications">
-                          Medications
-                        </TabsTrigger>
-                      </TabsList>
+            <TabsContent
+              value="soap"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <div className="bg-bg-light p-6">
+                <div className="max-w-7xl mx-auto">
+                  <SoapNotesForm patientId={selectedPatient.id.toString()} />
+                </div>
+              </div>
+            </TabsContent>
 
-                      <TabsContent value="soap">
-                        <SoapNotesForm patientId={selectedPatient.id.toString()} />
-                      </TabsContent>
+            <TabsContent
+              value="investigations"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <div className="bg-bg-light p-6">
+                <div className="max-w-7xl mx-auto">
+                  <InvestigationRequests patientId={selectedPatient.id.toString()} />
+                </div>
+              </div>
+            </TabsContent>
 
-                      <TabsContent value="investigations">
-                        <InvestigationRequests patientId={selectedPatient.id.toString()} />
-                      </TabsContent>
+            <TabsContent
+              value="medications"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <div className="bg-bg-light p-6">
+                <div className="max-w-7xl mx-auto">
+                  <MedicationOrders patientId={selectedPatient.id.toString()} />
+                </div>
+              </div>
+            </TabsContent>
 
-                      <TabsContent value="medications">
-                        <MedicationOrders patientId={selectedPatient.id.toString()} />
-                      </TabsContent>
-                    </Tabs>
-                  </div>
+            <TabsContent
+              value="discharge"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <div className="bg-bg-light p-6">
+                <div className="max-w-7xl mx-auto">
+                  <DischargeSummary patient={selectedPatient} />
                 </div>
               </div>
             </TabsContent>

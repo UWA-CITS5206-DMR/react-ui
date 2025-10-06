@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/hooks/use-auth";
+import { apiClientV2 } from "@/lib/queryClient";
 import type { Patient } from "@/lib/api-client-v2";
 
 interface DischargeSummaryProps {
@@ -26,13 +27,21 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
     role: user?.role || "student",
   });
 
-  // Mock mutation for form submission
+  // Real mutation for form submission
   const createDischargeSummaryMutation = useMutation({
-    mutationFn: async (data: any) => {
-      // Simulate API call delay
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      console.log("Discharge Summary data:", data);
-      return { success: true };
+    mutationFn: async (data: typeof formData) => {
+      if (!user) {
+        throw new Error("User not authenticated");
+      }
+
+      return apiClientV2.studentGroups.dischargeSummaries.create({
+        diagnosis: data.diagnosis,
+        plan: data.plan,
+        free_text: data.freeText,
+        name: data.name,
+        role: data.role,
+        patient: patient.id
+      });
     },
     onSuccess: () => {
       // Reset form
@@ -51,11 +60,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    createDischargeSummaryMutation.mutate({
-      ...formData,
-      patientId: patient.id,
-      createdAt: new Date().toISOString(),
-    });
+    createDischargeSummaryMutation.mutate(formData);
   };
 
   return (
