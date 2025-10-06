@@ -1,4 +1,5 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Activity, Plus } from "lucide-react";
 import CurrentObservationsDisplay from "@/components/current-observations-display";
 import AddObservations from "@/components/add-observations";
 import type { Patient } from "@/lib/api-client-v2";
@@ -12,8 +13,14 @@ export default function Observations({ patient }: ObservationsProps) {
     <div className="max-w-7xl mx-auto space-y-6">
       <Tabs defaultValue="current" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="current">Current Observations</TabsTrigger>
-          <TabsTrigger value="add">Add Observations</TabsTrigger>
+          <TabsTrigger value="current">
+            <Activity className="h-4 w-4 mr-2" />
+            Current Observations
+          </TabsTrigger>
+          <TabsTrigger value="add">
+            <Plus className="h-4 w-4 mr-2" />
+            Add Observations
+          </TabsTrigger>
         </TabsList>
         <TabsContent value="current">
           <CurrentObservationsDisplay patient={patient} />

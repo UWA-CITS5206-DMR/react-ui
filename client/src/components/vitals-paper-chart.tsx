@@ -1,9 +1,7 @@
 import React from "react";
 
-/** 可调：每行有多少时间格（比如 24 表示 24 个记录格） */
 const COLS = 24;
 
-/** 统一一些底色 */
 const tone: Record<string, string> = {
   none: "",
   mild: "bg-yellow-50",
@@ -15,7 +13,6 @@ const tone: Record<string, string> = {
 
 type Row = { label: string; note?: string; shade?: keyof typeof tone };
 
-/** 一个区块（心率/血压/体温）的通用网格 */
 function Block({
   title,
   unit,
@@ -26,7 +23,6 @@ function Block({
   title: string;
   unit?: string;
   rows: Row[];
-  /** 左右栏顶端的小提示文字（如“Write ≥ 140”） */
   leftHeader?: string;
   rightHeader?: string;
 }) {
@@ -37,7 +33,6 @@ function Block({
         {unit ? <span className="text-xs text-gray-500">{unit}</span> : null}
       </div>
 
-      {/* 头部提示（左右各一格，不参与网格列数） */}
       {(leftHeader || rightHeader) && (
         <div className="grid" style={{ gridTemplateColumns: `12rem 1fr 12rem` }}>
           <div className="px-3 py-1 text-xs text-gray-500 border-b border-gray-300">{leftHeader}</div>
@@ -46,19 +41,15 @@ function Block({
         </div>
       )}
 
-      {/* 主体网格：左标签 + N 列空白 + 右标签 */}
       <div className="grid" style={{ gridTemplateColumns: `12rem repeat(${COLS}, minmax(20px, 1fr)) 12rem` }}>
-        {/* 表头（空白一行，用于画竖线并撑开列） */}
         <div className="border-r border-gray-300 bg-gray-50/50 text-xs px-2 py-1 text-gray-500"> </div>
         {Array.from({ length: COLS }).map((_, i) => (
           <div key={`head-${i}`} className="h-6 border-b border-r border-gray-300" />
         ))}
         <div className="border-l border-gray-300 bg-gray-50/50 text-xs px-2 py-1 text-right text-gray-500"> </div>
 
-        {/* 数据行 */}
         {rows.map((r, idx) => (
           <React.Fragment key={idx}>
-            {/* 左侧行标 */}
             <div className={`px-2 py-1 text-xs border-t border-r border-gray-300 bg-white sticky left-0 z-[1]`}>
               <div className="flex items-center justify-between gap-2">
                 <span className="text-gray-800">{r.label}</span>
@@ -66,7 +57,6 @@ function Block({
               </div>
             </div>
 
-            {/* 中央时间/记录格 */}
             {Array.from({ length: COLS }).map((_, i) => (
               <div
                 key={`${idx}-${i}`}
@@ -77,7 +67,6 @@ function Block({
               />
             ))}
 
-            {/* 右侧行标（镜像一份，方便打印时左右都能看） */}
             <div className={`px-2 py-1 text-xs border-t border-l border-gray-300 bg-white sticky right-0 z-[1] text-right`}>
               <div className="flex items-center justify-end gap-2">
                 {r.note ? <span className="text-[10px] text-gray-500">{r.note}</span> : null}
@@ -91,7 +80,6 @@ function Block({
   );
 }
 
-/** 心率区（按 40s–140+，高值区域做浅黄底） */
 function HeartRateBlock() {
   const rows: Row[] = [
     { label: "≥ 140", shade: "high" },
@@ -117,7 +105,6 @@ function HeartRateBlock() {
   );
 }
 
-/** 收缩压区（60s–200+，顶部高值浅黄，最低段灰底；附加“Score for systolic BP only”行） */
 function BloodPressureBlock() {
   const rows: Row[] = [
     { label: "≥ 200", shade: "high" },
@@ -145,7 +132,6 @@ function BloodPressureBlock() {
         leftHeader="Write value if ≥ 200"
         rightHeader="Write ≥ 200"
       />
-      {/* 评分行（可按需求换成 3/2/1/0/1/2/3 等） */}
       <div className="grid" style={{ gridTemplateColumns: `12rem repeat(${COLS}, minmax(20px, 1fr)) 12rem` }}>
         <div className="px-2 py-1 text-xs text-gray-700 border border-gray-300 bg-white">
           Score for systolic BP only
@@ -159,7 +145,6 @@ function BloodPressureBlock() {
   );
 }
 
-/** 体温区（按区间行显示，发热区浅黄） */
 function TemperatureBlock() {
   const rows: Row[] = [
     { label: "≥ 38.6", shade: "high" },
@@ -174,7 +159,6 @@ function TemperatureBlock() {
     <Block title="Temperature" unit="°C" rows={rows} leftHeader="Write if ≥ 38.6" rightHeader="Write ≥ 38.6" />
   );
 }
-/** 呼吸频率（breaths/min） */
 function RespiratoryRateBlock() {
   const rows: Row[] = [
     { label: "≥ 36",   shade: "high" },
@@ -197,7 +181,6 @@ function RespiratoryRateBlock() {
   );
 }
 
-/** 血氧饱和度（SpO₂，%） */
 function OxygenSaturationBlock() {
   const rows: Row[] = [
     { label: "≥ 94" },               // 正常
@@ -216,7 +199,6 @@ function OxygenSaturationBlock() {
   );
 }
 
-/** 氧流量（L/min）+ 设备行 */
 function OxygenFlowRateBlock() {
   const rows: Row[] = [
     { label: "≥ 10", shade: "high" },
@@ -233,7 +215,6 @@ function OxygenFlowRateBlock() {
         leftHeader="Write value if > 10"
         rightHeader="Write > 10"
       />
-      {/* 设备记录行 */}
       <div
         className="grid"
         style={{ gridTemplateColumns: `12rem repeat(${COLS}, minmax(20px, 1fr)) 12rem` }}
@@ -249,7 +230,6 @@ function OxygenFlowRateBlock() {
     </div>
   );
 }
-/** 意识（AVPU） */
 function ConsciousnessBlock() {
   const rows: Row[] = [
     { label: "Alert",        note: "0" },
@@ -267,7 +247,6 @@ function ConsciousnessBlock() {
   );
 }
 
-/** 疼痛评分（0–10，静息/运动） */
 function PainScoreBlock() {
   const rows: Row[] = [
     { label: "Rest" },
@@ -282,7 +261,6 @@ function PainScoreBlock() {
   );
 }
 
-/** 尿量（上一次观察以来是否排尿） */
 function UrineOutputBlock() {
   const rows: Row[] = [
     { label: "Yes" },
@@ -309,7 +287,6 @@ export default function VitalsPaperChart() {
       <ConsciousnessBlock />
       <PainScoreBlock />
       <UrineOutputBlock />
-      {/* 打印友好 */}
       <div className="text-right text-xs text-gray-500">Columns: {COLS} (adjust in code)</div>
     </div>
   );
