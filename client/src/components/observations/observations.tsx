@@ -1,13 +1,22 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Activity, Plus } from "lucide-react";
-import CurrentObservationsDisplay from "@/components/current-observations-display";
-import AddObservations from "@/components/add-observations";
+import CurrentObservations from "./current-observations";
+import AddObservations from "./add-observations";
 import type { Patient } from "@/lib/api-client-v2";
 
 interface ObservationsProps {
   patient: Patient;
 }
 
+/**
+ * Main observations component with tabs for viewing and adding observations
+ * 
+ * Updated to use the new CurrentObservations component which includes:
+ * - Real Django API data fetching
+ * - Latest observations display
+ * - Historical trends chart
+ * - Form to add new observations
+ */
 export default function Observations({ patient }: ObservationsProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
@@ -23,7 +32,7 @@ export default function Observations({ patient }: ObservationsProps) {
           </TabsTrigger>
         </TabsList>
         <TabsContent value="current">
-          <CurrentObservationsDisplay patient={patient} />
+          <CurrentObservations patient={patient} />
         </TabsContent>
         <TabsContent value="add">
           <AddObservations patient={patient} />

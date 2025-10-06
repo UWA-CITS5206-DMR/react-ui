@@ -106,8 +106,12 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
       return response;
     },
     onSuccess: () => {
+      // Invalidate both latest and historical observation queries
       queryClient.invalidateQueries({
-        queryKey: ["/api/patients", patient.id, "vitals"],
+        queryKey: ["/api/student-groups/observations/latest", patient.id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["/api/student-groups/observations/history", patient.id],
       });
       setFormData(initialFormData);
     },

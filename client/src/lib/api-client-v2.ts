@@ -351,6 +351,15 @@ export interface PaginatedResponse<T> {
 	results: T[];
 }
 
+// Special response type for observations list endpoint
+// The API returns results as a single ObservationBundle object, not an array
+export interface ObservationListResponse {
+	count: number;
+	next: string | null;
+	previous: string | null;
+	results: ObservationBundle;
+}
+
 export type InstructorDashboardSummary = Record<string, unknown>;
 export type StatsResponse = Record<string, unknown>;
 
@@ -728,7 +737,7 @@ export class ApiClientV2 {
 		},
 		observations: {
 			list: (query?: QueryParams) =>
-				this.request<PaginatedResponse<ObservationBundle>>(
+				this.request<ObservationListResponse>(
 					"/api/student-groups/observations/",
 					{ method: "GET", query },
 				),

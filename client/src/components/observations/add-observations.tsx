@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListChecks, Layers } from "lucide-react";
-import { IndividualVitalSignsForm } from "./observations/individual-vital-signs-form";
-import { BulkVitalSignsForm } from "./observations/bulk-vital-signs-form";
+import { IndividualVitalSignsForm } from "./individual-vital-signs-form";
+import { BulkVitalSignsForm } from "./bulk-vital-signs-form";
 import type { Patient } from "@/lib/api-client-v2";
 
 interface AddObservationsProps {

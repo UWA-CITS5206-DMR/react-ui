@@ -30,7 +30,7 @@ import {
   CheckCircle,
   Clock
 } from "lucide-react";
-import TopNavigation from "@/components/top-navigation";
+import TopNavigation from "@/components/layout/top-navigation";
 
 // Form schemas
 const createDataVersionSchema = z.object({

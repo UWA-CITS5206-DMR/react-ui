@@ -1,9 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FlaskConical, Scan, List, Plus } from "lucide-react";
-import { BloodTestRequestForm } from "./investigation-requests/blood-test-request-form";
-import { BloodTestRequestList } from "./investigation-requests/blood-test-request-list";
-import { ImagingRequestForm } from "./investigation-requests/imaging-request-form";
-import { ImagingRequestList } from "./investigation-requests/imaging-request-list";
+import { BloodTestRequestForm } from "./blood-test-request-form";
+import { BloodTestRequestList } from "./blood-test-request-list";
+import { ImagingRequestForm } from "./imaging-request-form";
+import { ImagingRequestList } from "./imaging-request-list";
 
 interface InvestigationRequestsProps {
   patientId: string;

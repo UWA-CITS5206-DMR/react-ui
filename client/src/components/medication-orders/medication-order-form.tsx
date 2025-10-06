@@ -1,12 +1,15 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Plus, Pill } from "lucide-react";
 import { MedicationOrderCard, type MedicationFormData } from "./medication-order-card";
-import { SignOffSection } from "../investigation-requests/sign-off-section";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SignOffSection } from "@/components/ui/sign-off-section";
 
 interface MedicationOrderFormProps {
   patientId: string;
@@ -31,18 +34,9 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Initialize sign-off fields from user
-  useEffect(() => {
-    if (user) {
-      const userName =
-        user.first_name && user.last_name
-          ? `${user.first_name} ${user.last_name}`
-          : user.username;
-      const userRole = user.role || "student";
-      setSignOffName(userName);
-      setSignOffRole(userRole);
-    }
-  }, [user]);
+  // Note: signOffName and signOffRole are intentionally left empty
+  // In shared group account mode, the actual student operating the system
+  // should manually enter their own name and role, not use the group account info
 
   const createMedicationOrdersMutation = useMutation({
     mutationFn: async () => {

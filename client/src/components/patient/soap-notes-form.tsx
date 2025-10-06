@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { FileText, Plus, List } from "lucide-react";
+import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { NoteEntry } from "@/lib/api-client-v2";
 
 interface SOAPNotesFormProps {
@@ -27,17 +28,9 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Initialize sign-off fields from user
-  useEffect(() => {
-    if (user) {
-      const userName = user.first_name && user.last_name 
-        ? `${user.first_name} ${user.last_name}` 
-        : user.username;
-      const userRole = user.role || "student";
-      setSignOffName(userName);
-      setSignOffRole(userRole);
-    }
-  }, [user]);
+  // Note: signOffName and signOffRole are intentionally left empty
+  // In shared group account mode, the actual student operating the system
+  // should manually enter their own name and role, not use the group account info
 
   // Fetch notes
   const { data: notes } = useQuery({
@@ -187,34 +180,14 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                   </p>
                 </div>
 
-                {/* Sign-off Section - Horizontal Layout */}
-                <Card className="bg-muted/50">
-                  <CardHeader>
-                    <CardTitle className="text-sm">Sign-off Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="signoff-name">Name *</Label>
-                        <Input
-                          id="signoff-name"
-                          value={signOffName}
-                          onChange={(e) => setSignOffName(e.target.value)}
-                          placeholder="Enter your full name"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="signoff-role">Role *</Label>
-                        <Input
-                          id="signoff-role"
-                          value={signOffRole}
-                          onChange={(e) => setSignOffRole(e.target.value)}
-                          placeholder="e.g., Medical Student"
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                {/* Sign-off Section */}
+                <SignOffSection
+                  name={signOffName}
+                  role={signOffRole}
+                  onNameChange={setSignOffName}
+                  onRoleChange={setSignOffRole}
+                  idPrefix="soap-signoff"
+                />
 
                 <Button
                   type="submit"

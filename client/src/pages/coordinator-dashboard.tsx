@@ -34,7 +34,7 @@ import {
   Users,
   Database
 } from "lucide-react";
-import TopNavigation from "@/components/top-navigation";
+import TopNavigation from "@/components/layout/top-navigation";
 
 // Form schemas
 const uploadDocumentSchema = z.object({

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Send } from "lucide-react";
-import { SignOffSection } from "./sign-off-section";
+import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { BloodTestType } from "@/lib/api-client-v2";
 
 interface BloodTestRequestFormProps {
@@ -39,18 +39,9 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Initialize name and role from user
-  useEffect(() => {
-    if (user) {
-      const userName =
-        user.first_name && user.last_name
-          ? `${user.first_name} ${user.last_name}`
-          : user.username;
-      const userRole = user.role || "student";
-      setSignOffName(userName);
-      setSignOffRole(userRole);
-    }
-  }, [user]);
+  // Note: signOffName and signOffRole are intentionally left empty
+  // In shared group account mode, the actual student operating the system
+  // should manually enter their own name and role, not use the group account info
 
   const createBloodTestMutation = useMutation({
     mutationFn: async () => {

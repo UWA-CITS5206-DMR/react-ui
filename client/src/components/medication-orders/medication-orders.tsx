@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Plus, List } from "lucide-react";
-import { MedicationOrderForm } from "./medication-orders/medication-order-form";
-import { MedicationOrderList } from "./medication-orders/medication-order-list";
+import { MedicationOrderForm } from "./medication-order-form";
+import { MedicationOrderList } from "./medication-order-list";
 
 interface MedicationOrdersProps {
   patientId: string;

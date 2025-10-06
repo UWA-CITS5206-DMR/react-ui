@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SignOffSection } from "@/components/ui/sign-off-section";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import type { Patient } from "@/lib/api-client-v2";
@@ -16,15 +17,15 @@ interface DischargeSummaryProps {
 export default function DischargeSummary({ patient }: DischargeSummaryProps) {
   const { user } = useAuth();
 
+  // Note: name and role are intentionally left empty
+  // In shared group account mode, the actual student operating the system
+  // should manually enter their own name and role
   const [formData, setFormData] = useState({
     diagnosis: "",
     freeText: "",
     plan: "",
-    name:
-      user?.first_name && user?.last_name
-        ? `${user.first_name} ${user.last_name}`
-        : "",
-    role: user?.role || "student",
+    name: "",
+    role: "",
   });
 
   // Real mutation for form submission
@@ -44,16 +45,13 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
       });
     },
     onSuccess: () => {
-      // Reset form
+      // Reset form - leave name and role empty for next entry
       setFormData({
         diagnosis: "",
         freeText: "",
         plan: "",
-        name:
-          user?.first_name && user?.last_name
-            ? `${user.first_name} ${user.last_name}`
-            : "",
-        role: user?.role || "student",
+        name: "",
+        role: "",
       });
     },
   });
@@ -121,35 +119,13 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
 
             {/* Sign-off Section */}
             <div className="border-t pt-6">
-              <h3 className="text-md font-semibold text-gray-900 mb-4">
-                Sign-off
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name">Name *</Label>
-                  <Input
-                    id="name"
-                    placeholder="Full name"
-                    value={formData.name}
-                    onChange={(e) =>
-                      setFormData({ ...formData, name: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="role">Role *</Label>
-                  <Input
-                    id="role"
-                    placeholder="e.g., Medical Student, Resident, Attending"
-                    value={formData.role}
-                    onChange={(e) =>
-                      setFormData({ ...formData, role: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-              </div>
+              <SignOffSection
+                name={formData.name}
+                role={formData.role}
+                onNameChange={(name) => setFormData({ ...formData, name })}
+                onRoleChange={(role) => setFormData({ ...formData, role })}
+                idPrefix="discharge-signoff"
+              />
             </div>
 
             {/* Submit Button */}
