@@ -6,8 +6,7 @@ import TopNavigation from "@/components/top-navigation";
 import PatientList from "@/components/patient-list";
 import PatientHeader from "@/components/patient-header";
 import PatientOverview from "@/components/patient-overview";
-import CurrentObservationsDisplay from "@/components/current-observations-display";
-import AddObservations from "@/components/add-observations";
+import Observations from "@/components/observations";
 import SoapNotesForm from "@/components/soap-notes-form";
 import InvestigationRequests from "@/components/investigation-requests";
 import MedicationOrders from "@/components/medication-orders";
@@ -128,7 +127,7 @@ export default function StudentDashboard() {
             className="flex-1 flex flex-col min-h-0"
           >
             <div className="bg-white border-b border-gray-200 overflow-x-auto">
-              <TabsList className="h-auto p-0 bg-transparent inline-flex min-w-full">
+              <TabsList className="h-auto p-0 bg-transparent inline-flex min-w-full justify-center">
                 <div className="flex space-x-4 px-6">
                   <TabsTrigger
                     value="overview"
@@ -182,20 +181,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <div className="max-w-7xl mx-auto">
-                  <Tabs defaultValue="current" className="w-full">
-                    <TabsList className="grid w-full grid-cols-2 mb-6">
-                      <TabsTrigger value="current">Current Observations</TabsTrigger>
-                      <TabsTrigger value="add">Add Observations</TabsTrigger>
-                    </TabsList>
-                    <TabsContent value="current">
-                      <CurrentObservationsDisplay patient={selectedPatient} />
-                    </TabsContent>
-                    <TabsContent value="add">
-                      <AddObservations patient={selectedPatient} />
-                    </TabsContent>
-                  </Tabs>
-                </div>
+                <Observations patient={selectedPatient} />
               </div>
             </TabsContent>
 
@@ -204,9 +190,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <div className="max-w-7xl mx-auto">
-                  <SoapNotesForm patientId={selectedPatient.id.toString()} />
-                </div>
+                <SoapNotesForm patientId={selectedPatient.id.toString()} />
               </div>
             </TabsContent>
 
@@ -215,9 +199,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <div className="max-w-7xl mx-auto">
-                  <InvestigationRequests patientId={selectedPatient.id.toString()} />
-                </div>
+                <InvestigationRequests patientId={selectedPatient.id.toString()} />
               </div>
             </TabsContent>
 
@@ -226,9 +208,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <div className="max-w-7xl mx-auto">
-                  <MedicationOrders patientId={selectedPatient.id.toString()} />
-                </div>
+                <MedicationOrders patientId={selectedPatient.id.toString()} />
               </div>
             </TabsContent>
 
@@ -237,9 +217,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <div className="max-w-7xl mx-auto">
-                  <DischargeSummary patient={selectedPatient} />
-                </div>
+                <DischargeSummary patient={selectedPatient} />
               </div>
             </TabsContent>
           </Tabs>

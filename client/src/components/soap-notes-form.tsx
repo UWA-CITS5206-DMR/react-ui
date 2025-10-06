@@ -108,9 +108,9 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <Tabs defaultValue="create" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="create">
             <Plus className="h-4 w-4 mr-2" />
             Create Note

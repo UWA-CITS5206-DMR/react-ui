@@ -192,9 +192,9 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
   };
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <Tabs defaultValue="blood-tests" className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
+        <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="blood-tests">
             <FlaskConical className="h-4 w-4 mr-2" />
             Blood Tests
@@ -208,7 +208,7 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
         {/* Blood Tests Tab */}
         <TabsContent value="blood-tests">
           <Tabs defaultValue="create" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="create">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Request
@@ -357,7 +357,7 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
         {/* Imaging Tab */}
         <TabsContent value="imaging">
           <Tabs defaultValue="create" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-2 mb-4">
               <TabsTrigger value="create">
                 <Plus className="h-4 w-4 mr-2" />
                 Create Request
