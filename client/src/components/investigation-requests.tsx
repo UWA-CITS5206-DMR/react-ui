@@ -31,47 +31,47 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
         </TabsList>
 
         <TabsContent value="blood-tests">
-          <Tabs defaultValue="create" className="w-full">
+          <Tabs defaultValue="view" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="create">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Request
-              </TabsTrigger>
               <TabsTrigger value="view">
                 <List className="h-4 w-4 mr-2" />
                 View Requests
               </TabsTrigger>
+              <TabsTrigger value="create">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Request
+              </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="create">
-              <BloodTestRequestForm patientId={patientId} />
-            </TabsContent>
 
             <TabsContent value="view">
               <BloodTestRequestList patientId={patientId} />
+            </TabsContent>
+
+            <TabsContent value="create">
+              <BloodTestRequestForm patientId={patientId} />
             </TabsContent>
           </Tabs>
         </TabsContent>
 
         <TabsContent value="imaging">
-          <Tabs defaultValue="create" className="w-full">
+          <Tabs defaultValue="view" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-4">
-              <TabsTrigger value="create">
-                <Plus className="h-4 w-4 mr-2" />
-                Create Request
-              </TabsTrigger>
               <TabsTrigger value="view">
                 <List className="h-4 w-4 mr-2" />
                 View Requests
               </TabsTrigger>
+              <TabsTrigger value="create">
+                <Plus className="h-4 w-4 mr-2" />
+                Create Request
+              </TabsTrigger>
             </TabsList>
-
-            <TabsContent value="create">
-              <ImagingRequestForm patientId={patientId} />
-            </TabsContent>
 
             <TabsContent value="view">
               <ImagingRequestList patientId={patientId} />
+            </TabsContent>
+
+            <TabsContent value="create">
+              <ImagingRequestForm patientId={patientId} />
             </TabsContent>
           </Tabs>
         </TabsContent>

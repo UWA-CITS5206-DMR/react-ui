@@ -109,17 +109,59 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
 
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <Tabs defaultValue="create" className="w-full">
+      <Tabs defaultValue="view" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="create">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Note
-          </TabsTrigger>
           <TabsTrigger value="view">
             <List className="h-4 w-4 mr-2" />
             View Notes
           </TabsTrigger>
+          <TabsTrigger value="create">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Note
+          </TabsTrigger>
         </TabsList>
+
+        {/* View Notes */}
+        <TabsContent value="view">
+          <Card>
+            <CardHeader>
+              <CardTitle>Clinical Notes</CardTitle>
+              <CardDescription>View all clinical notes for this patient</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {!notes || notes.results.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">No notes found</p>
+              ) : (
+                <div className="space-y-4">
+                  {notes.results.map((note: NoteEntry) => (
+                    <Card key={note.id}>
+                      <CardContent className="pt-6">
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <p className="text-sm text-muted-foreground">
+                              {formatDate(note.created_at)}
+                            </p>
+                          </div>
+                          <FileText className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                        <div className="space-y-3">
+                          <div className="bg-muted/30 p-4 rounded-md">
+                            <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
+                          </div>
+                          <div className="border-t pt-2">
+                            <p className="text-xs text-muted-foreground">
+                              Written by: {note.name} ({note.role})
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Create Note */}
         <TabsContent value="create">
@@ -185,48 +227,6 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
               </CardContent>
             </Card>
           </form>
-        </TabsContent>
-
-        {/* View Notes */}
-        <TabsContent value="view">
-          <Card>
-            <CardHeader>
-              <CardTitle>Clinical Notes</CardTitle>
-              <CardDescription>View all clinical notes for this patient</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!notes || notes.results.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">No notes found</p>
-              ) : (
-                <div className="space-y-4">
-                  {notes.results.map((note: NoteEntry) => (
-                    <Card key={note.id}>
-                      <CardContent className="pt-6">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              {formatDate(note.created_at)}
-                            </p>
-                          </div>
-                          <FileText className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="space-y-3">
-                          <div className="bg-muted/30 p-4 rounded-md">
-                            <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
-                          </div>
-                          <div className="border-t pt-2">
-                            <p className="text-xs text-muted-foreground">
-                              Written by: {note.name} ({note.role})
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
         </TabsContent>
       </Tabs>
     </div>

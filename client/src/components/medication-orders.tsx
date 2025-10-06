@@ -16,24 +16,24 @@ interface MedicationOrdersProps {
 export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6">
-      <Tabs defaultValue="create" className="w-full">
+      <Tabs defaultValue="view" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="create">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Order
-          </TabsTrigger>
           <TabsTrigger value="view">
             <List className="h-4 w-4 mr-2" />
             View Orders
           </TabsTrigger>
+          <TabsTrigger value="create">
+            <Plus className="h-4 w-4 mr-2" />
+            Create Order
+          </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="create">
-          <MedicationOrderForm patientId={patientId} />
-        </TabsContent>
 
         <TabsContent value="view">
           <MedicationOrderList patientId={patientId} />
+        </TabsContent>
+
+        <TabsContent value="create">
+          <MedicationOrderForm patientId={patientId} />
         </TabsContent>
       </Tabs>
     </div>
