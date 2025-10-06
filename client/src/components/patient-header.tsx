@@ -1,11 +1,18 @@
-import { MapPin, AlertCircle } from "lucide-react";
+import { useState } from "react";
+import { MapPin, AlertCircle, Edit } from "lucide-react";
 import type { Patient } from "@shared/schema";
+import { Button } from "@/components/ui/button";
+import { PatientProfileEdit } from "@/components/ui/patient-profile-edit";
 
 interface PatientHeaderProps {
   patient: Patient;
+  onPatientUpdated?: (updatedPatient: Patient) => void;
 }
 
-export default function PatientHeader({ patient }: PatientHeaderProps) {
+export default function PatientHeader({ patient, onPatientUpdated }: PatientHeaderProps) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
   const calculateAge = (dateOfBirth: string) => {
     const today = new Date();
     const birthDate = new Date(dateOfBirth);
@@ -55,6 +62,33 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
     }
   };
 
+  const handleSave = async (updatedPatient: Patient) => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`/api/patients/${patient.id}`, {
+        method: 'PATCH',
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        body: JSON.stringify(updatedPatient)
+      });
+      
+      if (response.ok) {
+        const savedPatient = await response.json();
+        if (onPatientUpdated) {
+          onPatientUpdated(savedPatient);
+        }
+        setIsEditing(false);
+      } else {
+        console.error('Failed to update patient');
+      }
+    } catch (error) {
+      console.error('Error updating patient:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const statusDisplay = getStatusDisplay(patient.status);
   const StatusIcon = statusDisplay.icon;
 
@@ -84,8 +118,30 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
             {StatusIcon && <StatusIcon className="h-4 w-4 mr-1" />}
             {statusDisplay.label}
           </span>
+          <Button 
+            variant="outline" 
+            size="sm"
+            onClick={() => setIsEditing(true)}
+            disabled={isLoading}
+          >
+            <Edit className="h-4 w-4 mr-1" />
+            Edit
+          </Button>
         </div>
       </div>
+
+      {/* Edit Modal */}
+      {isEditing && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <PatientProfileEdit 
+              patient={patient}
+              onSave={handleSave}
+              onCancel={() => setIsEditing(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

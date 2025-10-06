@@ -1,4 +1,4 @@
-import { Hospital, Users, User, Settings } from "lucide-react";
+import { Hospital, Users, User, Settings, Plus } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
@@ -8,15 +8,20 @@ interface TopNavigationProps {
   onModeChange: (mode: "student" | "instructor") => void;
   sessionName?: string;
   timeRemaining?: string;
+  onCreatePatient?: () => void; // New prop for create patient
 }
 
 export default function TopNavigation({ 
   currentMode, 
   onModeChange, 
   sessionName = "Emergency Department Scenario",
-  timeRemaining = "42:15"
+  timeRemaining = "42:15",
+  onCreatePatient
 }: TopNavigationProps) {
   const { user, logout } = useAuth();
+
+  // Show Create Patient only for instructors and admins
+  const canCreatePatient = user?.role === "instructor" || user?.role === "admin";
 
   return (
     <header className="bg-hospital-blue text-white px-6 py-4 flex items-center justify-between shadow-lg">
@@ -31,6 +36,18 @@ export default function TopNavigation({
       </div>
       
       <div className="flex items-center space-x-6">
+        {/* CREATE PATIENT BUTTON - Only for instructors/admin */}
+        {canCreatePatient && onCreatePatient && (
+          <Button 
+            onClick={onCreatePatient}
+            size="sm"
+            className="bg-white/10 hover:bg-white/20 text-white flex items-center gap-2 border border-white/20"
+          >
+            <Plus className="h-4 w-4" />
+            Create Patient
+          </Button>
+        )}
+        
         {user?.role === "instructor" && (
           <>
             <div className="flex items-center space-x-2">

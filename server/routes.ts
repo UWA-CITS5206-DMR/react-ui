@@ -1,3 +1,4 @@
+import express from "express";
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
@@ -15,8 +16,49 @@ import {
   insertAssetSchema,
   insertPatientSchema
 } from "@shared/schema";
+import multer from "multer";
+import path from "path";
+import fs from "fs";
+
+// Configure multer for file uploads
+const storageConfig = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = './uploads';
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    // Create unique filename with timestamp and original name
+    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+    cb(null, 'document-' + uniqueSuffix + path.extname(file.originalname));
+  }
+});
+
+const upload = multer({ 
+  storage: storageConfig,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    // Allow only specific file types
+    const allowedTypes = /pdf|jpg|jpeg|png|doc|docx/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (mimetype && extname) {
+      return cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only PDF, images, and Word documents are allowed.'));
+    }
+  }
+});
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Serve static files from uploads directory
+  app.use('/uploads', express.static('uploads'));
+
   // Authentication
   app.post("/api/auth/login", async (req, res) => {
     try {
@@ -88,42 +130,121 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch patient" });
     }
   });
-app.post("/api/patients", async (req, res) => {
-  try {
-    // TODO: Remove debug log after patient creation is verified
-    console.log('Received patient data:', req.body);
-    const patientData = insertPatientSchema.parse(req.body);
-    console.log('Parsed patient data:', patientData);
-    const patient = await storage.createPatient(patientData);
-    res.status(201).json(patient);
-  } catch (error) {
-    console.log('Validation error details:', error);
-    if (error instanceof Error) {
-      console.log('Error message:', error.message);
-      console.log('Error stack:', error.stack);
-    }
-    res.status(400).json({ 
-      message: "Invalid patient data",
-      error: error instanceof Error ? error.message : String(error)
-    });
-  }
-});
 
-// Delete patient
-app.delete("/api/patients/:patientId", async (req, res) => {
-  try {
-    const { patientId } = req.params;
-    const deleted = await storage.deletePatient(patientId);
-    
-    if (!deleted) {
-      return res.status(404).json({ message: "Patient not found" });
+  app.post("/api/patients", async (req, res) => {
+    try {
+      console.log('Received patient data:', req.body);
+      const patientData = insertPatientSchema.parse(req.body);
+      console.log('Parsed patient data:', patientData);
+      const patient = await storage.createPatient(patientData);
+      res.status(201).json(patient);
+    } catch (error) {
+      console.log('Validation error details:', error);
+      if (error instanceof Error) {
+        console.log('Error message:', error.message);
+        console.log('Error stack:', error.stack);
+      }
+      res.status(400).json({ 
+        message: "Invalid patient data",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
+  });
 
-    res.status(204).send();
-  } catch (error) {
-    res.status(500).json({ message: "Failed to delete patient" });
-  }
-});
+  // Delete patient
+  app.delete("/api/patients/:patientId", async (req, res) => {
+    try {
+      const { patientId } = req.params;
+      const deleted = await storage.deletePatient(patientId);
+      
+      if (!deleted) {
+        return res.status(404).json({ message: "Patient not found" });
+      }
+
+      res.status(204).send();
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete patient" });
+    }
+  });
+
+  // ========== PATIENT DOCUMENT ROUTES ==========
+  app.get("/api/patients/:patientId/documents", async (req, res) => {
+    try {
+      const { patientId } = req.params;
+      console.log('📁 GET documents for patient:', patientId);
+      const documents = await storage.getDocuments("session-1", patientId);
+      console.log('📁 Found documents:', documents.length);
+      res.json(documents);
+    } catch (error) {
+      console.error("Error fetching patient documents:", error);
+      res.status(500).json({ message: "Failed to fetch patient documents" });
+    }
+  });
+
+  app.post("/api/patients/:patientId/documents", upload.single('file'), async (req, res) => {
+    try {
+      const { patientId } = req.params;
+      
+      if (!req.file) {
+        return res.status(400).json({ message: "No file uploaded" });
+      }
+
+      console.log('📁 File uploaded:', {
+        originalName: req.file.originalname,
+        filename: req.file.filename,
+        size: req.file.size,
+        mimetype: req.file.mimetype
+      });
+
+      const documentData = {
+        sessionId: "session-1",
+        patientId: patientId,
+        category: req.body.category || "lab_result",
+        originalName: req.file.originalname,
+        filePath: `/uploads/${req.file.filename}`,
+        fileSize: req.file.size,
+        mimeType: req.file.mimetype,
+        uploadedBy: "instructor-1"
+      };
+      
+      const document = await storage.uploadDocument(documentData);
+      console.log('📁 Document created in storage:', document.id);
+      res.status(201).json(document);
+    } catch (error) {
+      console.error("Error uploading document:", error);
+      if (error instanceof Error) {
+        res.status(500).json({ message: error.message });
+      } else {
+        res.status(500).json({ message: "Failed to upload document" });
+      }
+    }
+  });
+
+  // Delete document
+  app.delete("/api/patients/:patientId/documents/:documentId", async (req, res) => {
+    try {
+      const { documentId } = req.params;
+      const document = await storage.getDocument(documentId);
+      
+      if (document) {
+        // Delete physical file
+        const fs = require('fs');
+        const filePath = `.${document.filePath}`;
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+        
+        // Delete from storage
+        await storage.deleteDocument(documentId);
+      }
+      
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting document:", error);
+      res.status(500).json({ message: "Failed to delete document" });
+    }
+  });
+  // ========== END PATIENT DOCUMENT ROUTES ==========
 
   // Get patient vitals
   app.get("/api/patients/:patientId/vitals", async (req, res) => {
