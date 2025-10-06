@@ -55,7 +55,7 @@ export const patients = sqliteTable("patients", {
 
 export const medicalHistory = sqliteTable("medical_history", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+    patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   condition: text("condition").notNull(),
   diagnosedYear: text("diagnosed_year"),
   notes: text("notes"),
@@ -63,7 +63,7 @@ export const medicalHistory = sqliteTable("medical_history", {
 
 export const medications = sqliteTable("medications", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   name: text("name").notNull(),
   dosage: text("dosage").notNull(),
   frequency: text("frequency").notNull(),
@@ -73,7 +73,7 @@ export const medications = sqliteTable("medications", {
 
 export const vitalSigns = sqliteTable("vital_signs", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   bloodPressure: text("blood_pressure"),
   heartRate: integer("heart_rate"),
   respiratoryRate: integer("respiratory_rate"),
@@ -85,7 +85,7 @@ export const vitalSigns = sqliteTable("vital_signs", {
 
 export const labResults = sqliteTable("lab_results", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   testName: text("test_name").notNull(),
   value: text("value").notNull(),
   unit: text("unit"),
@@ -98,7 +98,7 @@ export const labResults = sqliteTable("lab_results", {
 
 export const soapNotes = sqliteTable("soap_notes", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   subjective: text("subjective"),
   objective: text("objective"),
   assessment: text("assessment"),
@@ -109,7 +109,7 @@ export const soapNotes = sqliteTable("soap_notes", {
 
 export const orders = sqliteTable("orders", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   type: text("type").notNull(), // 'lab', 'imaging', 'medication'
   orderText: text("order_text").notNull(),
   status: text("status").default('pending'), // 'pending', 'completed', 'cancelled'
@@ -168,7 +168,7 @@ export const groupDataAssignments = sqliteTable("group_data_assignments", {
   id: text("id").primaryKey().default(sql`(lower(hex(randomblob(16))))`),
   groupId: text("group_id").references(() => groups.id).notNull(),
   dataVersionId: text("data_version_id").references(() => dataVersions.id).notNull(),
-  patientId: text("patient_id").references(() => patients.id).notNull(),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }).notNull(),
   assignedBy: text("assigned_by").references(() => users.id).notNull(),
   assignedAt: integer("assigned_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),
 });
@@ -193,7 +193,7 @@ export const documents = sqliteTable("documents", {
   fileSize: integer("file_size").notNull(),
   filePath: text("file_path").notNull(),
   category: text("category").notNull(), // 'admission', 'lab', 'imaging', 'notes'
-  patientId: text("patient_id").references(() => patients.id),
+  patientId: text("patient_id").references(() => patients.id, { onDelete: "cascade" }),
   sessionId: text("session_id").references(() => sessions.id).notNull(),
   uploadedBy: text("uploaded_by").references(() => users.id).notNull(),
   uploadedAt: integer("uploaded_at", { mode: 'timestamp' }).default(sql`(unixepoch())`),

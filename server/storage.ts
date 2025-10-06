@@ -59,6 +59,7 @@ export interface IStorage {
   getPatient(id: string): Promise<Patient | undefined>;
   getPatientsBySession(sessionId: string): Promise<Patient[]>;
   updatePatient(id: string, updates: Partial<Patient>): Promise<Patient | undefined>;
+  deletePatient(id: string): Promise<boolean>;
   
   // Vital signs
   createVitalSigns(vitals: InsertVitalSigns): Promise<VitalSigns>;
@@ -711,6 +712,35 @@ export class MemStorage implements IStorage {
     this.patients.set(id, updatedPatient);
     return updatedPatient;
   }
+  async deletePatient(id: string): Promise<boolean> {
+  // Manual cascade delete for in-memory storage
+  const patient = this.patients.get(id);
+  if (!patient) return false;
+  
+  // Delete all related records
+  this.deleteRelatedRecords('medicalHistory', 'patientId', id);
+  this.deleteRelatedRecords('medications', 'patientId', id);
+  this.deleteRelatedRecords('vitalSigns', 'patientId', id);
+  this.deleteRelatedRecords('labResults', 'patientId', id);
+  this.deleteRelatedRecords('soapNotes', 'patientId', id);
+  this.deleteRelatedRecords('orders', 'patientId', id);
+  this.deleteRelatedRecords('groupDataAssignments', 'patientId', id);
+  this.deleteRelatedRecords('documents', 'patientId', id);
+  
+  // Finally delete the patient
+  return this.patients.delete(id);
+}
+
+private deleteRelatedRecords(collectionName: string, field: string, value: string): void {
+  const collection = (this as any)[collectionName] as Map<string, any>;
+  if (collection) {
+    for (const [key, record] of collection.entries()) {
+      if (record[field] === value) {
+        collection.delete(key);
+      }
+    }
+  }
+}
 
   async createVitalSigns(insertVitals: InsertVitalSigns): Promise<VitalSigns> {
     const id = randomUUID();
