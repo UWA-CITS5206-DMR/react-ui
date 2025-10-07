@@ -36,10 +36,9 @@ async function authenticatedFetch(input: RequestInfo | URL, init: RequestInit = 
 }
 
 // Create API Client v2 instance with authenticated fetcher
+// Note: Do not set Content-Type in defaultHeaders as it should be set dynamically
+// based on the request body type (JSON, FormData, etc.)
 export const apiClientV2 = new ApiClientV2({
-  defaultHeaders: {
-    "Content-Type": "application/json",
-  },
   fetcher: authenticatedFetch,
 });
 

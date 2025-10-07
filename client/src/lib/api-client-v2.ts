@@ -453,7 +453,13 @@ export class ApiClientV2 {
 
 		if (body !== undefined) {
 			if (isFormData(body)) {
+				// For FormData, let the browser set Content-Type with boundary
+				// Do NOT set Content-Type header manually
 				init.body = body;
+				// Remove Content-Type if it was set in defaultHeaders
+				const headers = new Headers(init.headers);
+				headers.delete("Content-Type");
+				init.headers = headers;
 			} else if (isBlob(body)) {
 				init.body = body;
 			} else if (body instanceof URLSearchParams) {
