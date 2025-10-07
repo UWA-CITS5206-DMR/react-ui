@@ -121,15 +121,15 @@ export default function InstructorDashboard() {
               </div>
               
               <div className="flex-1 overflow-hidden">
-                <TabsContent value="overview" className="h-full">
+                <TabsContent value="overview" className="h-full overflow-y-auto">
                   <PatientOverview patient={selectedPatient} />
                 </TabsContent>
                 
-                <TabsContent value="files" className="h-full p-4">
+                <TabsContent value="files" className="h-full overflow-y-auto p-4">
                   <FileManagement patientId={selectedPatient.id} />
                 </TabsContent>
                 
-                <TabsContent value="requests" className="h-full p-4">
+                <TabsContent value="requests" className="h-full overflow-y-auto p-4">
                   <InstructorLabRequests patientId={selectedPatient.id} />
                 </TabsContent>
               </div>

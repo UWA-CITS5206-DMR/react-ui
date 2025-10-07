@@ -95,12 +95,12 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
 
   // Fetch patient files for approval dialog
   const { data: patientFilesData } = useQuery({
-    queryKey: ["patients", approvalDialog.request?.patient, "files"],
+    queryKey: ["patients", approvalDialog.request?.patient?.id, "files"],
     queryFn: async () => {
       if (!approvalDialog.request?.patient) {
         return { count: 0, next: null, previous: null, results: [] };
       }
-      return apiClientV2.patients.files.list(approvalDialog.request.patient);
+      return apiClientV2.patients.files.list(approvalDialog.request.patient.id);
     },
     enabled: approvalDialog.open && !!approvalDialog.request?.patient,
   });
@@ -290,6 +290,16 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               </div>
               
               <div className="space-y-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>Student Group: {request.user.username}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  <span>
+                    Patient: {request.patient.first_name} {request.patient.last_name}
+                  </span>
+                </div>
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
                   <span>Requested by: {request.name} ({request.role})</span>

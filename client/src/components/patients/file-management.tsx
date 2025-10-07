@@ -11,6 +11,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Upload, FileText, Image, File, Trash2 } from "lucide-react";
 import type { PatientFile, FileCategory } from "@/lib/api-client-v2";
+import FilePreviewDialog from "./file-preview-dialog";
 
 interface FileManagementProps {
   patientId: number;
@@ -20,6 +21,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<FileCategory>("Admission");
   const [requiresPagination, setRequiresPagination] = useState(false);
+  const [previewFile, setPreviewFile] = useState<PatientFile | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -237,13 +239,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => {
-                          // Open file view - this would need to be implemented
-                          toast({
-                            title: "File View",
-                            description: "File viewing functionality would open here.",
-                          });
-                        }}
+                        onClick={() => setPreviewFile(file)}
                       >
                         View
                       </Button>
@@ -276,6 +272,19 @@ export default function FileManagement({ patientId }: FileManagementProps) {
           </p>
         </div>
       </CardContent>
+
+      {/* File Preview Dialog */}
+      {previewFile && (
+        <FilePreviewDialog
+          open={!!previewFile}
+          onOpenChange={(open) => !open && setPreviewFile(null)}
+          patientId={patientId}
+          fileId={previewFile.id}
+          fileName={previewFile.display_name}
+          category={previewFile.category}
+          requiresPagination={previewFile.requires_pagination}
+        />
+      )}
     </Card>
   );
 }

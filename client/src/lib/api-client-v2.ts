@@ -68,8 +68,8 @@ export interface ApprovedFileRequest {
 
 export interface BloodTestRequest {
 	id: number;
-	patient: number;
-	user: number;
+	patient: Patient;
+	user: User;
 	test_type: BloodTestType;
 	reason: string;
 	status: Status;
@@ -98,8 +98,8 @@ export interface BloodTestRequestStatusUpdate {
 
 export interface ImagingRequest {
 	id: number;
-	patient: number;
-	user: number;
+	patient: Patient;
+	user: User;
 	test_type: ImagingTestType;
 	reason: string;
 	status: Status;
@@ -1092,11 +1092,12 @@ export class ApiClientV2 {
 					`/api/patients/patients/${patientId}/files/${fileId}/`,
 					{ method: "DELETE" },
 				),
-			view: (patientId: number, fileId: string) =>
+			view: (patientId: number, fileId: string, pageRange?: string) =>
 				this.request<Blob>(
 					`/api/patients/patients/${patientId}/files/${fileId}/view/`,
 					{
 						method: "GET",
+						query: pageRange ? { page_range: pageRange } : undefined,
 						parser: (response) => response.blob(),
 					},
 				),
