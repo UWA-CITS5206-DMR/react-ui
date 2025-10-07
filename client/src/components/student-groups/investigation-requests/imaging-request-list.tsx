@@ -40,6 +40,8 @@ export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
                   name: request.name,
                   role: request.role,
                 }}
+                approvedFiles={request.approved_files}
+                patientId={parseInt(patientId)}
               />
             ))}
           </div>

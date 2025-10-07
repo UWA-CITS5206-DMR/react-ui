@@ -32,14 +32,17 @@ import {
   ChevronRight,
   FileText,
   Calendar,
-  User
+  User,
+  Eye
 } from "lucide-react";
 import type { 
   BloodTestRequest, 
   ImagingRequest,
   ApprovedFileRequest,
-  PatientFile 
+  PatientFile,
+  ApprovedFile
 } from "@/lib/api-client-v2";
+import FilePreviewDialog from "@/components/patients/file-preview-dialog";
 
 interface InstructorLabRequestsProps {
   patientId?: number;
@@ -70,6 +73,16 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
   // File selection state for approval
   const [selectedFiles, setSelectedFiles] = useState<ApprovedFileRequest[]>([]);
   const [pageRangeInput, setPageRangeInput] = useState<Record<string, string>>({});
+
+  // File preview state
+  const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
+  const [selectedPreviewFile, setSelectedPreviewFile] = useState<{
+    fileId: string;
+    fileName: string;
+    pageRange?: string;
+    requiresPagination: boolean;
+    patientId: number;
+  } | null>(null);
 
   // Fetch blood test requests (with pagination)
   const { data: bloodTestsData, isLoading: isLoadingBloodTests } = useQuery({
@@ -254,6 +267,17 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
     }
   };
 
+  const handlePreviewFile = (file: ApprovedFile, patientId: number) => {
+    setSelectedPreviewFile({
+      fileId: file.file_id,
+      fileName: file.display_name,
+      pageRange: file.page_range ?? undefined,
+      requiresPagination: file.requires_pagination,
+      patientId: patientId,
+    });
+    setPreviewDialogOpen(true);
+  };
+
   const bloodTests = bloodTestsData?.results || [];
   const imagingRequests = imagingRequestsData?.results || [];
   const patientFiles = patientFilesData?.results || [];
@@ -322,17 +346,37 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               {request.approved_files && request.approved_files.length > 0 && (
                 <div className="mt-3 pt-3 border-t">
                   <p className="text-sm font-medium mb-2">Approved Files:</p>
-                  <ul className="text-sm text-gray-600 space-y-1">
+                  <div className="space-y-2">
                     {request.approved_files.map((file) => (
-                      <li key={file.id} className="flex items-center gap-2">
-                        <FileText className="h-3 w-3" />
-                        <span>
-                          {file.display_name}
-                          {file.page_range && ` (Pages: ${file.page_range})`}
-                        </span>
-                      </li>
+                      <div
+                        key={file.id}
+                        className="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                      >
+                        <div className="flex-1 min-w-0 flex items-center gap-2">
+                          <FileText className="h-3 w-3 flex-shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {file.display_name}
+                            </p>
+                            {file.page_range && (
+                              <p className="text-xs text-gray-500">
+                                Pages: {file.page_range}
+                              </p>
+                            )}
+                          </div>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handlePreviewFile(file, request.patient.id)}
+                          className="ml-2"
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          Preview
+                        </Button>
+                      </div>
                     ))}
-                  </ul>
+                  </div>
                 </div>
               )}
             </div>
@@ -587,6 +631,18 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* File Preview Dialog */}
+      {selectedPreviewFile && (
+        <FilePreviewDialog
+          open={previewDialogOpen}
+          onOpenChange={setPreviewDialogOpen}
+          patientId={selectedPreviewFile.patientId}
+          fileId={selectedPreviewFile.fileId}
+          fileName={selectedPreviewFile.fileName}
+          requiresPagination={selectedPreviewFile.requiresPagination}
+        />
+      )}
     </>
   );
 }

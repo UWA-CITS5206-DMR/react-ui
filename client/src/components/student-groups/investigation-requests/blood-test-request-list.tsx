@@ -40,6 +40,8 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
                   name: request.name,
                   role: request.role,
                 }}
+                approvedFiles={request.approved_files}
+                patientId={parseInt(patientId)}
               />
             ))}
           </div>
