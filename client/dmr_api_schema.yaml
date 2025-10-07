@@ -466,6 +466,12 @@ paths:
   /api/patients/patients/:
     get:
       operationId: patients_patients_list
+      description: |-
+        ViewSet for managing patient records.
+
+        Provides CRUD operations for patients.
+        - Students: read-only access
+        - Instructors/Admins: full CRUD access
       parameters:
       - name: page
         required: false
@@ -487,6 +493,12 @@ paths:
           description: ''
     post:
       operationId: patients_patients_create
+      description: |-
+        ViewSet for managing patient records.
+
+        Provides CRUD operations for patients.
+        - Students: read-only access
+        - Instructors/Admins: full CRUD access
       tags:
       - patients
       requestBody:
@@ -514,6 +526,9 @@ paths:
   /api/patients/patients/{patient_pk}/files/:
     get:
       operationId: patients_patients_files_list
+      description: Returns all files associated with a specific patient. Only accessible
+        by instructors and admins.
+      summary: List files for a patient
       parameters:
       - name: page
         required: false
@@ -540,6 +555,10 @@ paths:
           description: ''
     post:
       operationId: patients_patients_files_create
+      description: Upload a new file for a patient. The file can be categorized using
+        the 'category' field. For PDF files, set 'requires_pagination' to true to
+        enable page-based authorization. Only accessible by instructors and admins.
+      summary: Upload a new file
       parameters:
       - in: path
         name: patient_pk
@@ -553,6 +572,22 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FileRequest'
+            examples:
+              UploadPDFWithPaginationEnabled:
+                value:
+                  file: (binary data)
+                  category: Imaging
+                  requires_pagination: true
+                summary: Upload PDF with pagination enabled
+                description: Upload a PDF file with pagination enabled for granular
+                  access control
+              UploadPathologyReport:
+                value:
+                  file: (binary data)
+                  category: Pathology
+                  requires_pagination: false
+                summary: Upload pathology report
+                description: Upload a regular pathology report without pagination
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/FileRequest'
@@ -573,6 +608,9 @@ paths:
   /api/patients/patients/{patient_pk}/files/{id}/:
     get:
       operationId: patients_patients_files_retrieve
+      description: Get metadata for a specific file including category, pagination
+        status, and creation date. Only accessible by instructors and admins.
+      summary: Retrieve file details
       parameters:
       - in: path
         name: id
@@ -601,6 +639,10 @@ paths:
           description: ''
     put:
       operationId: patients_patients_files_update
+      description: 'Update file metadata such as category or pagination settings.
+        Note: The actual file content cannot be updated - delete and recreate instead.
+        Only accessible by instructors and admins.'
+      summary: Update file metadata
       parameters:
       - in: path
         name: id
@@ -641,6 +683,9 @@ paths:
           description: ''
     patch:
       operationId: patients_patients_files_partial_update
+      description: Partially update file metadata such as category or pagination settings.
+        Only accessible by instructors and admins.
+      summary: Partially update file metadata
       parameters:
       - in: path
         name: id
@@ -680,6 +725,9 @@ paths:
           description: ''
     delete:
       operationId: patients_patients_files_destroy
+      description: Delete a file and remove it from disk. This will also remove any
+        approved file associations. Only accessible by instructors and admins.
+      summary: Delete a file
       parameters:
       - in: path
         name: id
@@ -737,6 +785,12 @@ paths:
   /api/patients/patients/{id}/:
     get:
       operationId: patients_patients_retrieve
+      description: |-
+        ViewSet for managing patient records.
+
+        Provides CRUD operations for patients.
+        - Students: read-only access
+        - Instructors/Admins: full CRUD access
       parameters:
       - in: path
         name: id
@@ -758,6 +812,12 @@ paths:
           description: ''
     put:
       operationId: patients_patients_update
+      description: |-
+        ViewSet for managing patient records.
+
+        Provides CRUD operations for patients.
+        - Students: read-only access
+        - Instructors/Admins: full CRUD access
       parameters:
       - in: path
         name: id
@@ -791,6 +851,12 @@ paths:
           description: ''
     patch:
       operationId: patients_patients_partial_update
+      description: |-
+        ViewSet for managing patient records.
+
+        Provides CRUD operations for patients.
+        - Students: read-only access
+        - Instructors/Admins: full CRUD access
       parameters:
       - in: path
         name: id
@@ -823,6 +889,12 @@ paths:
           description: ''
     delete:
       operationId: patients_patients_destroy
+      description: |-
+        ViewSet for managing patient records.
+
+        Provides CRUD operations for patients.
+        - Students: read-only access
+        - Instructors/Admins: full CRUD access
       parameters:
       - in: path
         name: id
@@ -841,6 +913,10 @@ paths:
   /api/patients/patients/{id}/upload_file/:
     post:
       operationId: patients_patients_upload_file_create
+      description: Legacy endpoint for uploading files to a patient. Consider using
+        POST /api/patients/{patient_pk}/files/ instead for better REST compliance.
+        This endpoint supports file upload with category and pagination settings.
+      summary: Upload file for patient (Legacy)
       parameters:
       - in: path
         name: id
@@ -855,6 +931,19 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/FileRequest'
+            examples:
+              UploadPDFWithPagination:
+                value:
+                  file: file.pdf
+                  category: Imaging
+                  requires_pagination: true
+                summary: Upload PDF with pagination
+              UploadRegularFile:
+                value:
+                  file: document.txt
+                  category: Other
+                  requires_pagination: false
+                summary: Upload regular file
           application/x-www-form-urlencoded:
             schema:
               $ref: '#/components/schemas/FileRequest'
@@ -866,7 +955,7 @@ paths:
       - tokenAuth: []
       - cookieAuth: []
       responses:
-        '200':
+        '201':
           content:
             application/json:
               schema:
@@ -1307,9 +1396,21 @@ paths:
   /api/student-groups/observations/:
     get:
       operationId: student_groups_observations_list
-      description: Retrieve observations for a specific user and patient
+      description: "Retrieve observations for the authenticated user and a specific\
+        \ patient. Supports ordering and basic pagination via page_size parameter.\
+        \ \n\nNote: This endpoint returns multiple heterogeneous observation types\
+        \ in a single response, which doesn't support standard DRF pagination (page\
+        \ numbers, next/previous links). For full pagination support with individual\
+        \ observation types, use the specific endpoints: /observations/blood-pressures/,\
+        \ /observations/heart-rates/, etc."
       summary: List observations
       parameters:
+      - in: query
+        name: ordering
+        schema:
+          type: string
+        description: 'Order by field (e.g., ''created_at'' or ''-created_at'' for
+          descending). Default: ''-created_at'''
       - name: page
         required: false
         in: query
@@ -1317,16 +1418,16 @@ paths:
         schema:
           type: integer
       - in: query
+        name: page_size
+        schema:
+          type: integer
+        description: Limit number of records returned for each observation type. Does
+          not support page navigation.
+      - in: query
         name: patient
         schema:
           type: integer
         description: Patient ID
-        required: true
-      - in: query
-        name: user
-        schema:
-          type: integer
-        description: User ID
         required: true
       tags:
       - student-groups
@@ -1342,8 +1443,8 @@ paths:
           description: ''
     post:
       operationId: student_groups_observations_create
-      description: Create one or more observation records (blood pressure, heart rate,
-        body temperature, respiratory rate, blood sugar, oxygen saturation)
+      description: Create one or more observation records. The user is automatically
+        set to the authenticated user.
       summary: Create observations
       tags:
       - student-groups
@@ -1357,7 +1458,6 @@ paths:
                 value:
                   blood_pressure:
                     patient: 1
-                    user: 1
                     systolic: 120
                     diastolic: 80
                 summary: Blood Pressure Only
@@ -1365,24 +1465,19 @@ paths:
                 value:
                   blood_pressure:
                     patient: 1
-                    user: 1
                     systolic: 120
                     diastolic: 80
                   heart_rate:
                     patient: 1
-                    user: 1
                     heart_rate: 72
                   respiratory_rate:
                     patient: 1
-                    user: 1
                     respiratory_rate: 16
                   blood_sugar:
                     patient: 1
-                    user: 1
                     sugar_level: 120.0
                   oxygen_saturation:
                     patient: 1
-                    user: 1
                     saturation_percentage: 98
                 summary: Multiple Observations
           application/x-www-form-urlencoded:
@@ -1405,7 +1500,6 @@ paths:
                   value:
                     blood_pressure:
                       patient: 1
-                      user: 1
                       systolic: 120
                       diastolic: 80
                   summary: Blood Pressure Only
@@ -1413,24 +1507,19 @@ paths:
                   value:
                     blood_pressure:
                       patient: 1
-                      user: 1
                       systolic: 120
                       diastolic: 80
                     heart_rate:
                       patient: 1
-                      user: 1
                       heart_rate: 72
                     respiratory_rate:
                       patient: 1
-                      user: 1
                       respiratory_rate: 16
                     blood_sugar:
                       patient: 1
-                      user: 1
                       sugar_level: 120.0
                     oxygen_saturation:
                       patient: 1
-                      user: 1
                       saturation_percentage: 98
                   summary: Multiple Observations
           description: ''
@@ -3007,6 +3096,13 @@ components:
       - role
     File:
       type: object
+      description: |-
+        Serializer for File model.
+
+        Handles file uploads with validation for:
+        - Category selection
+        - PDF pagination requirement (only PDFs can have requires_pagination=True)
+        - Automatic display_name generation from uploaded filename
       properties:
         id:
           type: string
@@ -3024,6 +3120,12 @@ components:
         file:
           type: string
           format: uri
+          description: The file to upload. Supported formats depend on use case.
+        requires_pagination:
+          type: boolean
+          default: false
+          description: Set to true for PDF files that should use page-based authorization.
+            Only valid for PDF files.
         created_at:
           type: string
           format: date-time
@@ -3036,12 +3138,25 @@ components:
       - patient
     FileRequest:
       type: object
+      description: |-
+        Serializer for File model.
+
+        Handles file uploads with validation for:
+        - Category selection
+        - PDF pagination requirement (only PDFs can have requires_pagination=True)
+        - Automatic display_name generation from uploaded filename
       properties:
         category:
           $ref: '#/components/schemas/CategoryEnum'
         file:
           type: string
           format: binary
+          description: The file to upload. Supported formats depend on use case.
+        requires_pagination:
+          type: boolean
+          default: false
+          description: Set to true for PDF files that should use page-based authorization.
+            Only valid for PDF files.
       required:
       - file
     HeartRate:
@@ -4035,12 +4150,25 @@ components:
           title: Temperature (°C)
     PatchedFileRequest:
       type: object
+      description: |-
+        Serializer for File model.
+
+        Handles file uploads with validation for:
+        - Category selection
+        - PDF pagination requirement (only PDFs can have requires_pagination=True)
+        - Automatic display_name generation from uploaded filename
       properties:
         category:
           $ref: '#/components/schemas/CategoryEnum'
         file:
           type: string
           format: binary
+          description: The file to upload. Supported formats depend on use case.
+        requires_pagination:
+          type: boolean
+          default: false
+          description: Set to true for PDF files that should use page-based authorization.
+            Only valid for PDF files.
     PatchedHeartRateRequest:
       type: object
       description: |-

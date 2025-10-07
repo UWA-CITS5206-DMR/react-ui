@@ -19,6 +19,7 @@ interface FileManagementProps {
 export default function FileManagement({ patientId }: FileManagementProps) {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<FileCategory>("Admission");
+  const [requiresPagination, setRequiresPagination] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -32,10 +33,15 @@ export default function FileManagement({ patientId }: FileManagementProps) {
 
   // Upload file mutation
   const uploadFileMutation = useMutation({
-    mutationFn: async ({ file, category }: { file: File; category: FileCategory }) => {
+    mutationFn: async ({ file, category, requires_pagination }: { 
+      file: File; 
+      category: FileCategory; 
+      requires_pagination: boolean 
+    }) => {
       return apiClientV2.patients.files.create(patientId, {
         file,
         category,
+        requires_pagination,
       });
     },
     onSuccess: () => {
@@ -96,6 +102,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
     uploadFileMutation.mutate({
       file: selectedFile,
       category: selectedCategory,
+      requires_pagination: requiresPagination,
     });
   };
 
@@ -169,6 +176,19 @@ export default function FileManagement({ patientId }: FileManagementProps) {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+          
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="requiresPagination"
+              checked={requiresPagination}
+              onChange={(e) => setRequiresPagination(e.target.checked)}
+              className="rounded border-gray-300"
+            />
+            <Label htmlFor="requiresPagination" className="text-sm font-normal cursor-pointer">
+              Requires page-based access control (only PDF documents)
+            </Label>
           </div>
           
           <Button

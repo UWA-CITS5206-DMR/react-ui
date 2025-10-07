@@ -3,11 +3,11 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
-import PatientList from "@/components/patient/patient-list";
-import PatientHeader from "@/components/patient/patient-header";
-import PatientOverview from "@/components/patient/patient-overview";
-import InstructorControls from "@/components/instructor/instructor-controls";
-import FileManagement from "@/components/patient/file-management";
+import PatientList from "@/components/patients/patient-list";
+import PatientHeader from "@/components/patients/patient-header";
+import PatientOverview from "@/components/patients/patient-overview";
+import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
+import FileManagement from "@/components/patients/file-management";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
@@ -130,11 +130,7 @@ export default function InstructorDashboard() {
                 </TabsContent>
                 
                 <TabsContent value="requests" className="h-full p-4">
-                  <InstructorControls
-                    patientId={selectedPatient.id.toString()}
-                    isVisible={true}
-                    onClose={() => {}}
-                  />
+                  <InstructorLabRequests patientId={selectedPatient.id} />
                 </TabsContent>
               </div>
             </Tabs>

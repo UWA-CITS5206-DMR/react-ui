@@ -194,12 +194,14 @@ export interface PatientFile {
 	display_name: string;
 	category?: FileCategory;
 	file: string;
+	requires_pagination: boolean;
 	created_at: ISODateString;
 }
 
 export interface PatientFileUpload {
 	category?: FileCategory;
 	file: File | Blob;
+	requires_pagination?: boolean;
 }
 
 export interface Patient {
@@ -1029,6 +1031,9 @@ export class ApiClientV2 {
 				if (payload.category) {
 					formData.append("category", payload.category);
 				}
+				if (payload.requires_pagination !== undefined) {
+					formData.append("requires_pagination", String(payload.requires_pagination));
+				}
 
 				return this.request<PatientFile>(
 					`/api/patients/patients/${patientId}/files/`,
@@ -1045,6 +1050,9 @@ export class ApiClientV2 {
 				formData.append("file", payload.file);
 				if (payload.category) {
 					formData.append("category", payload.category);
+				}
+				if (payload.requires_pagination !== undefined) {
+					formData.append("requires_pagination", String(payload.requires_pagination));
 				}
 
 				return this.request<PatientFile>(
@@ -1063,6 +1071,9 @@ export class ApiClientV2 {
 				}
 				if (payload.category) {
 					formData.append("category", payload.category);
+				}
+				if (payload.requires_pagination !== undefined) {
+					formData.append("requires_pagination", String(payload.requires_pagination));
 				}
 
 				return this.request<PatientFile>(
@@ -1089,6 +1100,9 @@ export class ApiClientV2 {
 			formData.append("file", payload.file);
 			if (payload.category) {
 				formData.append("category", payload.category);
+			}
+			if (payload.requires_pagination !== undefined) {
+				formData.append("requires_pagination", String(payload.requires_pagination));
 			}
 
 			return this.request<PatientFile>(
