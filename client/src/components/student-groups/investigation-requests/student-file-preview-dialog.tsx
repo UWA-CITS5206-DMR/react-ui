@@ -19,13 +19,13 @@ interface StudentFilePreviewDialogProps {
   fileName: string;
   category?: FileCategory;
   requiresPagination?: boolean;
-  pageRange?: string; // Pre-defined page range from instructor
+  pageRange?: string; // Display only - shows approved page range, not sent to server
 }
 
 /**
  * Student-specific file preview dialog
- * Uses instructor-specified page range from approved files
- * Does not allow students to modify the page range
+ * Server determines the page range based on instructor approval
+ * Students cannot modify or specify the page range
  */
 export default function StudentFilePreviewDialog({
   open,
@@ -37,10 +37,10 @@ export default function StudentFilePreviewDialog({
   requiresPagination = false,
   pageRange,
 }: StudentFilePreviewDialogProps) {
-  // Fetch file blob with instructor-specified page range
+  // Fetch file blob - server determines page range based on approval
   const { data: fileBlob, isLoading, error } = useQuery({
-    queryKey: ["patients", patientId, "files", fileId, "view", pageRange],
-    queryFn: () => apiClientV2.patients.files.view(patientId, fileId, pageRange),
+    queryKey: ["patients", patientId, "files", fileId, "view"],
+    queryFn: () => apiClientV2.patients.files.view(patientId, fileId),
     enabled: open,
     staleTime: 0, // Always refetch when dialog opens
     gcTime: 0, // Don't cache the blob
