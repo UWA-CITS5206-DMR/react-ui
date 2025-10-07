@@ -78,11 +78,13 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
           instructions: "",
         },
       ]);
+      setSignOffName("");
+      setSignOffRole("");
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to submit medication orders. Please try again.",
+        description: `Failed to submit medication orders. ${error.message}`,
         variant: "destructive",
       });
     },

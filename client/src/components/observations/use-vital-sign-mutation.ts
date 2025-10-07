@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClientV2 } from "@/lib/queryClient";
+import { useToast } from "@/hooks/use-toast";
 import type { ObservationCreateBundle, User } from "@/lib/api-client-v2";
 
 interface UseVitalSignMutationOptions {
@@ -13,6 +14,7 @@ interface UseVitalSignMutationOptions {
  */
 export function useVitalSignMutation({ patientId, user, onSuccess }: UseVitalSignMutationOptions) {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   return useMutation({
     mutationFn: async (payload: ObservationCreateBundle) => {
@@ -21,9 +23,29 @@ export function useVitalSignMutation({ patientId, user, onSuccess }: UseVitalSig
       }
       return apiClientV2.studentGroups.observations.createBundle(payload);
     },
-    onSuccess: () => {
+    onSuccess: (data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "vitals"] });
+      
+      const vitalSignType = Object.keys(variables)[0]
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+
+      toast({
+        title: "Success",
+        description: `${vitalSignType} submitted successfully!`,
+      });
       onSuccess?.();
+    },
+    onError: (error: Error, variables) => {
+      const vitalSignType = Object.keys(variables)[0]
+        .replace(/_/g, ' ')
+        .replace(/\b\w/g, l => l.toUpperCase());
+        
+      toast({
+        title: "Error",
+        description: `Failed to submit ${vitalSignType}. ${error.message}`,
+        variant: "destructive",
+      });
     },
   });
 }

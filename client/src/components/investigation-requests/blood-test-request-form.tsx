@@ -68,11 +68,13 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
       // Reset form
       setTestType("");
       setReason("");
+      setSignOffName("");
+      setSignOffRole("");
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to submit blood test request. Please try again.",
+        description: `Failed to submit blood test request. ${error.message}`,
         variant: "destructive",
       });
     },

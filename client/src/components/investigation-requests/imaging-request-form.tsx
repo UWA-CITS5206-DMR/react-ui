@@ -66,11 +66,13 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
       // Reset form
       setTestType("");
       setReason("");
+      setSignOffName("");
+      setSignOffRole("");
     },
-    onError: () => {
+    onError: (error: Error) => {
       toast({
         title: "Error",
-        description: "Failed to submit imaging request. Please try again.",
+        description: `Failed to submit imaging request. ${error.message}`,
         variant: "destructive",
       });
     },

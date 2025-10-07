@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,7 @@ const initialFormData: BulkFormData = {
 export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   const [formData, setFormData] = useState<BulkFormData>(initialFormData);
 
   const createBulkObservationsMutation = useMutation({
@@ -114,10 +116,18 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
         queryKey: ["/api/student-groups/observations/history", patient.id],
       });
       setFormData(initialFormData);
+      toast({
+        title: "Success",
+        description: "Bulk vital signs submitted successfully!",
+      });
     },
     onError: (error: Error) => {
       console.error("Failed to record new vitals:", error);
-      alert(`Error: ${error.message}`);
+      toast({
+        title: "Error",
+        description: `Failed to record new vitals: ${error.message}`,
+        variant: "destructive",
+      });
     },
   });
 
