@@ -47,54 +47,69 @@ export function ObservationChart({
   painScores = [],
 }: ObservationChartProps) {
   // Transform blood pressure data for chart
-  const bpData = bloodPressures.map((bp) => ({
-    time: format(new Date(bp.created_at), "HH:mm"),
-    systolic: bp.systolic,
-    diastolic: bp.diastolic,
-    fullTime: format(new Date(bp.created_at), "MMM dd, HH:mm"),
-  }));
+  // Sort by created_at in ascending order (oldest to newest) and format with full date
+  const bpData = bloodPressures
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((bp) => ({
+      time: format(new Date(bp.created_at), "MMM dd HH:mm"),
+      systolic: bp.systolic,
+      diastolic: bp.diastolic,
+      fullTime: format(new Date(bp.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   // Transform heart rate data for chart
-  const hrData = heartRates.map((hr) => ({
-    time: format(new Date(hr.created_at), "HH:mm"),
-    heartRate: hr.heart_rate,
-    fullTime: format(new Date(hr.created_at), "MMM dd, HH:mm"),
-  }));
+  const hrData = heartRates
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((hr) => ({
+      time: format(new Date(hr.created_at), "MMM dd HH:mm"),
+      heartRate: hr.heart_rate,
+      fullTime: format(new Date(hr.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   // Transform temperature data for chart
-  const tempData = bodyTemperatures.map((temp) => ({
-    time: format(new Date(temp.created_at), "HH:mm"),
-    temperature: parseFloat(temp.temperature),
-    fullTime: format(new Date(temp.created_at), "MMM dd, HH:mm"),
-  }));
+  const tempData = bodyTemperatures
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((temp) => ({
+      time: format(new Date(temp.created_at), "MMM dd HH:mm"),
+      temperature: parseFloat(temp.temperature),
+      fullTime: format(new Date(temp.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   // Transform respiratory rate data for chart
-  const rrData = respiratoryRates.map((rr) => ({
-    time: format(new Date(rr.created_at), "HH:mm"),
-    respiratoryRate: rr.respiratory_rate,
-    fullTime: format(new Date(rr.created_at), "MMM dd, HH:mm"),
-  }));
+  const rrData = respiratoryRates
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((rr) => ({
+      time: format(new Date(rr.created_at), "MMM dd HH:mm"),
+      respiratoryRate: rr.respiratory_rate,
+      fullTime: format(new Date(rr.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   // Transform blood sugar data for chart
-  const bsData = bloodSugars.map((bs) => ({
-    time: format(new Date(bs.created_at), "HH:mm"),
-    bloodSugar: parseFloat(bs.sugar_level),
-    fullTime: format(new Date(bs.created_at), "MMM dd, HH:mm"),
-  }));
+  const bsData = bloodSugars
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((bs) => ({
+      time: format(new Date(bs.created_at), "MMM dd HH:mm"),
+      bloodSugar: parseFloat(bs.sugar_level),
+      fullTime: format(new Date(bs.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   // Transform oxygen saturation data for chart
-  const o2Data = oxygenSaturations.map((o2) => ({
-    time: format(new Date(o2.created_at), "HH:mm"),
-    oxygenSaturation: o2.saturation_percentage,
-    fullTime: format(new Date(o2.created_at), "MMM dd, HH:mm"),
-  }));
+  const o2Data = oxygenSaturations
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((o2) => ({
+      time: format(new Date(o2.created_at), "MMM dd HH:mm"),
+      oxygenSaturation: o2.saturation_percentage,
+      fullTime: format(new Date(o2.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   // Transform pain score data for chart
-  const painData = painScores.map((pain) => ({
-    time: format(new Date(pain.created_at), "HH:mm"),
-    painScore: pain.score,
-    fullTime: format(new Date(pain.created_at), "MMM dd, HH:mm"),
-  }));
+  const painData = painScores
+    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+    .map((pain) => ({
+      time: format(new Date(pain.created_at), "MMM dd HH:mm"),
+      painScore: pain.score,
+      fullTime: format(new Date(pain.created_at), "MMM dd, yyyy HH:mm"),
+    }));
 
   const hasData =
     bpData.length > 0 ||
@@ -147,10 +162,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={bpData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[60, 180]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number, name: string) => [
                         `${value} mmHg`,
                         name === "systolic" ? "Systolic" : "Diastolic",
@@ -184,10 +204,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={hrData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[40, 140]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number) => [`${value} bpm`, "Heart Rate"]}
                     />
                     <Legend />
@@ -211,10 +236,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={tempData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[35, 40]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number) => [`${value}°C`, "Temperature"]}
                     />
                     <Legend />
@@ -238,10 +268,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={rrData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[10, 30]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number) => [
                         `${value} /min`,
                         "Respiratory Rate",
@@ -268,10 +303,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={bsData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[60, 200]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number) => [
                         `${value} mg/dL`,
                         "Blood Sugar",
@@ -298,10 +338,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={o2Data}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[90, 100]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number) => [`${value}%`, "O2 Saturation"]}
                     />
                     <Legend />
@@ -325,10 +370,15 @@ export function ObservationChart({
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={painData}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="time" />
+                    <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
                     <YAxis domain={[0, 10]} />
                     <Tooltip
-                      labelFormatter={(value) => `Time: ${value}`}
+                      labelFormatter={(value, payload) => {
+                        if (payload && payload.length > 0) {
+                          return `Time: ${payload[0].payload.fullTime}`;
+                        }
+                        return `Time: ${value}`;
+                      }}
                       formatter={(value: number) => [`${value}/10`, "Pain Score"]}
                     />
                     <Legend />
