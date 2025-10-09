@@ -44,8 +44,8 @@ export default function Landing() {
     },
     onError: (error: any) => {
       toast({
-        title: "登录失败",
-        description: error.message || "用户名或密码无效",
+        title: "Login Failed",
+        description: error.message || "Invalid username or password.",
         variant: "destructive",
       });
     },
