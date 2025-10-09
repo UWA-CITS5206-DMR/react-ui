@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -121,11 +122,11 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
         description: "Bulk vital signs submitted successfully!",
       });
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       console.error("Failed to record new vitals:", error);
       toast({
         title: "Error",
-        description: `Failed to record new vitals: ${error.message}`,
+        description: `Failed to record new vitals: ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     },

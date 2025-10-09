@@ -9,6 +9,7 @@ import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
+import { getErrorMessage } from "@/lib/error-utils";
 
 export default function Landing() {
   const [, setLocation] = useLocation();
@@ -45,7 +46,7 @@ export default function Landing() {
     onError: (error: any) => {
       toast({
         title: "Login Failed",
-        description: error.message || "Invalid username or password.",
+        description: getErrorMessage(error, "Invalid username or password."),
         variant: "destructive",
       });
     },

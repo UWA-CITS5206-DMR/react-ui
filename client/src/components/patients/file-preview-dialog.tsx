@@ -9,6 +9,7 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
 import { apiClientV2 } from "@/lib/queryClient";
+import { getErrorMessage } from "@/lib/error-utils";
 import type { FileCategory } from "@/lib/api-client-v2";
 import PageRangeInput from "./page-range-input";
 
@@ -127,7 +128,7 @@ export default function FilePreviewDialog({
               <Alert variant="destructive">
                 <AlertCircle className="h-4 w-4" />
                 <AlertDescription>
-                  Failed to load file: {error instanceof Error ? error.message : "Unknown error"}
+                  Failed to load file: {getErrorMessage(error, "Unknown error")}
                 </AlertDescription>
               </Alert>
             </div>

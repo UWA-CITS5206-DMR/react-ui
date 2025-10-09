@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Upload, FileText, Image, File, Trash2 } from "lucide-react";
 import type { PatientFile, FileCategory } from "@/lib/api-client-v2";
@@ -57,7 +58,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
     onError: (error: any) => {
       toast({
         title: "Upload Failed",
-        description: error.message || "Failed to upload file.",
+        description: getErrorMessage(error, "Failed to upload file."),
         variant: "destructive",
       });
     },
@@ -78,7 +79,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
     onError: (error: any) => {
       toast({
         title: "Delete Failed",
-        description: error.message || "Failed to delete file.",
+        description: getErrorMessage(error, "Failed to delete file."),
         variant: "destructive",
       });
     },

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClientV2 } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import type { ObservationCreateBundle, User } from "@/lib/api-client-v2";
 
 interface UseVitalSignMutationOptions {
@@ -36,14 +37,14 @@ export function useVitalSignMutation({ patientId, user, onSuccess }: UseVitalSig
       });
       onSuccess?.();
     },
-    onError: (error: Error, variables) => {
+    onError: (error: any, variables) => {
       const vitalSignType = Object.keys(variables)[0]
         .replace(/_/g, ' ')
         .replace(/\b\w/g, l => l.toUpperCase());
         
       toast({
         title: "Error",
-        description: `Failed to submit ${vitalSignType}. ${error.message}`,
+        description: `Failed to submit ${vitalSignType}. ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     },

@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { 
   Upload, 
   Calendar, 
@@ -176,7 +177,7 @@ export default function CoordinatorDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to upload document",
+        description: getErrorMessage(error, "Failed to upload document"),
         variant: "destructive",
       });
     },
@@ -206,7 +207,7 @@ export default function CoordinatorDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to schedule release",
+        description: getErrorMessage(error, "Failed to schedule release"),
         variant: "destructive",
       });
     },
@@ -243,7 +244,7 @@ export default function CoordinatorDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create simulation week",
+        description: getErrorMessage(error, "Failed to create simulation week"),
         variant: "destructive",
       });
     },
@@ -266,7 +267,7 @@ export default function CoordinatorDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to release document",
+        description: getErrorMessage(error, "Failed to release document"),
         variant: "destructive",
       });
     },

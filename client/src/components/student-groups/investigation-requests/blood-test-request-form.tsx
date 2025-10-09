@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -71,10 +72,10 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
       setSignOffName("");
       setSignOffRole("");
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: `Failed to submit blood test request. ${error.message}`,
+        description: `Failed to submit blood test request. ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     },

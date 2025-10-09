@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { 
   Users, 
   Database, 
@@ -155,7 +156,7 @@ export default function AdminDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create data version",
+        description: getErrorMessage(error, "Failed to create data version"),
         variant: "destructive",
       });
     },
@@ -178,7 +179,7 @@ export default function AdminDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create group account",
+        description: getErrorMessage(error, "Failed to create group account"),
         variant: "destructive",
       });
     },
@@ -213,7 +214,7 @@ export default function AdminDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to create user",
+        description: getErrorMessage(error, "Failed to create user"),
         variant: "destructive",
       });
     },
@@ -235,7 +236,7 @@ export default function AdminDashboard() {
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: error.message || "Failed to delete user",
+        description: getErrorMessage(error, "Failed to delete user"),
         variant: "destructive",
       });
     },

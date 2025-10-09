@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { apiClientV2 } from "@/lib/queryClient";
 import { 
   CheckCircle, 
@@ -142,10 +143,10 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
       });
       closeApprovalDialog();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: `Failed to update request: ${error.message}`,
+        description: getErrorMessage(error, "Failed to update request"),
         variant: "destructive",
       });
     },
@@ -175,10 +176,10 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
       });
       closeApprovalDialog();
     },
-    onError: (error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: `Failed to update request: ${error.message}`,
+        description: getErrorMessage(error, "Failed to update request"),
         variant: "destructive",
       });
     },

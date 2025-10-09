@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -81,10 +82,10 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
       setSignOffName("");
       setSignOffRole("");
     },
-    onError: (error: Error) => {
+    onError: (error: any) => {
       toast({
         title: "Error",
-        description: `Failed to submit medication orders. ${error.message}`,
+        description: `Failed to submit medication orders. ${getErrorMessage(error)}`,
         variant: "destructive",
       });
     },
