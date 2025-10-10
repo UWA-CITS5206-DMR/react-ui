@@ -1,8 +1,19 @@
 # 技术架构文档 (Technical Architecture Documentation)
 
+> **⚠️ 文档状态：部分已废弃**
+> 
+> 本文档描述的是原始全栈架构（Node.js + React）。项目现已迁移为纯前端应用，后端使用 Django。
+> 
+> - **前端部分仍然有效**：React、Vite、TailwindCSS、组件架构
+> - **后端部分已废弃**：Express、SQLite、Drizzle ORM 相关内容
+> 
+> 请参考 [FRONTEND_STACK.md](./FRONTEND_STACK.md) 了解当前前端技术栈。
+
+---
+
 ## 系统概览 (System Overview)
 
-数字医疗记录仿真平台采用现代化的全栈Web应用架构，基于微服务理念设计，支持高并发、可扩展的医疗教育仿真环境。
+数字医疗记录仿真平台采用现代化的前后端分离架构。前端使用 React + TypeScript，后端使用 Django REST Framework。
 
 ## 架构设计原则 (Architecture Principles)
 

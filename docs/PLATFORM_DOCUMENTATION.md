@@ -131,13 +131,18 @@
 - **Vite**: 快速构建工具
 
 ### 后端技术栈 (Backend Stack)
-- **Node.js + Express**: 服务器运行时和Web框架
-- **TypeScript**: 类型安全的服务器开发
-- **PostgreSQL**: 关系型数据库
-- **Drizzle ORM**: 类型安全的数据库访问层
-- **Session管理**: 基于会话的身份验证
+
+> **注意**: 后端已迁移至 Django REST Framework（独立仓库）
+
+- **Django**: Python Web 框架
+- **Django REST Framework**: RESTful API 构建
+- **PostgreSQL/SQLite**: 关系型数据库
+- **Django ORM**: 数据库访问层
+- **认证系统**: Django 内置认证或 JWT
 
 ### 数据库设计 (Database Schema)
+
+> 数据库由 Django 后端管理，以下为主要数据模型：
 
 #### 核心数据表 (Core Tables)
 - **users**: 用户账户信息
