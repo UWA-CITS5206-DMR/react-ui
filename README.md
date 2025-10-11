@@ -140,54 +140,78 @@ Tests are located in the `cypress/e2e/` directory.
 
 ### Group Collaboration
 
-- Team-based simulation exercises
-- Real-time observations recording
-- Investigation requests (blood tests, imaging)
-- Medication orders and management
+- Team-based clinical practice with shared student group accounts
+- Real-time observations recording (vital signs, clinical notes)
+- Investigation requests (imaging, blood tests)
+- Medication orders
+- Discharge summaries
 - Group activity tracking
 
-### Session Management
+### Request Management
 
-- Create and manage simulation sessions
-- Timeline control for scheduled events
-- Document release scheduling
-- Session status tracking
+- Investigation request workflow (pending → completed)
+- Lab request approval and status tracking
+- File access control through `ApprovedFile` system
+- Page-level document authorization
+- Request dashboard and statistics for instructors
 
 ### User Management
 
-- Multi-role authentication and authorization
+- Multi-role authentication and authorization (Admin, Instructor, Student)
 - Role-based dashboards and permissions
 - User activity audit logging
 
-## � User Roles
+## User Roles
 
-The platform supports four distinct user roles:
+The platform supports three distinct user roles:
 
-1. **Students**
-   - Access assigned simulation sessions
-   - View patient records and documents
-   - Submit observations and clinical notes
-   - Order investigations and medications
-   - Collaborate with team members
+### 1. Students (Student Group Shared Accounts)
 
-2. **Instructors**
-   - Create and manage simulation sessions
-   - Design patient scenarios
-   - Review lab requests
-   - Monitor student progress
-   - Provide feedback and assessments
+Students operate using a **student group shared account model**, where one student group shares a single login account. All observations and requests are associated with the group account.
 
-3. **Coordinators**
-   - Upload and manage patient documents
-   - Control information release timing
-   - Coordinate simulation schedules
-   - Manage system resources
+**Key Capabilities**:
 
-4. **Admins**
-   - System administration
-   - User management (create, edit, delete users)
-   - Role assignment
-   - System-wide settings and configuration
+- View patient records and documents (with page-level access control)
+- Submit observations (vital signs, clinical notes)
+- Create investigation requests (imaging, blood tests)
+- Order medications
+- Create discharge summaries
+- Access approved files for completed requests only
+
+**Access Control**:
+
+- Can only view and modify their own group's records
+- File access restricted by `ApprovedFile` and completed request status
+- Cannot upload patient files or manage other groups' data
+
+### 2. Instructors
+
+**Key Capabilities**:
+
+- Manage all diagnostic requests (imaging, blood tests, medications)
+- Review and approve investigation requests
+- Update request status (pending → completed)
+- Upload and manage patient files
+- Configure file access permissions (`ApprovedFile` with page ranges)
+- View all student observations (read-only)
+- Access dashboard with request statistics
+- Provide feedback and monitor student progress
+
+**Access Control**:
+
+- Full access to all patient files
+- Can manage requests from all student groups
+- Cannot modify student observations directly
+
+### 3. Admins
+
+**System Administration**:
+
+- Full system access and control
+- User management (create, edit, delete users)
+- Role assignment and permission management
+- System-wide settings and configuration
+- Complete access to all resources without restrictions
 
 ## 🔧 Troubleshooting
 
