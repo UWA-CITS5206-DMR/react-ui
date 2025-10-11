@@ -1,6 +1,8 @@
 # Digital Medical Records (DMR) Frontend
 
-A comprehensive medical simulation platform frontend for healthcare education, featuring patient management, group collaboration, and real-time simulation scenarios.
+A web-based Digital Medical Record (DMR) simulation system for UWA's ward simulation program, helping final-year medical students and nurses practice with electronic medical systems before entering hospital workplaces.
+
+This system replaces paper-based records in UWA's 5-week simulation program, where approximately 40 student groups rotate through different shifts across 4 wards, managing 12 pre-defined patient cases and building up data history throughout the simulation period.
 
 > **Note**: This is a frontend-only React application. The backend is powered by a separate Django REST API.
 >
@@ -115,6 +117,8 @@ Tests are located in the `cypress/e2e/` directory.
 
 ## 🏗️ Technology Stack
 
+### Frontend
+
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite 5 for fast development and optimized builds
 - **Styling**: Tailwind CSS 3 with custom components
@@ -126,6 +130,15 @@ Tests are located in the `cypress/e2e/` directory.
 - **Charts**: Recharts for data visualization
 - **Animation**: Framer Motion for smooth animations
 - **Testing**: Cypress for E2E testing
+
+### Backend
+
+- **Framework**: Django with Django REST Framework (DRF)
+- **Authentication**: DRF Token + Session authentication
+- **Database**: SQLite (default `db.sqlite3`)
+- **Permissions**: Resource-based RBAC with object-level checks
+- **API Documentation**: drf-spectacular (Swagger/OpenAPI)
+- **File Storage**: Django FileField with custom upload paths
 
 ## 🎯 Features
 
@@ -140,20 +153,22 @@ Tests are located in the `cypress/e2e/` directory.
 
 ### Group Collaboration
 
-- Team-based clinical practice with shared student group accounts
-- Real-time observations recording (vital signs, clinical notes)
-- Investigation requests (imaging, blood tests)
-- Medication orders
-- Discharge summaries
-- Group activity tracking
+- Team-based clinical practice where each student group shares one Django User account
+- Real-time observations recording (vital signs, clinical notes) associated with group account
+- Investigation requests (imaging, blood tests) scoped to the authenticated group
+- Medication orders and discharge summaries
+- Object-level permission checks ensure groups can only access their own data
+- Group activity tracking across the 5-week simulation period
 
 ### Request Management
 
 - Investigation request workflow (pending → completed)
-- Lab request approval and status tracking
-- File access control through `ApprovedFile` system
-- Page-level document authorization
-- Request dashboard and statistics for instructors
+- Student-side: Create and view own group's requests (scoped by `user=request.user`)
+- Instructor-side: Full CRUD management of all diagnostic requests
+- Lab request approval and status tracking with serializer validation
+- File access control through `ApprovedFile` system with page-range authorization
+- Students can only access files linked to their completed requests
+- Request dashboard, to-do lists, and statistics for instructors
 
 ### User Management
 
@@ -167,7 +182,7 @@ The platform supports three distinct user roles:
 
 ### 1. Students (Student Group Shared Accounts)
 
-Students operate using a **student group shared account model**, where one student group shares a single login account. All observations and requests are associated with the group account.
+Students operate using a **student group shared account model**, where each student group shares a single Django User account for login. All observations and requests are associated with that group's account (`user` field in models).
 
 **Key Capabilities**:
 
@@ -180,28 +195,30 @@ Students operate using a **student group shared account model**, where one stude
 
 **Access Control**:
 
-- Can only view and modify their own group's records
-- File access restricted by `ApprovedFile` and completed request status
+- Can only view and modify their own group's records (object-level check: `obj.user == request.user`)
+- File access controlled by three-tier mechanism: `ApprovedFile` + `page_range` + completed request status
 - Cannot upload patient files or manage other groups' data
+- All operations are automatically scoped to the authenticated group account
 
 ### 2. Instructors
 
 **Key Capabilities**:
 
-- Manage all diagnostic requests (imaging, blood tests, medications)
+- Manage all diagnostic requests (imaging, blood tests, medications) from all student groups
 - Review and approve investigation requests
 - Update request status (pending → completed)
 - Upload and manage patient files
 - Configure file access permissions (`ApprovedFile` with page ranges)
-- View all student observations (read-only)
-- Access dashboard with request statistics
-- Provide feedback and monitor student progress
+- View all student observations (read-only access)
+- Access dashboard with request statistics and to-do lists
+- Monitor student progress across all groups
 
 **Access Control**:
 
-- Full access to all patient files
+- Full access to all patient files and request management
 - Can manage requests from all student groups
-- Cannot modify student observations directly
+- Read-only access to student observations (cannot create or modify)
+- Controlled by `InstructorManagementPermission` for instructor-specific endpoints
 
 ### 3. Admins
 
