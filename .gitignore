@@ -1,17 +1,12 @@
 node_modules
 dist
 .DS_Store
-server/public
 vite.config.ts.*
 *.tar.gz
-
-# Database files
-data/
-*.db
-*.db-shm
-*.db-wal
-migrations/
 
 # Environment files
 .env
 .env.local
+
+# Build output
+dist/public
