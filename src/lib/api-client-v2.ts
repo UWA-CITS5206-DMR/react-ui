@@ -1,5 +1,14 @@
+const getDefaultBaseUrl = (): string => {
+	// If running in browser, use the current origin
+	if (typeof window !== "undefined" && window.location) {
+		return window.location.origin;
+	}
+	// Fallback for non-browser environments (e.g., SSR, tests)
+	return "http://localhost:8000";
+};
+
 const API_BASE_URL =
-	import.meta.env.VITE_API_BASE_URL || "http://dmrserver:8000";
+	import.meta.env.VITE_API_BASE_URL || getDefaultBaseUrl();
 
 type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 
