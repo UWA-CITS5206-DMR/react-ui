@@ -209,29 +209,72 @@ Refer to the Django backend documentation for complete API reference.
 
 ## 🚦 Production Deployment
 
-### Build for Production
+### Automated Build and Release
 
-1. **Build the application**:
-   ```bash
-   npm run build
-   ```
+This project uses GitHub Actions to automatically build and publish releases.
 
-2. **Preview the build** (optional):
-   ```bash
-   npm run preview
-   ```
+**Create a release:**
 
-The built files will be in `dist/public/` directory.
+```bash
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+GitHub Actions will automatically build the project and create a release with build artifacts.
+
+**Download build artifacts:**
+
+```bash
+# Latest version
+wget https://github.com/UWA-CITS5206-DMR/react-ui/releases/latest/download/react-ui-dist.tar.gz
+
+# Specific version
+wget https://github.com/UWA-CITS5206-DMR/react-ui/releases/download/v1.0.0/react-ui-dist.tar.gz
+```
+
+**Extract and deploy:**
+
+```bash
+tar -xzf react-ui-dist.tar.gz -C /var/www/react-ui
+```
+
+### Manual Build
+
+```bash
+npm run build
+```
+
+Built files will be in the `dist/` directory.
 
 ### Deployment Options
 
-- **Static Hosting**: Deploy to Netlify, Vercel, or AWS S3
-- **Docker**: Containerize with Nginx
-- **CDN**: Serve via CloudFront or similar CDN
+- **Static Hosting**: Netlify, Vercel, AWS S3
+- **Nginx**: See configuration example below
+- **CDN**: CloudFront or similar
+- **GitHub Actions**: Automated builds on tag push
 
-### Environment Variables
+### Nginx Configuration Example
 
-Set the production Django backend URL:
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /var/www/react-ui;
+    index index.html;
+    
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg)$ {
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+}
+```
+
+### Production Environment Variables
+
 ```env
 VITE_API_URL=https://your-backend-domain.com
 ```

@@ -1,0 +1,62 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run type check
+        run: npm run check
+
+      - name: Build project
+        run: npm run build
+
+      - name: Create build artifact archives
+        run: |
+          cd dist
+          tar -czf ../react-ui-dist.tar.gz .
+          cd ..
+          zip -r react-ui-dist.zip dist/
+
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            react-ui-dist.tar.gz
+            react-ui-dist.zip
+          body: |
+            ## Build Artifacts
+            
+            - `react-ui-dist.tar.gz` - Production build (recommended)
+            - `react-ui-dist.zip` - Production build (zip format)
+            
+            ## Usage
+            
+            Download and extract to your Nginx directory:
+            
+            ```bash
+            wget https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/react-ui-dist.tar.gz
+            tar -xzf react-ui-dist.tar.gz -C /var/www/react-ui
+            ```
+          draft: false
+          prerelease: false
