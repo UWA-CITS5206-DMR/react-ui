@@ -4,8 +4,9 @@ on:
   push:
     tags:
       - 'v*.*.*'
-  release:
-    types: [created, published]
+
+permissions:
+  contents: write
 
 jobs:
   build-and-release:
@@ -30,34 +31,19 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Create build artifact archive
+      - name: Create build artifact archives
         run: |
           cd dist
           tar -czf ../react-ui-dist.tar.gz .
           cd ..
           zip -r react-ui-dist.zip dist/
 
-      - name: Get release info
-        id: release_info
-        run: |
-          if [ "${{ github.event_name }}" == "release" ]; then
-            echo "upload_url=${{ github.event.release.upload_url }}" >> $GITHUB_OUTPUT
-            echo "tag_name=${{ github.event.release.tag_name }}" >> $GITHUB_OUTPUT
-          else
-            echo "tag_name=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Create Release (if triggered by tag)
-        id: create_release
-        if: github.event_name == 'push'
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Create Release and Upload Assets
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ steps.release_info.outputs.tag_name }}
-          release_name: Release ${{ steps.release_info.outputs.tag_name }}
-          draft: false
-          prerelease: false
+          files: |
+            react-ui-dist.tar.gz
+            react-ui-dist.zip
           body: |
             ## Build Artifacts
             
@@ -69,26 +55,8 @@ jobs:
             Download and extract to your Nginx directory:
             
             ```bash
-            wget https://github.com/${{ github.repository }}/releases/download/${{ steps.release_info.outputs.tag_name }}/react-ui-dist.tar.gz
+            wget https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/react-ui-dist.tar.gz
             tar -xzf react-ui-dist.tar.gz -C /var/www/react-ui
             ```
-
-      - name: Upload tar.gz to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url || github.event.release.upload_url }}
-          asset_path: ./react-ui-dist.tar.gz
-          asset_name: react-ui-dist.tar.gz
-          asset_content_type: application/gzip
-
-      - name: Upload zip to Release
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url || github.event.release.upload_url }}
-          asset_path: ./react-ui-dist.zip
-          asset_name: react-ui-dist.zip
-          asset_content_type: application/zip
+          draft: false
+          prerelease: false
