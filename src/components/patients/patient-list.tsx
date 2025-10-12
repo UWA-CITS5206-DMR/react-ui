@@ -1,13 +1,22 @@
-import { User } from "lucide-react";
+import { User, ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Patient } from "@/lib/api-client-v2";
 
 interface PatientListProps {
   patients: Patient[];
   selectedPatientId?: string;
   onPatientSelect: (patientId: string) => void;
+  isCollapsed?: boolean;
+  onToggleCollapse?: () => void;
 }
 
-export default function PatientList({ patients, selectedPatientId, onPatientSelect }: PatientListProps) {
+export default function PatientList({ 
+  patients, 
+  selectedPatientId, 
+  onPatientSelect,
+  isCollapsed = false,
+  onToggleCollapse
+}: PatientListProps) {
   const getStatusColor = (status?: string) => {
     switch (status?.toLowerCase()) {
       case "critical":
@@ -38,10 +47,35 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
   };
 
   return (
-    <div className="w-80 bg-white border-r border-gray-200 flex flex-col">
-      <div className="p-4 border-b border-gray-200">
-        <h2 className="text-lg font-semibold text-gray-900">Patient List</h2>
-        <p className="text-sm text-gray-500">Select a patient to view records</p>
+    <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-64'}`}>
+      {/* Collapse Toggle Button */}
+      {onToggleCollapse && (
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onToggleCollapse}
+          className="absolute -right-3 top-4 z-10 h-6 w-6 rounded-full border border-gray-300 bg-white p-0 shadow-sm hover:bg-gray-50"
+          aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+        >
+          {isCollapsed ? (
+            <ChevronRight className="h-4 w-4" />
+          ) : (
+            <ChevronLeft className="h-4 w-4" />
+          )}
+        </Button>
+      )}
+      
+      <div className="p-3 border-b border-gray-200">
+        {!isCollapsed ? (
+          <>
+            <h2 className="text-lg font-semibold text-gray-900">Patient List</h2>
+            <p className="text-sm text-gray-500">Select a patient to view records</p>
+          </>
+        ) : (
+          <div className="flex justify-center">
+            <User className="h-6 w-6 text-gray-600" />
+          </div>
+        )}
       </div>
       
       <div className="flex-1 overflow-y-auto">
@@ -49,35 +83,42 @@ export default function PatientList({ patients, selectedPatientId, onPatientSele
           <div
             key={patient.id}
             onClick={() => onPatientSelect(patient.id.toString())}
-            className={`p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
+            className={`p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
               selectedPatientId === patient.id.toString() ? "bg-hospital-blue/5 border-hospital-blue/20" : ""
             }`}
+            title={isCollapsed ? `${patient.first_name} ${patient.last_name}` : undefined}
           >
-            <div className="flex items-start space-x-3">
-              <div className="w-10 h-10 bg-hospital-blue/10 rounded-full flex items-center justify-center flex-shrink-0">
-                <User className="h-5 w-5 text-hospital-blue" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center justify-between">
-                  <h3 className="text-sm font-medium text-gray-900 truncate">
-                    {patient.first_name} {patient.last_name}
-                  </h3>
-                  <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
-                    {getStatusLabel()}
-                  </span>
+            {!isCollapsed ? (
+              <div className="flex items-start space-x-3">
+                <div className="w-10 h-10 bg-hospital-blue/10 rounded-full flex items-center justify-center flex-shrink-0">
+                  <User className="h-5 w-5 text-hospital-blue" />
                 </div>
-                <p className="text-xs text-gray-500">ID: {patient.id}</p>
-                <div className="flex items-center space-x-4 mt-1">
-                  <span className="text-xs text-gray-500">{calculateAge(patient.date_of_birth)}y</span>
-                  {patient.email && (
-                    <span className="text-xs text-gray-500 truncate">{patient.email}</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-sm font-medium text-gray-900 truncate">
+                      {patient.first_name} {patient.last_name}
+                    </h3>
+                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+                      {getStatusLabel()}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">ID: {patient.id} • Age: {calculateAge(patient.date_of_birth)}y</p>
+                  {patient.phone_number && (
+                    <p className="text-xs text-gray-500 mt-1">{patient.phone_number}</p>
                   )}
                 </div>
-                {patient.phone_number && (
-                  <p className="text-xs text-gray-500 mt-1">{patient.phone_number}</p>
-                )}
               </div>
-            </div>
+            ) : (
+              <div className="flex justify-center">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                  selectedPatientId === patient.id.toString() 
+                    ? "bg-hospital-blue text-white" 
+                    : "bg-hospital-blue/10 text-hospital-blue"
+                }`}>
+                  <User className="h-5 w-5" />
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>

@@ -31,11 +31,11 @@ export default function LoginPage() {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center mb-4">
             <Hospital className="h-8 w-8 text-hospital-blue mr-2" />
-            <h1 className="text-2xl font-semibold text-gray-900">Digital Medical Records</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">Digital Medical Records (DMR)</h1>
           </div>
-          <CardTitle>Simulation Platform</CardTitle>
+          <CardTitle>Simulation System</CardTitle>
           <CardDescription>
-            Sign in to access the medical education simulator
+            UWA ward simulation program - Sign in to access the DMR system
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,11 +76,6 @@ export default function LoginPage() {
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>
-          <div className="mt-6 text-center text-sm text-gray-600">
-            <p>Test Credentials:</p>
-            <p>Instructor: username "instructor", password "password"</p>
-            <p>Student: username "student", password "password"</p>
-          </div>
         </CardContent>
       </Card>
     </div>

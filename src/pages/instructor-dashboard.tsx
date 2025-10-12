@@ -1,6 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
@@ -12,33 +11,17 @@ import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
-// Local interface for session data (not available in API Client v2)
-interface Session {
-  id: string;
-  name: string;
-  timeRemaining?: number;
-}
+const LAST_PATIENT_KEY = "lastSelectedPatientId";
 
 export default function InstructorDashboard() {
-  const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
-  const [currentMode, setCurrentMode] = useState<"student" | "instructor">("instructor");
   const [activeTab, setActiveTab] = useState<"overview" | "files" | "requests">("overview");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [notifications, setNotifications] = useState<Array<{
     id: string;
     type: "success" | "warning" | "error";
     message: string;
   }>>([]);
-
-  // For demo purposes, using a hardcoded session ID
-  const sessionId = "session-1";
-
-  // Mock session data (since Session API is not available in API Client v2)
-  const session: Session = {
-    id: sessionId,
-    name: "Ward Round Session",
-    timeRemaining: 42
-  };
 
   const { data: patientsResponse } = useQuery({
     queryKey: ["/api/patients"],
@@ -53,15 +36,28 @@ export default function InstructorDashboard() {
     enabled: !!selectedPatientId,
   });
 
-  // Auto-select first patient if none selected
-  useState(() => {
+  // Load last selected patient from localStorage or auto-select first patient
+  useEffect(() => {
     if (patients.length > 0 && !selectedPatientId) {
+      const lastPatientId = localStorage.getItem(LAST_PATIENT_KEY);
+      if (lastPatientId) {
+        const patientId = parseInt(lastPatientId);
+        // Verify patient still exists in the list
+        const patientExists = patients.some(p => p.id === patientId);
+        if (patientExists) {
+          setSelectedPatientId(patientId.toString());
+          return;
+        }
+      }
+      // Default to first patient if no valid saved selection
       setSelectedPatientId(patients[0].id.toString());
     }
-  });
+  }, [patients, selectedPatientId]);
 
   const handlePatientSelect = (patientId: string) => {
     setSelectedPatientId(patientId);
+    // Save to localStorage
+    localStorage.setItem(LAST_PATIENT_KEY, patientId);
   };
 
   const dismissNotification = (id: string) => {
@@ -70,18 +66,15 @@ export default function InstructorDashboard() {
 
   if (!selectedPatient) {
     return (
-      <div className="h-screen flex flex-col">
-        <TopNavigation
-          currentMode={currentMode}
-          onModeChange={setCurrentMode}
-          sessionName={session?.name}
-          timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
-        />
+      <div className="h-screen flex flex-col overflow-x-hidden">
+        <TopNavigation />
         <div className="flex flex-1">
           <PatientList
             patients={patients}
             selectedPatientId={selectedPatientId}
             onPatientSelect={handlePatientSelect}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
           <div className="flex-1 flex items-center justify-center bg-bg-light">
             <p className="text-gray-500">Select a patient to view their records</p>
@@ -92,49 +85,78 @@ export default function InstructorDashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <TopNavigation
-        currentMode={currentMode}
-        onModeChange={setCurrentMode}
-        sessionName={session?.name}
-        timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
-      />
+    <div className="h-screen flex flex-col overflow-x-hidden">
+      <TopNavigation />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-w-0">
         <PatientList
           patients={patients}
           selectedPatientId={selectedPatientId}
           onPatientSelect={handlePatientSelect}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
         
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col min-h-0 min-w-0">
           <PatientHeader patient={selectedPatient} />
           
-          <div className="flex-1 overflow-hidden">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "files" | "requests")} className="h-full flex flex-col">
-              <div className="px-4 border-b">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="overview">Patient Overview</TabsTrigger>
-                  <TabsTrigger value="files">File Management</TabsTrigger>
-                  <TabsTrigger value="requests">Lab Requests</TabsTrigger>
+          <Tabs
+            value={activeTab}
+            onValueChange={(value) => setActiveTab(value as "overview" | "files" | "requests")}
+            className="flex-1 flex flex-col min-h-0"
+          >
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+              <div className="overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+                <TabsList className="h-auto p-0 bg-transparent inline-flex">
+                  <div className="flex space-x-4 px-6 py-0">
+                    <TabsTrigger
+                      value="overview"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Patient Overview
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="files"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      File Management
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="requests"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Lab Requests
+                    </TabsTrigger>
+                  </div>
                 </TabsList>
               </div>
-              
-              <div className="flex-1 overflow-hidden">
-                <TabsContent value="overview" className="h-full overflow-y-auto">
-                  <PatientOverview patient={selectedPatient} />
-                </TabsContent>
-                
-                <TabsContent value="files" className="h-full overflow-y-auto p-4">
-                  <FileManagement patientId={selectedPatient.id} />
-                </TabsContent>
-                
-                <TabsContent value="requests" className="h-full overflow-y-auto p-4">
-                  <InstructorLabRequests patientId={selectedPatient.id} />
-                </TabsContent>
+            </div>
+            
+            <TabsContent
+              value="overview"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <PatientOverview patient={selectedPatient} />
+            </TabsContent>
+            
+            <TabsContent
+              value="files"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <div className="bg-bg-light p-6">
+                <FileManagement patientId={selectedPatient.id} />
               </div>
-            </Tabs>
-          </div>
+            </TabsContent>
+            
+            <TabsContent
+              value="requests"
+              className="flex-1 min-h-0 overflow-auto m-0"
+            >
+              <div className="bg-bg-light p-6">
+                <InstructorLabRequests patientId={selectedPatient.id} />
+              </div>
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
       
