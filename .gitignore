@@ -10,3 +10,5 @@ vite.config.ts.*
 
 # Build output
 dist/
+
+cypress/screenshots/
