@@ -11,6 +11,7 @@ import SoapNotesForm from "@/components/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";
 import MedicationOrders from "@/components/student-groups/medication-orders/medication-orders";
 import DischargeSummary from "@/components/patients/discharge-summary";
+// import NotificationToast from "@/components/layout/notification-toast"; // REMOVED TEMPORARILY
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
@@ -21,10 +22,16 @@ interface Session {
   timeRemaining?: number;
 }
 
-type StudentTabValue = "overview" | "observations" | "soap" | "investigations" | "medications" | "discharge";
+type StudentTabValue = 
+  | "overview" 
+  | "observations" 
+  | "soap" 
+  | "investigations" 
+  | "medications" 
+  | "discharge";
 
-const LAST_TAB_KEY = "student-dashboard-last-tab";
-const LAST_PATIENT_KEY = "student-dashboard-last-patient";
+const LAST_PATIENT_KEY = "lastSelectedPatientId";
+const LAST_TAB_KEY = "lastSelectedStudentTab";
 
 export default function StudentDashboard() {
   const { user } = useAuth();
@@ -48,23 +55,11 @@ export default function StudentDashboard() {
   });
 
   const patients = patientsResponse?.results || [];
+  const selectedPatient = patients.find(p => p.id === selectedPatientId);
 
-  // Fetch selected patient details
-  const { data: selectedPatient } = useQuery({
-    queryKey: ["patient", selectedPatientId],
-    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(selectedPatientId) : null,
-    enabled: !!selectedPatientId,
-  });
-
-  const handlePatientSelect = (patientId: number) => {
-    setSelectedPatientId(patientId);
-    localStorage.setItem(LAST_PATIENT_KEY, patientId.toString());
-  };
-
-  // NEW: Handle patient updates
+  // Handle patient updates - refresh patients
   const handlePatientUpdated = (updatedPatient: Patient) => {
     queryClient.invalidateQueries({ queryKey: ["patients"] });
-    queryClient.invalidateQueries({ queryKey: ["patient", selectedPatientId] });
   };
 
   // Load last selected tab from localStorage
@@ -96,15 +91,28 @@ export default function StudentDashboard() {
     }
   }, [patients, selectedPatientId]);
 
-  // Save active tab to localStorage when it changes
-  useEffect(() => {
-    localStorage.setItem(LAST_TAB_KEY, activeTab);
-  }, [activeTab]);
+  const handlePatientSelect = (patientId: number) => {
+    setSelectedPatientId(patientId);
+    // Save to localStorage
+    localStorage.setItem(LAST_PATIENT_KEY, patientId.toString());
+  };
+
+  const handleTabChange = (value: string) => {
+    const newTab = value as StudentTabValue;
+    setActiveTab(newTab);
+    // Save to localStorage
+    localStorage.setItem(LAST_TAB_KEY, newTab);
+  };
 
   if (patientsLoading) {
     return (
       <div className="h-screen flex flex-col">
-        <TopNavigation />
+        <TopNavigation
+          currentMode={currentMode}
+          onModeChange={setCurrentMode}
+          sessionName={mockSession.name}
+          timeRemaining={mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined}
+        />
         <div className="flex-1 flex items-center justify-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hospital-blue"></div>
         </div>
@@ -114,17 +122,22 @@ export default function StudentDashboard() {
 
   if (!selectedPatientId || patients.length === 0) {
     return (
-      <div className="h-screen flex flex-col overflow-x-hidden">
-        <TopNavigation />
+      <div className="h-screen flex flex-col">
+        <TopNavigation
+          currentMode={currentMode}
+          onModeChange={setCurrentMode}
+          sessionName={mockSession.name}
+          timeRemaining={mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined}
+        />
         <div className="flex flex-1 min-h-0">
-          <PatientList
-            patients={patients}
-            selectedPatientId={selectedPatientId?.toString()}
-            onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
-            isCollapsed={isSidebarCollapsed}
-            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-            showCreateButton={false} // STUDENTS CANNOT CREATE PATIENTS
-          />
+          <div className="w-80 shrink-0 overflow-y-auto border-r">
+            <PatientList
+              patients={patients}
+              selectedPatientId={selectedPatientId?.toString()}
+              onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
+              showCreateButton={false} // STUDENTS CANNOT CREATE PATIENTS
+            />
+          </div>
           <div className="flex-1 flex items-center justify-center bg-bg-light">
             <p className="text-gray-500">
               {patients.length === 0 ? "No patients available" : "Select a patient to view their records"}
@@ -136,18 +149,23 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col overflow-x-hidden">
-      <TopNavigation />
+    <div className="h-screen flex flex-col">
+      <TopNavigation
+        currentMode={currentMode}
+        onModeChange={setCurrentMode}
+        sessionName={mockSession.name}
+        timeRemaining={mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined}
+      />
 
-      <div className="flex flex-1 min-h-0 min-w-0">
-        <PatientList
-          patients={patients}
-          selectedPatientId={selectedPatientId?.toString()}
-          onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
-          isCollapsed={isSidebarCollapsed}
-          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
-          showCreateButton={false} // STUDENTS CANNOT CREATE PATIENTS
-        />
+      <div className="flex flex-1 min-h-0">
+        <div className="w-80 shrink-0 overflow-y-auto border-r">
+          <PatientList
+            patients={patients}
+            selectedPatientId={selectedPatientId?.toString()}
+            onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
+            showCreateButton={false} // STUDENTS CANNOT CREATE PATIENTS
+          />
+        </div>
         <main className="flex-1 flex flex-col min-h-0 min-w-0">
           {selectedPatient && (
             <>
@@ -158,7 +176,7 @@ export default function StudentDashboard() {
 
               <Tabs
                 value={activeTab}
-                onValueChange={(value) => setActiveTab(value as StudentTabValue)}
+                onValueChange={handleTabChange}
                 className="flex-1 flex flex-col min-h-0"
               >
                 <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
@@ -236,6 +254,9 @@ export default function StudentDashboard() {
           )}
         </main>
       </div>
+      
+      {/* REMOVED: NotificationToast until we fix the props issue */}
+      {/* <NotificationToast /> */}
     </div>
   );
 }
