@@ -11,26 +11,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Send } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
-import type { ImagingTestType } from "@/lib/api-client-v2";
+import type { ImagingTestType, InfectionControlPrecaution } from "@/lib/api-client-v2";
+import { IMAGING_TEST_OPTIONS, INFECTION_CONTROL_OPTIONS } from "@/lib/constants";
 
 interface ImagingRequestFormProps {
   patientId: string;
 }
-
-const IMAGING_TEST_OPTIONS: ImagingTestType[] = [
-  "X-ray",
-  "CT scan",
-  "MRI scan",
-  "Ultrasound scan",
-  "Echocardiogram",
-];
 
 /**
  * Imaging request form component
  */
 export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
   const [testType, setTestType] = useState<ImagingTestType | "">("");
-  const [reason, setReason] = useState("");
+  const [details, setDetails] = useState("");
+  const [infectionControlPrecautions, setInfectionControlPrecautions] = useState<InfectionControlPrecaution>("None");
+  const [imagingFocus, setImagingFocus] = useState("");
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
 
@@ -52,7 +47,9 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
         patient: parseInt(patientId),
         user: user.id,
         test_type: testType as ImagingTestType,
-        reason: reason,
+        details: details,
+        infection_control_precautions: infectionControlPrecautions,
+        imaging_focus: imagingFocus,
         status: "pending",
         name: signOffName,
         role: signOffRole,
@@ -66,7 +63,9 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
       });
       // Reset form
       setTestType("");
-      setReason("");
+      setDetails("");
+      setInfectionControlPrecautions("None");
+      setImagingFocus("");
       setSignOffName("");
       setSignOffRole("");
     },
@@ -82,7 +81,7 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!testType || !reason || !signOffName || !signOffRole) {
+    if (!testType || !details || !signOffName || !signOffRole) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields including your name and role.",
@@ -119,15 +118,44 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
             </Select>
           </div>
 
-          {/* Clinical Reason */}
+          {/* Clinical Details */}
           <div className="space-y-2">
-            <Label htmlFor="imaging-reason">Clinical Reasoning *</Label>
+            <Label htmlFor="imaging-details">Clinical Details *</Label>
             <Textarea
-              id="imaging-reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Explain your reasoning for this imaging request..."
+              id="imaging-details"
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="Provide clinical details for this imaging request..."
               rows={4}
+            />
+          </div>
+
+          {/* Infection Control Precautions */}
+          <div className="space-y-2">
+            <Label htmlFor="infection-control">Infection Control Precautions *</Label>
+            <Select value={infectionControlPrecautions} onValueChange={(value) => setInfectionControlPrecautions(value as InfectionControlPrecaution)}>
+              <SelectTrigger id="infection-control">
+                <SelectValue placeholder="Select precautions" />
+              </SelectTrigger>
+              <SelectContent>
+                {INFECTION_CONTROL_OPTIONS.map((option) => (
+                  <SelectItem key={option} value={option}>
+                    {option}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Imaging Focus */}
+          <div className="space-y-2">
+            <Label htmlFor="imaging-focus">Imaging Focus</Label>
+            <Textarea
+              id="imaging-focus"
+              value={imagingFocus}
+              onChange={(e) => setImagingFocus(e.target.value)}
+              placeholder="Specify the area or focus of the imaging request (optional)..."
+              rows={2}
             />
           </div>
 

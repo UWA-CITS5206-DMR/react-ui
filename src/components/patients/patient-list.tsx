@@ -102,7 +102,7 @@ export default function PatientList({
                       {getStatusLabel()}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">ID: {patient.id} • Age: {calculateAge(patient.date_of_birth)}y</p>
+                  <p className="text-xs text-gray-500">{patient.ward}-{patient.bed} • Age: {calculateAge(patient.date_of_birth)}y</p>
                   {patient.phone_number && (
                     <p className="text-xs text-gray-500 mt-1">{patient.phone_number}</p>
                   )}

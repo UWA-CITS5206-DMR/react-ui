@@ -73,6 +73,18 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
               <p className="text-sm text-gray-900">{new Date(patient.date_of_birth).toLocaleDateString()}</p>
             </div>
             <div>
+              <label className="text-sm font-medium text-gray-500">MRN</label>
+              <p className="text-sm text-gray-900">{patient.mrn}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Ward</label>
+              <p className="text-sm text-gray-900">{patient.ward}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Bed</label>
+              <p className="text-sm text-gray-900">{patient.bed}</p>
+            </div>
+            <div>
               <label className="text-sm font-medium text-gray-500">Email</label>
               <p className="text-sm text-gray-900">{patient.email}</p>
             </div>

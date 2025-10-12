@@ -33,7 +33,7 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
                 key={request.id}
                 id={request.id}
                 testType={request.test_type}
-                reason={request.reason}
+                details={request.details}
                 status={request.status}
                 createdAt={request.created_at}
                 requestedBy={{

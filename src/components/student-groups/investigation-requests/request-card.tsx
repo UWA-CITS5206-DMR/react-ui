@@ -9,7 +9,7 @@ import StudentFilePreviewDialog from "./student-file-preview-dialog";
 interface RequestCardProps {
   id: number;
   testType: string;
-  reason: string;
+  details: string;
   status: "pending" | "completed";
   createdAt: string;
   requestedBy: {
@@ -26,7 +26,7 @@ interface RequestCardProps {
  */
 export function RequestCard({
   testType,
-  reason,
+  details,
   status,
   createdAt,
   requestedBy,
@@ -84,8 +84,8 @@ export function RequestCard({
         </div>
         <div className="space-y-2">
           <div>
-            <p className="text-sm font-medium">Reason:</p>
-            <p className="text-sm text-muted-foreground">{reason}</p>
+            <p className="text-sm font-medium">Details:</p>
+            <p className="text-sm text-muted-foreground">{details}</p>
           </div>
           <div className="border-t pt-2 mt-2">
             <p className="text-xs text-muted-foreground">
