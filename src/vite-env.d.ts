@@ -1,12 +1,17 @@
 /// <reference types="vite/client" />
 
+/**
+ * Type definitions for Vite environment variables
+ * 
+ * Note: Only define environment variables that are actually used in the project.
+ * All Vite environment variables must be prefixed with VITE_ to be exposed to the client.
+ */
 interface ImportMetaEnv {
+  /**
+   * Backend API URL
+   * @default "http://localhost:8000" (fallback in api-client-v2.ts)
+   */
   readonly VITE_API_BASE_URL: string;
-  readonly VITE_API_LOGGING: string;
-  readonly VITE_MOCK_API: string;
-  readonly VITE_MOCK_DELAY_MIN: string;
-  readonly VITE_MOCK_DELAY_MAX: string;
-  readonly VITE_MOCK_ERROR_RATE: string;
 }
 
 interface ImportMeta {
