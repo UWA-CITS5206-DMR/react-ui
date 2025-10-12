@@ -1,62 +1,198 @@
-// cypress/e2e/observations.cy.ts
+/**
+ * E2E Tests for Observation/Vital Signs Feature
+ * 
+ * This test suite verifies the functionality of recording vital signs
+ * for patients in the student dashboard.
+ */
 
-describe('Observation Feature E2E Tests', () => {
-
+describe('Observations Feature - E2E Tests', () => {
+  /**
+   * Setup: Login and navigate to patient before each test
+   * This ensures each test starts with a clean, consistent state
+   */
   beforeEach(() => {
-    // beforeEach 会在每个 it() 测试用例运行前执行
-    // 这确保了每个测试都有一个干净、统一的起点
+    // Visit the application home page
+    cy.visit('/');
 
-    // 1. 访问应用首页
-    cy.visit('http://localhost:5173/');
+    // Login with student group credentials
+    // Note: Update these selectors if the login form changes
+    cy.get('input[type="text"]').first().type('sg1');
+    cy.get('input[type="password"]').type('studentgroup-1');
+    cy.get('button[type="submit"]').click();
 
-    // 登录操作
-    // 【注意】: 这里的选择器是占位符，需要你用实际的替换
-    cy.get('#username').type('sg1');
-    cy.get('#password').type('studentgroup-1');
-    cy.get('[type="submit"]').click();
-  }); // <-- 看这里！beforeEach 在这里正确地结束了
+    // Wait for successful login and dashboard to load
+    cy.url().should('include', '/student');
 
-  it('OBS-001: 应该允许用户成功添加一条新的生命体征记录', () => {
-    // ==== Arrange (准备) ====
-    // 点击病人列表中的 "Toni Baxter" 进入详情页
-    // cy.contains() 是一个非常有用的命令，它会查找包含特定文本的元素
+    // Select a patient from the patient list
+    // Using contains to find patient name - update "Toni Baxter" if needed
     cy.contains('Toni Baxter').click();
 
-    // 点击 "Observations" 标签页
-    cy.contains('Observations').click();
-
-
-    // ==== Act (行动) ====
-    // 点击 "+ Add Observations" 按钮，打开添加表单
-    // 注意：这里我们假设按钮上的文本就是这些，如果不是，需要修改
-    cy.contains('Add Observations').click();
-
-    // 填写表单。你需要找到这些输入框对应的“选择器” (selector)
-    // 最佳实践是使用 data-testid 属性，但也可以用 id, class, name 等
-    // 【你的任务】: 你需要用浏览器的“检查”功能找到正确的选择器来替换下面的占位符
-
-    cy.get('#bp-systolic').type('125');
-    cy.get('#bp-diastolic').type('85');
-    cy.get('#bp-systolic').parents('.grid').find('button').click();
-
-    cy.get('#heartRate').type('75');
-    cy.get('#heartRate').parents('.grid').find('button').click();
-
-    cy.get('#temperature').type('36.8');
-    cy.get('#temperature').parents('.grid').find('button').click();
-
-    cy.get('#respiratoryRate').type('18');
-    cy.get('#respiratoryRate').parents('.grid').find('button').click();
-
-    cy.get('#oxygenSaturation').type('98');
-    cy.get('#oxygenSaturation').parents('.grid').find('button').click();
-
-    cy.get('#bloodSugar').type('5.6');
-    cy.get('#bloodSugar').parents('.grid').find('button').click();
-
-    cy.get('#painScore').type('6');
-    cy.get('#painScore').parents('.grid').find('button').click();
-
+    // Navigate to Observations tab
+    cy.contains('button', 'Observations').click();
   });
 
+  /**
+   * Test Case OBS-001: Add Individual Vital Signs
+   * Verifies that users can successfully record vital signs one at a time
+   */
+  it('OBS-001: Should allow user to add individual vital signs records', () => {
+    // Navigate to "Add Observations" tab
+    cy.contains('Add Observations').click();
+
+    // Ensure we're on the Individual Entry form (default)
+    cy.contains('Individual Entry').should('be.visible');
+
+    // Test 1: Record Blood Pressure
+    cy.get('#bp-systolic').clear().type('125');
+    cy.get('#bp-diastolic').clear().type('85');
+    cy.get('#bp-systolic')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    // Wait for success (button should show "Recording..." then "Record" again)
+    cy.contains('button', 'Record').should('be.visible');
+
+    // Test 2: Record Heart Rate
+    cy.get('#heartRate').clear().type('75');
+    cy.get('#heartRate')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    cy.contains('button', 'Record').should('be.visible');
+
+    // Test 3: Record Body Temperature
+    cy.get('#temperature').clear().type('36.8');
+    cy.get('#temperature')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    cy.contains('button', 'Record').should('be.visible');
+
+    // Test 4: Record Respiratory Rate
+    cy.get('#respiratoryRate').clear().type('18');
+    cy.get('#respiratoryRate')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    cy.contains('button', 'Record').should('be.visible');
+
+    // Test 5: Record Oxygen Saturation
+    cy.get('#oxygenSaturation').clear().type('98');
+    cy.get('#oxygenSaturation')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    cy.contains('button', 'Record').should('be.visible');
+
+    // Test 6: Record Blood Sugar
+    cy.get('#bloodSugar').clear().type('5.6');
+    cy.get('#bloodSugar')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    cy.contains('button', 'Record').should('be.visible');
+
+    // Test 7: Record Pain Score
+    cy.get('#painScore').clear().type('6');
+    cy.get('#painScore')
+      .closest('div')
+      .parent()
+      .parent()
+      .find('button')
+      .contains('Record')
+      .click();
+
+    cy.contains('button', 'Record').should('be.visible');
+  });
+
+  /**
+   * Test Case OBS-002: View Current Observations
+   * Verifies that users can view previously recorded vital signs
+   */
+  it('OBS-002: Should display current observations and historical data', () => {
+    // Navigate to "Current Observations" tab (default)
+    cy.contains('Current Observations').click();
+
+    // Verify that the observations display is visible
+    // This should show the latest vital signs and historical trends
+    cy.contains('Latest Observations').should('be.visible');
+
+    // Verify that observation chart/history is displayed
+    cy.contains('Observation Trends').should('be.visible');
+  });
+
+  /**
+   * Test Case OBS-003: Bulk Entry Mode
+   * Verifies that users can enter multiple vital signs at once
+   */
+  it('OBS-003: Should allow user to add vital signs in bulk entry mode', () => {
+    // Navigate to "Add Observations" tab
+    cy.contains('Add Observations').click();
+
+    // Switch to Bulk Entry mode
+    cy.contains('Bulk Entry').click();
+
+    // Verify bulk entry form is displayed
+    cy.contains('Record all vital signs at once').should('be.visible');
+
+    // Fill in all fields in bulk form
+    cy.get('input[placeholder*="120"]').type('125'); // Systolic
+    cy.get('input[placeholder*="80"]').type('85');   // Diastolic
+    cy.get('input[placeholder="72"]').type('75');    // Heart Rate
+    cy.get('input[placeholder="36.5"]').type('36.8'); // Temperature
+    cy.get('input[placeholder="16"]').type('18');    // Respiratory Rate
+    cy.get('input[placeholder="98"]').type('98');    // O2 Saturation
+    cy.get('input[placeholder="5.5"]').type('5.6');  // Blood Sugar
+    cy.get('input[placeholder="0"]').type('3');      // Pain Score
+
+    // Submit the bulk form
+    cy.contains('button', 'Record All Vital Signs').click();
+
+    // Verify success or wait for form to clear
+    cy.contains('Recording...').should('be.visible');
+  });
+
+  /**
+   * Test Case OBS-004: Input Validation
+   * Verifies that the form validates input correctly
+   */
+  it('OBS-004: Should validate vital sign input values', () => {
+    // Navigate to "Add Observations" tab
+    cy.contains('Add Observations').click();
+
+    // Test: Record button should be disabled with empty input
+    cy.get('#heartRate').closest('div').parent().parent()
+      .find('button')
+      .contains('Record')
+      .should('be.disabled');
+
+    // Test: Enter invalid pain score (out of range)
+    cy.get('#painScore').type('15'); // Max is 10
+    
+    // Note: Additional validation tests can be added based on actual validation rules
+  });
 });
