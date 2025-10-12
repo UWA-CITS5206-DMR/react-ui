@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
@@ -8,7 +8,6 @@ import PatientHeader from "@/components/patients/patient-header";
 import PatientOverview from "@/components/patients/patient-overview";
 import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
 import FileManagement from "@/components/patients/file-management";
-// import NotificationToast from "@/components/layout/notification-toast"; // REMOVED TEMPORARILY
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
@@ -19,11 +18,16 @@ interface Session {
   timeRemaining?: number;
 }
 
+type InstructorTabValue = "overview" | "files" | "requests";
+const LAST_TAB_KEY = "instructor-last-tab";
+const LAST_PATIENT_KEY = "instructor-last-patient";
+
 export default function InstructorDashboard() {
   const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [currentMode, setCurrentMode] = useState<"student" | "instructor">("instructor");
-  const [activeTab, setActiveTab] = useState<"overview" | "files" | "requests">("overview");
+  const [activeTab, setActiveTab] = useState<InstructorTabValue>("overview");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const queryClient = useQueryClient();
 
   // Mock session data
@@ -40,10 +44,17 @@ export default function InstructorDashboard() {
   });
 
   const patients = patientsResponse?.results || [];
-  const selectedPatient = patients.find(p => p.id.toString() === selectedPatientId);
+
+  // Fetch selected patient details
+  const { data: selectedPatient } = useQuery({
+    queryKey: ["/api/patients", selectedPatientId],
+    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(Number(selectedPatientId)) : null,
+    enabled: !!selectedPatientId,
+  });
 
   const handlePatientSelect = (patientId: string) => {
     setSelectedPatientId(patientId);
+    localStorage.setItem(LAST_PATIENT_KEY, patientId);
   };
 
   // Handle patient creation - refresh the patients list
@@ -54,7 +65,42 @@ export default function InstructorDashboard() {
   // Handle patient updates - refresh patients and update selected patient
   const handlePatientUpdated = (updatedPatient: Patient) => {
     queryClient.invalidateQueries({ queryKey: ["patients"] });
+    queryClient.invalidateQueries({ queryKey: ["/api/patients", selectedPatientId] });
   };
+
+  // Load last selected tab from localStorage
+  useEffect(() => {
+    const savedTab = localStorage.getItem(LAST_TAB_KEY);
+    if (savedTab) {
+      const validTabs: InstructorTabValue[] = ["overview", "files", "requests"];
+      if (validTabs.includes(savedTab as InstructorTabValue)) {
+        setActiveTab(savedTab as InstructorTabValue);
+      }
+    }
+  }, []);
+
+  // Load last selected patient from localStorage or auto-select first patient
+  useEffect(() => {
+    if (patients.length > 0 && !selectedPatientId) {
+      const lastPatientId = localStorage.getItem(LAST_PATIENT_KEY);
+      if (lastPatientId) {
+        const patientId = parseInt(lastPatientId);
+        // Verify patient still exists in the list
+        const patientExists = patients.some((p: Patient) => p.id === patientId);
+        if (patientExists) {
+          setSelectedPatientId(patientId.toString());
+          return;
+        }
+      }
+      // Default to first patient if no valid saved selection
+      setSelectedPatientId(patients[0].id.toString());
+    }
+  }, [patients, selectedPatientId]);
+
+  // Save active tab to localStorage
+  useEffect(() => {
+    localStorage.setItem(LAST_TAB_KEY, activeTab);
+  }, [activeTab]);
 
   if (patientsLoading) {
     return (
@@ -72,7 +118,7 @@ export default function InstructorDashboard() {
     );
   }
 
-  if (!selectedPatientId) {
+  if (!selectedPatientId || !selectedPatient) {
     return (
       <div className="h-screen flex flex-col">
         <TopNavigation
@@ -87,6 +133,8 @@ export default function InstructorDashboard() {
             selectedPatientId={selectedPatientId}
             onPatientSelect={handlePatientSelect}
             onPatientCreated={handlePatientCreated}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
           <div className="flex-1 flex items-center justify-center bg-bg-light">
             <p className="text-gray-500">Select a patient to view their records</p>
@@ -111,16 +159,18 @@ export default function InstructorDashboard() {
           selectedPatientId={selectedPatientId}
           onPatientSelect={handlePatientSelect}
           onPatientCreated={handlePatientCreated}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
         
-        <main className="flex-1 flex flex-col overflow-hidden">
+        <main className="flex-1 flex flex-col min-h-0 min-w-0">
           <PatientHeader 
             patient={selectedPatient} 
             onPatientUpdated={handlePatientUpdated}
           />
           
           <div className="flex-1 overflow-hidden">
-            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "files" | "requests")} className="h-full flex flex-col">
+            <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as InstructorTabValue)} className="h-full flex flex-col">
               <div className="px-4 border-b">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="overview">Patient Overview</TabsTrigger>
@@ -146,9 +196,6 @@ export default function InstructorDashboard() {
           </div>
         </main>
       </div>
-      
-      {/* REMOVED: NotificationToast until we fix the props issue */}
-      {/* <NotificationToast /> */}
     </div>
   );
 }
