@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
@@ -8,7 +8,7 @@ import PatientHeader from "@/components/patients/patient-header";
 import PatientOverview from "@/components/patients/patient-overview";
 import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
 import FileManagement from "@/components/patients/file-management";
-import NotificationToast from "@/components/layout/notification-toast";
+// import NotificationToast from "@/components/layout/notification-toast"; // REMOVED TEMPORARILY
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
@@ -24,51 +24,55 @@ export default function InstructorDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [currentMode, setCurrentMode] = useState<"student" | "instructor">("instructor");
   const [activeTab, setActiveTab] = useState<"overview" | "files" | "requests">("overview");
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    type: "success" | "warning" | "error";
-    message: string;
-  }>>([]);
+  const queryClient = useQueryClient();
 
-  // For demo purposes, using a hardcoded session ID
-  const sessionId = "session-1";
-
-  // Mock session data (since Session API is not available in API Client v2)
-  const session: Session = {
-    id: sessionId,
-    name: "Ward Round Session",
-    timeRemaining: 42
+  // Mock session data
+  const session: Session | undefined = {
+    id: "1",
+    name: "Clinical Session 1",
+    timeRemaining: 45,
   };
 
-  const { data: patientsResponse } = useQuery({
-    queryKey: ["/api/patients"],
+  // Fetch patients with React Query
+  const { data: patientsResponse, isLoading: patientsLoading } = useQuery({
+    queryKey: ["patients"],
     queryFn: () => apiClientV2.patients.list(),
   });
 
   const patients = patientsResponse?.results || [];
-
-  const { data: selectedPatient } = useQuery({
-    queryKey: ["/api/patients", selectedPatientId],
-    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(Number(selectedPatientId)) : null,
-    enabled: !!selectedPatientId,
-  });
-
-  // Auto-select first patient if none selected
-  useState(() => {
-    if (patients.length > 0 && !selectedPatientId) {
-      setSelectedPatientId(patients[0].id.toString());
-    }
-  });
+  const selectedPatient = patients.find(p => p.id.toString() === selectedPatientId);
 
   const handlePatientSelect = (patientId: string) => {
     setSelectedPatientId(patientId);
   };
 
-  const dismissNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+  // Handle patient creation - refresh the patients list
+  const handlePatientCreated = (newPatient: Patient) => {
+    queryClient.invalidateQueries({ queryKey: ["patients"] });
   };
 
-  if (!selectedPatient) {
+  // Handle patient updates - refresh patients and update selected patient
+  const handlePatientUpdated = (updatedPatient: Patient) => {
+    queryClient.invalidateQueries({ queryKey: ["patients"] });
+  };
+
+  if (patientsLoading) {
+    return (
+      <div className="h-screen flex flex-col">
+        <TopNavigation
+          currentMode={currentMode}
+          onModeChange={setCurrentMode}
+          sessionName={session?.name}
+          timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hospital-blue"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedPatientId) {
     return (
       <div className="h-screen flex flex-col">
         <TopNavigation
@@ -82,6 +86,7 @@ export default function InstructorDashboard() {
             patients={patients}
             selectedPatientId={selectedPatientId}
             onPatientSelect={handlePatientSelect}
+            onPatientCreated={handlePatientCreated}
           />
           <div className="flex-1 flex items-center justify-center bg-bg-light">
             <p className="text-gray-500">Select a patient to view their records</p>
@@ -105,10 +110,14 @@ export default function InstructorDashboard() {
           patients={patients}
           selectedPatientId={selectedPatientId}
           onPatientSelect={handlePatientSelect}
+          onPatientCreated={handlePatientCreated}
         />
         
         <main className="flex-1 flex flex-col overflow-hidden">
-          <PatientHeader patient={selectedPatient} />
+          <PatientHeader 
+            patient={selectedPatient} 
+            onPatientUpdated={handlePatientUpdated}
+          />
           
           <div className="flex-1 overflow-hidden">
             <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "overview" | "files" | "requests")} className="h-full flex flex-col">
@@ -125,12 +134,12 @@ export default function InstructorDashboard() {
                   <PatientOverview patient={selectedPatient} />
                 </TabsContent>
                 
-                <TabsContent value="files" className="h-full overflow-y-auto p-4">
+                <TabsContent value="files" className="h-full overflow-y-auto">
                   <FileManagement patientId={selectedPatient.id} />
                 </TabsContent>
                 
-                <TabsContent value="requests" className="h-full overflow-y-auto p-4">
-                  <InstructorLabRequests patientId={selectedPatient.id} />
+                <TabsContent value="requests" className="h-full overflow-y-auto">
+                  <InstructorLabRequests />
                 </TabsContent>
               </div>
             </Tabs>
@@ -138,10 +147,8 @@ export default function InstructorDashboard() {
         </main>
       </div>
       
-      <NotificationToast
-        notifications={notifications}
-        onDismiss={dismissNotification}
-      />
+      {/* REMOVED: NotificationToast until we fix the props issue */}
+      {/* <NotificationToast /> */}
     </div>
   );
 }

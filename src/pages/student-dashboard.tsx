@@ -11,7 +11,6 @@ import SoapNotesForm from "@/components/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";
 import MedicationOrders from "@/components/student-groups/medication-orders/medication-orders";
 import DischargeSummary from "@/components/patients/discharge-summary";
-import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
@@ -26,61 +25,53 @@ export default function StudentDashboard() {
   const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>();
   const [currentMode, setCurrentMode] = useState<"student" | "instructor">("student");
-  const [notifications, setNotifications] = useState<
-    Array<{
-      id: string;
-      type: "success" | "warning" | "error";
-      message: string;
-    }>
-  >([]);
 
-  // Mock session data - replace with actual session API when available
+  // Mock session data
   const mockSession: Session = {
-    id: "session-1",
-    name: "Clinical Training Session",
+    id: "1",
+    name: "Clinical Session 1",
     timeRemaining: 45,
   };
 
-  // Fetch patients using API Client v2
-  const { data: patientsResponse } = useQuery({
+  // Fetch patients with React Query
+  const { data: patientsResponse, isLoading: patientsLoading } = useQuery({
     queryKey: ["patients"],
     queryFn: () => apiClientV2.patients.list(),
   });
 
   const patients = patientsResponse?.results || [];
-
-  // Fetch selected patient details
-  const { data: selectedPatient } = useQuery({
-    queryKey: ["patient", selectedPatientId],
-    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(selectedPatientId) : null,
-    enabled: !!selectedPatientId,
-  });
-
-  // Auto-select first patient if none selected
-  useState(() => {
-    if (patients.length > 0 && !selectedPatientId) {
-      setSelectedPatientId(patients[0].id);
-    }
-  });
+  const selectedPatient = patients.find(p => p.id === selectedPatientId);
 
   const handlePatientSelect = (patientId: number) => {
     setSelectedPatientId(patientId);
   };
 
-  const dismissNotification = (id: string) => {
-    setNotifications((prev) => prev.filter((n) => n.id !== id));
-  };
+  // Students cannot create patients, so no handlePatientCreated needed
 
-  if (!selectedPatient) {
+  if (patientsLoading) {
     return (
       <div className="h-screen flex flex-col">
         <TopNavigation
           currentMode={currentMode}
           onModeChange={setCurrentMode}
           sessionName={mockSession.name}
-          timeRemaining={
-            mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined
-          }
+          timeRemaining={mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-hospital-blue"></div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!selectedPatientId) {
+    return (
+      <div className="h-screen flex flex-col">
+        <TopNavigation
+          currentMode={currentMode}
+          onModeChange={setCurrentMode}
+          sessionName={mockSession.name}
+          timeRemaining={mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined}
         />
         <div className="flex flex-1 min-h-0">
           <div className="w-80 shrink-0 overflow-y-auto border-r">
@@ -88,6 +79,7 @@ export default function StudentDashboard() {
               patients={patients}
               selectedPatientId={selectedPatientId?.toString()}
               onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
+              showCreateButton={false} // STUDENTS CANNOT CREATE PATIENTS
             />
           </div>
           <div className="flex-1 flex items-center justify-center bg-bg-light">
@@ -106,9 +98,7 @@ export default function StudentDashboard() {
         currentMode={currentMode}
         onModeChange={setCurrentMode}
         sessionName={mockSession.name}
-        timeRemaining={
-          mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined
-        }
+        timeRemaining={mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined}
       />
 
       <div className="flex flex-1 min-h-0">
@@ -117,6 +107,7 @@ export default function StudentDashboard() {
             patients={patients}
             selectedPatientId={selectedPatientId?.toString()}
             onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
+            showCreateButton={false} // STUDENTS CANNOT CREATE PATIENTS
           />
         </div>
         <main className="flex-1 flex flex-col min-h-0">
@@ -151,19 +142,19 @@ export default function StudentDashboard() {
                     value="investigations"
                     className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
                   >
-                    Investigation Requests
+                    Investigations
                   </TabsTrigger>
                   <TabsTrigger
                     value="medications"
                     className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
                   >
-                    Medication Orders
+                    Medications
                   </TabsTrigger>
                   <TabsTrigger
                     value="discharge"
                     className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
                   >
-                    Discharge Summary
+                    Discharge
                   </TabsTrigger>
                 </div>
               </TabsList>
@@ -199,7 +190,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <InvestigationRequests patientId={selectedPatient.id.toString()} />
+                <InvestigationRequests patient={selectedPatient} />
               </div>
             </TabsContent>
 
@@ -208,7 +199,7 @@ export default function StudentDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <MedicationOrders patientId={selectedPatient.id.toString()} />
+                <MedicationOrders patient={selectedPatient} />
               </div>
             </TabsContent>
 
@@ -223,11 +214,6 @@ export default function StudentDashboard() {
           </Tabs>
         </main>
       </div>
-
-      <NotificationToast
-        notifications={notifications}
-        onDismiss={dismissNotification}
-      />
     </div>
   );
 }
