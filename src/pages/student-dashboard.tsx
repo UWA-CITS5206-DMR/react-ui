@@ -5,7 +5,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import PatientOverview from "@/components/patients/patient-overview";
+import StudentPatientOverview from "@/components/student-groups/student-patient-overview";
 import Observations from "@/components/student-groups/observations/observations";
 import SoapNotesForm from "@/components/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";
@@ -13,14 +13,11 @@ import MedicationOrders from "@/components/student-groups/medication-orders/medi
 import DischargeSummary from "@/components/patients/discharge-summary";
 // import NotificationToast from "@/components/layout/notification-toast"; // REMOVED TEMPORARILY
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Patient } from "@/lib/api-client-v2";
 
-// Mock session type for now since sessions API is not available in v2
-interface Session {
-  id: string;
-  name: string;
-  timeRemaining?: number;
-}
+const LAST_PATIENT_KEY = "lastSelectedPatientId";
+const LAST_TAB_KEY = "studentDashboardLastTab";
+
+type StudentTabValue = "overview" | "observations" | "soap" | "investigations" | "medications" | "discharge";
 
 type StudentTabValue = 
   | "overview" 
@@ -34,7 +31,6 @@ const LAST_PATIENT_KEY = "lastSelectedPatientId";
 const LAST_TAB_KEY = "lastSelectedStudentTab";
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>();
   const [currentMode, setCurrentMode] = useState<"student" | "instructor">("student");
   const [activeTab, setActiveTab] = useState<StudentTabValue>("overview");

@@ -52,7 +52,7 @@ const createUserSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
-  role: z.enum(["student", "instructor", "coordinator"]),
+  role: z.enum(["student", "instructor", "admin"]),
 });
 
 type CreateDataVersionForm = z.infer<typeof createDataVersionSchema>;
@@ -62,7 +62,6 @@ type CreateUserForm = z.infer<typeof createUserSchema>;
 export default function AdminDashboard() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [selectedMode, setSelectedMode] = useState<"student" | "instructor">("instructor");
 
   // Queries using API Client v2
   // Note: Sessions API removed as backend uses token auth instead of session auth
@@ -262,14 +261,9 @@ export default function AdminDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <TopNavigation 
-        currentMode={selectedMode}
-        onModeChange={setSelectedMode}
-        sessionName="System Administration"
-        timeRemaining="System Online"
-      />
+      <TopNavigation />
       
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">System Administration</h1>
           <p className="text-gray-600">
@@ -318,7 +312,6 @@ export default function AdminDashboard() {
                             <div className="text-sm text-gray-500">@{user.username}</div>
                             <Badge 
                               variant={user.role === 'admin' ? 'destructive' : 
-                                      user.role === 'coordinator' ? 'secondary' : 
                                       user.role === 'instructor' ? 'default' : 'outline'}
                             >
                               {user.role}
@@ -419,7 +412,7 @@ export default function AdminDashboard() {
                                 <SelectContent>
                                   <SelectItem value="student">Student</SelectItem>
                                   <SelectItem value="instructor">Instructor</SelectItem>
-                                  <SelectItem value="coordinator">Coordinator</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
                                 </SelectContent>
                               </Select>
                               <FormMessage />
@@ -645,26 +638,6 @@ export default function AdminDashboard() {
                         <div className="flex items-center gap-2">
                           <CheckCircle className="h-3 w-3 text-green-500" />
                           Manage groups
-                        </div>
-                      </CardContent>
-                    </Card>
-
-                    <Card>
-                      <CardHeader className="pb-3">
-                        <CardTitle className="text-sm">Coordinators</CardTitle>
-                      </CardHeader>
-                      <CardContent className="space-y-2 text-sm">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          Upload documents
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          Schedule releases
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-3 w-3 text-green-500" />
-                          Manage timeline
                         </div>
                       </CardContent>
                     </Card>

@@ -5,18 +5,16 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import PatientOverview from "@/components/patients/patient-overview";
+import InstructorPatientOverview from "@/components/instructors/instructor-patient-overview";
 import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
 import FileManagement from "@/components/patients/file-management";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
-// Local interface for session data (not available in API Client v2)
-interface Session {
-  id: string;
-  name: string;
-  timeRemaining?: number;
-}
+const LAST_PATIENT_KEY = "lastSelectedPatientId";
+const LAST_TAB_KEY = "instructorDashboardLastTab";
+
+type InstructorTabValue = "overview" | "files" | "requests";
 
 type InstructorTabValue = "overview" | "files" | "requests";
 
@@ -24,7 +22,6 @@ const LAST_PATIENT_KEY = "lastSelectedPatient";
 const LAST_TAB_KEY = "lastSelectedTab";
 
 export default function InstructorDashboard() {
-  const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [currentMode, setCurrentMode] = useState<"student" | "instructor">("instructor");
   const [activeTab, setActiveTab] = useState<InstructorTabValue>("overview");
@@ -116,13 +113,8 @@ export default function InstructorDashboard() {
 
   if (!selectedPatientId) {
     return (
-      <div className="h-screen flex flex-col">
-        <TopNavigation
-          currentMode={currentMode}
-          onModeChange={setCurrentMode}
-          sessionName={session?.name}
-          timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
-        />
+      <div className="h-screen flex flex-col overflow-x-hidden">
+        <TopNavigation />
         <div className="flex flex-1">
           <PatientList
             patients={patients}
@@ -139,15 +131,10 @@ export default function InstructorDashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <TopNavigation
-        currentMode={currentMode}
-        onModeChange={setCurrentMode}
-        sessionName={session?.name}
-        timeRemaining={session?.timeRemaining ? `${session.timeRemaining}:00` : undefined}
-      />
+    <div className="h-screen flex flex-col overflow-x-hidden">
+      <TopNavigation />
       
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden min-w-0">
         <PatientList
           patients={patients}
           selectedPatientId={selectedPatientId}
@@ -215,7 +202,7 @@ export default function InstructorDashboard() {
               className="flex-1 min-h-0 overflow-auto m-0"
             >
               <div className="bg-bg-light p-6">
-                <InstructorLabRequests />
+                <InstructorLabRequests patientId={selectedPatient.id} />
               </div>
             </TabsContent>
           </Tabs>
