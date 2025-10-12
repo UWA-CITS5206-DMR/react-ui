@@ -4,7 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import PatientOverview from "@/components/patients/patient-overview";
+import StudentPatientOverview from "@/components/student-groups/student-patient-overview";
 import Observations from "@/components/student-groups/observations/observations";
 import SoapNotesForm from "@/components/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";
@@ -159,7 +159,7 @@ export default function StudentDashboard() {
               value="overview"
               className="flex-1 min-h-0 overflow-auto m-0"
             >
-              <PatientOverview patient={selectedPatient} />
+              <StudentPatientOverview patient={selectedPatient} />
             </TabsContent>
 
             <TabsContent
