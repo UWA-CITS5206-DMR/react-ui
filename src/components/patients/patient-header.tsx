@@ -1,4 +1,4 @@
-import { Calendar, Phone, Mail } from "lucide-react";
+import { Calendar, Phone } from "lucide-react";
 import type { Patient } from "@/lib/api-client-v2";
 
 interface PatientHeaderProps {
@@ -33,23 +33,17 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
             <h1 className="text-2xl font-bold text-gray-900">
               {patient.first_name} {patient.last_name}
             </h1>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 whitespace-nowrap">
               Patient ID: {patient.id}
             </span>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <Calendar className="h-4 w-4 text-gray-400" />
               <span className="text-gray-600">DOB:</span>
               <span className="font-medium">{formatDate(patient.date_of_birth)}</span>
               <span className="text-gray-500">({calculateAge(patient.date_of_birth)}y)</span>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4 text-gray-400" />
-              <span className="text-gray-600">Email:</span>
-              <span className="font-medium">{patient.email}</span>
             </div>
             
             {patient.phone_number && (

@@ -31,7 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // --- English version of the login function ---
+  // --- Login function ---
   const login = async (
     username: string,
     password: string

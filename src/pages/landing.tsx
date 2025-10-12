@@ -36,7 +36,6 @@ export default function Landing() {
     onSuccess: (user) => {
       // Use immediate window.location for fastest navigation
       const targetPath = user.role === "admin" ? "/admin" :
-                        user.role === "coordinator" ? "/coordinator" :
                         user.role === "instructor" ? "/instructor" :
                         "/student";
       
@@ -59,12 +58,6 @@ export default function Landing() {
     }
   };
 
-  const quickLogin = (role: string, user: string, pass: string) => {
-    setUsername(user);
-    setPassword(pass);
-    loginMutation.mutate({ username: user, password: pass });
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
       {/* Hero Section */}
@@ -73,11 +66,11 @@ export default function Landing() {
           <div className="flex items-center justify-center mb-6">
             <Stethoscope className="h-12 w-12 text-blue-600 mr-3" />
             <h1 className="text-4xl font-bold text-gray-900">
-              Medical Education Simulation Platform
+              Digital Medical Records (DMR) Simulation System
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            A comprehensive web-based digital medical record simulation platform designed for nursing and medical students to practice with virtual patients in realistic clinical scenarios.
+            A web-based Digital Medical Record simulation system for UWA's ward simulation program, helping final-year medical students and nurses practice with electronic medical systems before entering hospital workplaces.
           </p>
         </div>
 
@@ -160,7 +153,7 @@ export default function Landing() {
             <Card className="w-full max-w-md shadow-xl border-0">
               <CardHeader className="text-center">
                 <CardTitle className="text-2xl font-bold text-gray-900">Welcome Back</CardTitle>
-                <CardDescription>Sign in to access your simulation platform</CardDescription>
+                <CardDescription>Sign in to access the DMR simulation system</CardDescription>
               </CardHeader>
               <CardContent>
                 <form onSubmit={handleLogin} className="space-y-4">
@@ -194,45 +187,6 @@ export default function Landing() {
                     {loginMutation.isPending ? "Signing in..." : "Sign In"}
                   </Button>
                 </form>
-
-                {/* Quick Login Options */}
-                <div className="mt-6 pt-6 border-t">
-                  <p className="text-sm text-gray-600 text-center mb-4">Demo Accounts (For Testing)</p>
-                  <div className="grid grid-cols-2 gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => quickLogin("student", "student", "password")}
-                      className="text-xs"
-                    >
-                      Student Demo
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => quickLogin("instructor", "instructor", "password")}
-                      className="text-xs"
-                    >
-                      Instructor Demo
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => quickLogin("coordinator", "coordinator", "password")}
-                      className="text-xs"
-                    >
-                      Coordinator Demo
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => quickLogin("admin", "admin", "password")}
-                      className="text-xs"
-                    >
-                      Admin Demo
-                    </Button>
-                  </div>
-                </div>
               </CardContent>
             </Card>
           </div>
@@ -268,7 +222,7 @@ export default function Landing() {
 
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-200 text-center text-gray-600">
-          <p>&copy; 2025 Medical Education Simulation Platform. Designed for healthcare education excellence.</p>
+          <p>&copy; 2025 Digital Medical Records (DMR) Simulation System - UWA Ward Simulation Program</p>
         </footer>
       </div>
     </div>

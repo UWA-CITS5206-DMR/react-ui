@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import PatientOverview from "@/components/patients/patient-overview";
+import StudentPatientOverview from "@/components/student-groups/student-patient-overview";
 import Observations from "@/components/student-groups/observations/observations";
 import SoapNotesForm from "@/components/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";
@@ -13,19 +12,16 @@ import MedicationOrders from "@/components/student-groups/medication-orders/medi
 import DischargeSummary from "@/components/patients/discharge-summary";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Patient } from "@/lib/api-client-v2";
 
-// Mock session type for now since sessions API is not available in v2
-interface Session {
-  id: string;
-  name: string;
-  timeRemaining?: number;
-}
+const LAST_PATIENT_KEY = "lastSelectedPatientId";
+const LAST_TAB_KEY = "studentDashboardLastTab";
+
+type StudentTabValue = "overview" | "observations" | "soap" | "investigations" | "medications" | "discharge";
 
 export default function StudentDashboard() {
-  const { user } = useAuth();
   const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>();
-  const [currentMode, setCurrentMode] = useState<"student" | "instructor">("student");
+  const [activeTab, setActiveTab] = useState<StudentTabValue>("overview");
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [notifications, setNotifications] = useState<
     Array<{
       id: string;
@@ -33,13 +29,6 @@ export default function StudentDashboard() {
       message: string;
     }>
   >([]);
-
-  // Mock session data - replace with actual session API when available
-  const mockSession: Session = {
-    id: "session-1",
-    name: "Clinical Training Session",
-    timeRemaining: 45,
-  };
 
   // Fetch patients using API Client v2
   const { data: patientsResponse } = useQuery({
@@ -56,15 +45,46 @@ export default function StudentDashboard() {
     enabled: !!selectedPatientId,
   });
 
-  // Auto-select first patient if none selected
-  useState(() => {
+  // Load last selected tab from localStorage
+  useEffect(() => {
+    const savedTab = localStorage.getItem(LAST_TAB_KEY);
+    if (savedTab) {
+      const validTabs: StudentTabValue[] = ["overview", "observations", "soap", "investigations", "medications", "discharge"];
+      if (validTabs.includes(savedTab as StudentTabValue)) {
+        setActiveTab(savedTab as StudentTabValue);
+      }
+    }
+  }, []);
+
+  // Load last selected patient from localStorage or auto-select first patient
+  useEffect(() => {
     if (patients.length > 0 && !selectedPatientId) {
+      const lastPatientId = localStorage.getItem(LAST_PATIENT_KEY);
+      if (lastPatientId) {
+        const patientId = parseInt(lastPatientId);
+        // Verify patient still exists in the list
+        const patientExists = patients.some((p: { id: number }) => p.id === patientId);
+        if (patientExists) {
+          setSelectedPatientId(patientId);
+          return;
+        }
+      }
+      // Default to first patient if no valid saved selection
       setSelectedPatientId(patients[0].id);
     }
-  });
+  }, [patients, selectedPatientId]);
 
   const handlePatientSelect = (patientId: number) => {
     setSelectedPatientId(patientId);
+    // Save to localStorage
+    localStorage.setItem(LAST_PATIENT_KEY, patientId.toString());
+  };
+
+  const handleTabChange = (value: string) => {
+    const newTab = value as StudentTabValue;
+    setActiveTab(newTab);
+    // Save to localStorage
+    localStorage.setItem(LAST_TAB_KEY, newTab);
   };
 
   const dismissNotification = (id: string) => {
@@ -73,23 +93,16 @@ export default function StudentDashboard() {
 
   if (!selectedPatient) {
     return (
-      <div className="h-screen flex flex-col">
-        <TopNavigation
-          currentMode={currentMode}
-          onModeChange={setCurrentMode}
-          sessionName={mockSession.name}
-          timeRemaining={
-            mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined
-          }
-        />
+      <div className="h-screen flex flex-col overflow-x-hidden">
+        <TopNavigation />
         <div className="flex flex-1 min-h-0">
-          <div className="w-80 shrink-0 overflow-y-auto border-r">
-            <PatientList
-              patients={patients}
-              selectedPatientId={selectedPatientId?.toString()}
-              onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
-            />
-          </div>
+          <PatientList
+            patients={patients}
+            selectedPatientId={selectedPatientId?.toString()}
+            onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
+            isCollapsed={isSidebarCollapsed}
+            onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          />
           <div className="flex-1 flex items-center justify-center bg-bg-light">
             <p className="text-gray-500">
               Select a patient to view their records
@@ -101,79 +114,75 @@ export default function StudentDashboard() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
-      <TopNavigation
-        currentMode={currentMode}
-        onModeChange={setCurrentMode}
-        sessionName={mockSession.name}
-        timeRemaining={
-          mockSession.timeRemaining ? `${mockSession.timeRemaining}:00` : undefined
-        }
-      />
+    <div className="h-screen flex flex-col overflow-x-hidden">
+      <TopNavigation />
 
-      <div className="flex flex-1 min-h-0">
-        <div className="w-80 shrink-0 overflow-y-auto border-r">
-          <PatientList
-            patients={patients}
-            selectedPatientId={selectedPatientId?.toString()}
-            onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
-          />
-        </div>
-        <main className="flex-1 flex flex-col min-h-0">
+      <div className="flex flex-1 min-h-0 min-w-0">
+        <PatientList
+          patients={patients}
+          selectedPatientId={selectedPatientId?.toString()}
+          onPatientSelect={(patientId: string) => handlePatientSelect(parseInt(patientId))}
+          isCollapsed={isSidebarCollapsed}
+          onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+        />
+        <main className="flex-1 flex flex-col min-h-0 min-w-0">
           <PatientHeader patient={selectedPatient} />
 
           <Tabs
-            defaultValue="overview"
+            value={activeTab}
+            onValueChange={handleTabChange}
             className="flex-1 flex flex-col min-h-0"
           >
-            <div className="bg-white border-b border-gray-200 overflow-x-auto">
-              <TabsList className="h-auto p-0 bg-transparent inline-flex min-w-full justify-center">
-                <div className="flex space-x-4 px-6">
-                  <TabsTrigger
-                    value="overview"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
-                  >
-                    Overview
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="observations"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
-                  >
-                    Observations
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="soap"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
-                  >
-                    SOAP Notes
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="investigations"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
-                  >
-                    Investigation Requests
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="medications"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
-                  >
-                    Medication Orders
-                  </TabsTrigger>
-                  <TabsTrigger
-                    value="discharge"
-                    className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-2 rounded-none bg-transparent whitespace-nowrap"
-                  >
-                    Discharge Summary
-                  </TabsTrigger>
-                </div>
-              </TabsList>
+            <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
+              <div className="overflow-x-auto overflow-y-hidden scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+                <TabsList className="h-auto p-0 bg-transparent inline-flex">
+                  <div className="flex space-x-4 px-6 py-0">
+                    <TabsTrigger
+                      value="overview"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Overview
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="observations"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Observations
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="soap"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      SOAP Notes
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="investigations"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Investigation Requests
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="medications"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Medication Orders
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="discharge"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Discharge Summary
+                    </TabsTrigger>
+                  </div>
+                </TabsList>
+              </div>
             </div>
 
             <TabsContent
               value="overview"
               className="flex-1 min-h-0 overflow-auto m-0"
             >
-              <PatientOverview patient={selectedPatient} />
+              <StudentPatientOverview patient={selectedPatient} />
             </TabsContent>
 
             <TabsContent
