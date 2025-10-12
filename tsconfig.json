@@ -39,6 +39,6 @@
     },
     
     /* Types */
-    "types": ["node", "vite/client"]
+    "types": ["node", "vite/client", "cypress"]
   }
 }

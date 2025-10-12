@@ -47,7 +47,7 @@ export default function PatientList({
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-64'}`}>
+    <div data-testid="patient-list" className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Collapse Toggle Button */}
       {onToggleCollapse && (
         <Button
@@ -82,6 +82,7 @@ export default function PatientList({
         {patients.map((patient) => (
           <div
             key={patient.id}
+            data-testid={`patient-item-${patient.id}`}
             onClick={() => onPatientSelect(patient.id.toString())}
             className={`p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
               selectedPatientId === patient.id.toString() ? "bg-hospital-blue/5 border-hospital-blue/20" : ""
