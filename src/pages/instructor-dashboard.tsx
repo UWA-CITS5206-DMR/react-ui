@@ -12,10 +12,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { Patient } from "@/lib/api-client-v2";
 
 const LAST_PATIENT_KEY = "lastSelectedPatientId";
+const LAST_TAB_KEY = "instructorDashboardLastTab";
+
+type InstructorTabValue = "overview" | "files" | "requests";
 
 export default function InstructorDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
-  const [activeTab, setActiveTab] = useState<"overview" | "files" | "requests">("overview");
+  const [activeTab, setActiveTab] = useState<InstructorTabValue>("overview");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [notifications, setNotifications] = useState<Array<{
     id: string;
@@ -36,6 +39,17 @@ export default function InstructorDashboard() {
     enabled: !!selectedPatientId,
   });
 
+  // Load last selected tab from localStorage
+  useEffect(() => {
+    const savedTab = localStorage.getItem(LAST_TAB_KEY);
+    if (savedTab) {
+      const validTabs: InstructorTabValue[] = ["overview", "files", "requests"];
+      if (validTabs.includes(savedTab as InstructorTabValue)) {
+        setActiveTab(savedTab as InstructorTabValue);
+      }
+    }
+  }, []);
+
   // Load last selected patient from localStorage or auto-select first patient
   useEffect(() => {
     if (patients.length > 0 && !selectedPatientId) {
@@ -43,7 +57,7 @@ export default function InstructorDashboard() {
       if (lastPatientId) {
         const patientId = parseInt(lastPatientId);
         // Verify patient still exists in the list
-        const patientExists = patients.some(p => p.id === patientId);
+        const patientExists = patients.some((p: { id: number }) => p.id === patientId);
         if (patientExists) {
           setSelectedPatientId(patientId.toString());
           return;
@@ -58,6 +72,13 @@ export default function InstructorDashboard() {
     setSelectedPatientId(patientId);
     // Save to localStorage
     localStorage.setItem(LAST_PATIENT_KEY, patientId);
+  };
+
+  const handleTabChange = (value: string) => {
+    const newTab = value as InstructorTabValue;
+    setActiveTab(newTab);
+    // Save to localStorage
+    localStorage.setItem(LAST_TAB_KEY, newTab);
   };
 
   const dismissNotification = (id: string) => {
@@ -102,7 +123,7 @@ export default function InstructorDashboard() {
           
           <Tabs
             value={activeTab}
-            onValueChange={(value) => setActiveTab(value as "overview" | "files" | "requests")}
+            onValueChange={handleTabChange}
             className="flex-1 flex flex-col min-h-0"
           >
             <div className="bg-white border-b border-gray-200 sticky top-0 z-10">
