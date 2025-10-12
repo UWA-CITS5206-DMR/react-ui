@@ -8,10 +8,10 @@ interface PatientListProps {
   patients: Patient[];
   selectedPatientId?: string;
   onPatientSelect: (patientId: string) => void;
-  onPatientCreated?: (patient: Patient) => void; // YOUR: patient creation
-  showCreateButton?: boolean; // YOUR: Control create button visibility
-  isCollapsed?: boolean; // MAIN: Collapse feature
-  onToggleCollapse?: () => void; // MAIN: Collapse toggle
+  onPatientCreated?: (patient: Patient) => void;
+  isCollapsed?: boolean; // FROM MAIN: Collapse functionality
+  onToggleCollapse?: () => void; // FROM MAIN: Collapse toggle
+  showCreateButton?: boolean; // YOUR: Control Add Patient button visibility
 }
 
 export default function PatientList({ 
@@ -19,9 +19,9 @@ export default function PatientList({
   selectedPatientId, 
   onPatientSelect, 
   onPatientCreated,
-  showCreateButton = true, // YOUR: DEFAULT: show button unless explicitly hidden
-  isCollapsed = false, // MAIN: Collapse state
-  onToggleCollapse // MAIN: Collapse handler
+  isCollapsed = false, // FROM MAIN: Default to not collapsed
+  onToggleCollapse, // FROM MAIN: Optional collapse toggle
+  showCreateButton = true // YOUR: Default to showing create button
 }: PatientListProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -124,7 +124,7 @@ export default function PatientList({
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
                       <h3 className="text-sm font-medium text-gray-900 truncate">
-                        {patient.first_name} {patient.last_name}
+                        {patient.first_name} ${patient.last_name}
                       </h3>
                       <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
                         {getStatusLabel()}
@@ -158,7 +158,7 @@ export default function PatientList({
         </div>
       </div>
 
-      {/* Create Patient Modal - YOUR functionality */}
+      {/* Create Patient Modal - YOUR feature */}
       <CreatePatientModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
