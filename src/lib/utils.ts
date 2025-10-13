@@ -1,8 +1,8 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
+  return twMerge(clsx(inputs));
 }
 
 /**
@@ -14,7 +14,7 @@ export function cn(...inputs: ClassValue[]) {
 export function formatDate(
   dateInput?: string | Date | null,
   options?: Intl.DateTimeFormatOptions,
-  locale = "en-AU",
+  locale = "en-AU"
 ): string {
   if (!dateInput) return "";
   const d = typeof dateInput === "string" ? new Date(dateInput) : dateInput;
@@ -31,7 +31,7 @@ export function formatDate(
       hour: "2-digit",
       minute: "2-digit",
     });
-  } catch (err) {
+  } catch {
     return d.toString();
   }
 }

@@ -32,28 +32,28 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   // --- Login function ---
-  const login = async (
-    username: string,
-    password: string
-  ): Promise<boolean> => {
+  const login = async (username: string, password: string): Promise<boolean> => {
     try {
       setIsLoading(true);
       // Call apiClientV2 login method
       const response = await apiClientV2.auth.login({ username, password });
-      
+
       // Check if response contains both user and token
       if (response && response.user && response.token) {
         // Store user info in component state
         setUser(response.user);
         // Store complete auth data (user + token) in localStorage
-        localStorage.setItem("user", JSON.stringify({
-          ...response.user,
-          token: response.token
-        }));
+        localStorage.setItem(
+          "user",
+          JSON.stringify({
+            ...response.user,
+            token: response.token,
+          })
+        );
         setIsLoading(false);
         return true;
       }
-      
+
       // If response is missing user or token, treat as failure
       setIsLoading(false);
       return false;

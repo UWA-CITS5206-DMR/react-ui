@@ -4,7 +4,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { FileText, Users, Clock, Shield, Stethoscope, GraduationCap, UserCog, BookOpen } from "lucide-react";
+import {
+  FileText,
+  Users,
+  Clock,
+  Shield,
+  Stethoscope,
+  GraduationCap,
+  UserCog,
+  BookOpen,
+} from "lucide-react";
 import { useLocation } from "wouter";
 import { useMutation } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
@@ -12,7 +21,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { getErrorMessage } from "@/lib/error-utils";
 
 export default function Landing() {
-  const [, setLocation] = useLocation();
+  useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();
@@ -24,7 +33,7 @@ export default function Landing() {
       if (!success) {
         throw new Error("Invalid username or password");
       }
-      
+
       // Get user from localStorage to determine role for immediate redirect
       const userStr = localStorage.getItem("user");
       if (userStr) {
@@ -35,10 +44,9 @@ export default function Landing() {
     },
     onSuccess: (user) => {
       // Use immediate window.location for fastest navigation
-      const targetPath = user.role === "admin" ? "/admin" :
-                        user.role === "instructor" ? "/instructor" :
-                        "/student";
-      
+      const targetPath =
+        user.role === "admin" ? "/admin" : user.role === "instructor" ? "/instructor" : "/student";
+
       // Force immediate navigation
       window.location.href = targetPath;
     },
@@ -70,7 +78,9 @@ export default function Landing() {
             </h1>
           </div>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            A web-based Digital Medical Record simulation system for UWA's ward simulation program, helping final-year medical students and nurses practice with electronic medical systems before entering hospital workplaces.
+            A web-based Digital Medical Record simulation system for UWA's ward simulation program,
+            helping final-year medical students and nurses practice with electronic medical systems
+            before entering hospital workplaces.
           </p>
         </div>
 
@@ -86,7 +96,8 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Experience authentic hospital EHR systems with patient records, vitals, labs, and imaging studies.
+                    Experience authentic hospital EHR systems with patient records, vitals, labs,
+                    and imaging studies.
                   </p>
                 </CardContent>
               </Card>
@@ -98,7 +109,8 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Work together in real-time with fellow students on complex patient cases and scenarios.
+                    Work together in real-time with fellow students on complex patient cases and
+                    scenarios.
                   </p>
                 </CardContent>
               </Card>
@@ -110,7 +122,8 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Experience time-based patient progression with evolving symptoms and test results.
+                    Experience time-based patient progression with evolving symptoms and test
+                    results.
                   </p>
                 </CardContent>
               </Card>
@@ -122,7 +135,8 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Instructors can create scenarios, monitor progress, and guide learning experiences.
+                    Instructors can create scenarios, monitor progress, and guide learning
+                    experiences.
                   </p>
                 </CardContent>
               </Card>
@@ -179,8 +193,8 @@ export default function Landing() {
                       required
                     />
                   </div>
-                  <Button 
-                    type="submit" 
+                  <Button
+                    type="submit"
                     className="w-full bg-blue-600 hover:bg-blue-700"
                     disabled={loginMutation.isPending}
                   >
@@ -201,28 +215,40 @@ export default function Landing() {
                 <Shield className="h-8 w-8 text-blue-600" />
               </div>
               <h4 className="text-lg font-semibold mb-2">Safe Learning Environment</h4>
-              <p className="text-gray-600">Practice without risk to real patients. Make mistakes and learn from them in a controlled environment.</p>
+              <p className="text-gray-600">
+                Practice without risk to real patients. Make mistakes and learn from them in a
+                controlled environment.
+              </p>
             </div>
             <div className="p-6">
               <div className="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <FileText className="h-8 w-8 text-green-600" />
               </div>
               <h4 className="text-lg font-semibold mb-2">Comprehensive Tracking</h4>
-              <p className="text-gray-600">Monitor progress with detailed analytics and assessment tools for continuous improvement.</p>
+              <p className="text-gray-600">
+                Monitor progress with detailed analytics and assessment tools for continuous
+                improvement.
+              </p>
             </div>
             <div className="p-6">
               <div className="bg-purple-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-purple-600" />
               </div>
               <h4 className="text-lg font-semibold mb-2">Collaborative Learning</h4>
-              <p className="text-gray-600">Work in teams just like in real healthcare settings, building essential communication skills.</p>
+              <p className="text-gray-600">
+                Work in teams just like in real healthcare settings, building essential
+                communication skills.
+              </p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <footer className="mt-16 pt-8 border-t border-gray-200 text-center text-gray-600">
-          <p>&copy; 2025 Digital Medical Records (DMR) Simulation System - UWA Ward Simulation Program</p>
+          <p>
+            &copy; 2025 Digital Medical Records (DMR) Simulation System - UWA Ward Simulation
+            Program
+          </p>
         </footer>
       </div>
     </div>

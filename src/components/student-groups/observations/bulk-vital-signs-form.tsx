@@ -256,9 +256,7 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
             disabled={createBulkObservationsMutation.isPending}
             className="w-full"
           >
-            {createBulkObservationsMutation.isPending
-              ? "Recording..."
-              : "Record All Observations"}
+            {createBulkObservationsMutation.isPending ? "Recording..." : "Record All Observations"}
           </Button>
         </form>
       </CardContent>

@@ -3,7 +3,7 @@ name: Build and Release
 on:
   push:
     tags:
-      - 'v*.*.*'
+      - "v*.*.*"
 
 permissions:
   contents: write
@@ -11,7 +11,7 @@ permissions:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,8 +19,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
 
       - name: Install dependencies
         run: npm ci
@@ -46,14 +46,14 @@ jobs:
             react-ui-dist.zip
           body: |
             ## Build Artifacts
-            
+
             - `react-ui-dist.tar.gz` - Production build (recommended)
             - `react-ui-dist.zip` - Production build (zip format)
-            
+
             ## Usage
-            
+
             Download and extract to your Nginx directory:
-            
+
             ```bash
             wget https://github.com/${{ github.repository }}/releases/download/${{ github.ref_name }}/react-ui-dist.tar.gz
             tar -xzf react-ui-dist.tar.gz -C /var/www/react-ui

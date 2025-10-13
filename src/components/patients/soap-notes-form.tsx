@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -20,12 +18,11 @@ interface SOAPNotesFormProps {
 
 export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   const [content, setContent] = useState("");
-  
+
   // Sign-off fields
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
-  
-  const { user } = useAuth();
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -45,14 +42,14 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
         patient: parseInt(patientId),
         name: signOffName,
         role: signOffRole,
-        content: content
+        content: content,
       });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes", patientId] });
       toast({
         title: "Success",
-        description: "Note saved successfully!"
+        description: "Note saved successfully!",
       });
       // Reset form
       setContent("");
@@ -62,19 +59,19 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
       toast({
         title: "Error",
         description: "Failed to save note. Please try again.",
-        variant: "destructive"
+        variant: "destructive",
       });
-    }
+    },
   });
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!content.trim()) {
       toast({
         title: "Validation Error",
         description: "Please enter note content.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -83,7 +80,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
       toast({
         title: "Validation Error",
         description: "Please provide your name and role for sign-off.",
-        variant: "destructive"
+        variant: "destructive",
       });
       return;
     }
@@ -130,7 +127,9 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                         </div>
                         <div className="space-y-3">
                           <div className="bg-muted/30 p-4 rounded-md">
-                            <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
+                            <pre className="whitespace-pre-wrap text-sm font-sans">
+                              {note.content}
+                            </pre>
                           </div>
                           <div className="border-t pt-2">
                             <p className="text-xs text-muted-foreground">
@@ -153,7 +152,9 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
             <Card>
               <CardHeader>
                 <CardTitle>Clinical Note</CardTitle>
-                <CardDescription>Document clinical observations, assessment, and plan</CardDescription>
+                <CardDescription>
+                  Document clinical observations, assessment, and plan
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Content */}
@@ -167,7 +168,8 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                     className="min-h-[300px]"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Tip: Consider organizing your notes using headings like Subjective, Objective, Assessment, and Plan
+                    Tip: Consider organizing your notes using headings like Subjective, Objective,
+                    Assessment, and Plan
                   </p>
                 </div>
 

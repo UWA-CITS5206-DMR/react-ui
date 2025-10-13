@@ -4,7 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
@@ -36,10 +42,14 @@ export default function FileManagement({ patientId }: FileManagementProps) {
 
   // Upload file mutation
   const uploadFileMutation = useMutation({
-    mutationFn: async ({ file, category, requires_pagination }: { 
-      file: File; 
-      category: FileCategory; 
-      requires_pagination: boolean 
+    mutationFn: async ({
+      file,
+      category,
+      requires_pagination,
+    }: {
+      file: File;
+      category: FileCategory;
+      requires_pagination: boolean;
     }) => {
       return apiClientV2.patients.files.create(patientId, {
         file,
@@ -146,9 +156,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle className="text-lg font-semibold">
-          Patient File Management
-        </CardTitle>
+        <CardTitle className="text-lg font-semibold">Patient File Management</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* File Upload Section */}
@@ -165,7 +173,10 @@ export default function FileManagement({ patientId }: FileManagementProps) {
             </div>
             <div className="space-y-2">
               <Label htmlFor="category">Category</Label>
-              <Select value={selectedCategory} onValueChange={(value: FileCategory) => setSelectedCategory(value)}>
+              <Select
+                value={selectedCategory}
+                onValueChange={(value: FileCategory) => setSelectedCategory(value)}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -185,7 +196,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
               )}
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-2">
             <input
               type="checkbox"
@@ -198,7 +209,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
               Requires page-based access control (only PDF documents)
             </Label>
           </div>
-          
+
           <Button
             onClick={handleUpload}
             disabled={!selectedFile || uploadFileMutation.isPending}
@@ -214,9 +225,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
           <h3 className="font-medium text-sm">Patient Files ({files.length})</h3>
           <ScrollArea className="h-64">
             {files.length === 0 ? (
-              <p className="text-sm text-gray-500 text-center py-8">
-                No files uploaded yet
-              </p>
+              <p className="text-sm text-gray-500 text-center py-8">No files uploaded yet</p>
             ) : (
               <div className="space-y-2">
                 {files.map((file) => (
@@ -235,18 +244,12 @@ export default function FileManagement({ patientId }: FileManagementProps) {
                           >
                             {file.category || "Other"}
                           </Badge>
-                          <span className="text-xs text-gray-500">
-                            Patient #{file.patient}
-                          </span>
+                          <span className="text-xs text-gray-500">Patient #{file.patient}</span>
                         </div>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPreviewFile(file)}
-                      >
+                      <Button variant="outline" size="sm" onClick={() => setPreviewFile(file)}>
                         View
                       </Button>
                       <Button
@@ -268,13 +271,11 @@ export default function FileManagement({ patientId }: FileManagementProps) {
 
         {/* File Access Control Info */}
         <div className="bg-blue-50 p-3 rounded-lg">
-          <h4 className="text-sm font-medium text-blue-900 mb-2">
-            File Access Control
-          </h4>
+          <h4 className="text-sm font-medium text-blue-900 mb-2">File Access Control</h4>
           <p className="text-xs text-blue-700">
-            Files uploaded here can be linked to student lab requests. When you approve 
-            a blood test or imaging request in the Instructor Controls, you can specify 
-            which files students can access as approved_files.
+            Files uploaded here can be linked to student lab requests. When you approve a blood test
+            or imaging request in the Instructor Controls, you can specify which files students can
+            access as approved_files.
           </p>
         </div>
       </CardContent>

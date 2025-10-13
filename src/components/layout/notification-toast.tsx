@@ -58,7 +58,9 @@ export default function NotificationToast({ notifications, onDismiss }: Notifica
         return (
           <div
             key={notification.id}
-            className={`px-4 py-3 rounded-lg shadow-xl flex items-center backdrop-blur-sm ${getNotificationStyles(notification.type)} animate-in slide-in-from-right duration-300`}
+            className={`px-4 py-3 rounded-lg shadow-xl flex items-center backdrop-blur-sm ${getNotificationStyles(
+              notification.type
+            )} animate-in slide-in-from-right duration-300`}
           >
             <Icon className="h-5 w-5 mr-3 flex-shrink-0" />
             <span className="flex-1 text-sm font-medium">{notification.message}</span>

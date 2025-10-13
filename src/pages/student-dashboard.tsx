@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
@@ -16,7 +16,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const LAST_PATIENT_KEY = "lastSelectedPatientId";
 const LAST_TAB_KEY = "studentDashboardLastTab";
 
-type StudentTabValue = "overview" | "observations" | "soap" | "investigations" | "medications" | "discharge";
+type StudentTabValue =
+  | "overview"
+  | "observations"
+  | "soap"
+  | "investigations"
+  | "medications"
+  | "discharge";
 
 export default function StudentDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<number | undefined>();
@@ -36,12 +42,12 @@ export default function StudentDashboard() {
     queryFn: () => apiClientV2.patients.list(),
   });
 
-  const patients = patientsResponse?.results || [];
+  const patients = useMemo(() => patientsResponse?.results ?? [], [patientsResponse]);
 
   // Fetch selected patient details
   const { data: selectedPatient } = useQuery({
     queryKey: ["patient", selectedPatientId],
-    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(selectedPatientId) : null,
+    queryFn: () => (selectedPatientId ? apiClientV2.patients.retrieve(selectedPatientId) : null),
     enabled: !!selectedPatientId,
   });
 
@@ -49,7 +55,14 @@ export default function StudentDashboard() {
   useEffect(() => {
     const savedTab = localStorage.getItem(LAST_TAB_KEY);
     if (savedTab) {
-      const validTabs: StudentTabValue[] = ["overview", "observations", "soap", "investigations", "medications", "discharge"];
+      const validTabs: StudentTabValue[] = [
+        "overview",
+        "observations",
+        "soap",
+        "investigations",
+        "medications",
+        "discharge",
+      ];
       if (validTabs.includes(savedTab as StudentTabValue)) {
         setActiveTab(savedTab as StudentTabValue);
       }
@@ -104,9 +117,7 @@ export default function StudentDashboard() {
             onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
           />
           <div className="flex-1 flex items-center justify-center bg-bg-light">
-            <p className="text-gray-500">
-              Select a patient to view their records
-            </p>
+            <p className="text-gray-500">Select a patient to view their records</p>
           </div>
         </div>
       </div>
@@ -178,53 +189,35 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            <TabsContent
-              value="overview"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+            <TabsContent value="overview" className="flex-1 min-h-0 overflow-auto m-0">
               <StudentPatientOverview patient={selectedPatient} />
             </TabsContent>
 
-            <TabsContent
-              value="observations"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+            <TabsContent value="observations" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <Observations patient={selectedPatient} />
               </div>
             </TabsContent>
 
-            <TabsContent
-              value="soap"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+            <TabsContent value="soap" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <SoapNotesForm patientId={selectedPatient.id.toString()} />
               </div>
             </TabsContent>
 
-            <TabsContent
-              value="investigations"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+            <TabsContent value="investigations" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <InvestigationRequests patientId={selectedPatient.id.toString()} />
               </div>
             </TabsContent>
 
-            <TabsContent
-              value="medications"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+            <TabsContent value="medications" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <MedicationOrders patientId={selectedPatient.id.toString()} />
               </div>
             </TabsContent>
 
-            <TabsContent
-              value="discharge"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+            <TabsContent value="discharge" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <DischargeSummary patient={selectedPatient} />
               </div>
@@ -233,10 +226,7 @@ export default function StudentDashboard() {
         </main>
       </div>
 
-      <NotificationToast
-        notifications={notifications}
-        onDismiss={dismissNotification}
-      />
+      <NotificationToast notifications={notifications} onDismiss={dismissNotification} />
     </div>
   );
 }

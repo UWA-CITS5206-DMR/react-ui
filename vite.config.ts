@@ -12,13 +12,8 @@ export default defineConfig({
     react(),
     // Replit-specific plugins - only loaded in Replit environment
     runtimeErrorOverlay(),
-    ...(process.env.NODE_ENV !== "production" &&
-    process.env.REPL_ID !== undefined
-      ? [
-          await import("@replit/vite-plugin-cartographer").then((m) =>
-            m.cartographer(),
-          ),
-        ]
+    ...(process.env.NODE_ENV !== "production" && process.env.REPL_ID !== undefined
+      ? [await import("@replit/vite-plugin-cartographer").then((m) => m.cartographer())]
       : []),
   ],
   resolve: {

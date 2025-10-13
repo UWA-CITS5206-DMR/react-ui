@@ -19,22 +19,22 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
 import { apiClientV2 } from "@/lib/queryClient";
-import { 
-  CheckCircle, 
-  Clock, 
-  ChevronLeft, 
+import {
+  CheckCircle,
+  Clock,
+  ChevronLeft,
   ChevronRight,
   FileText,
   Calendar,
   User,
-  Eye
+  Eye,
 } from "lucide-react";
-import type { 
-  BloodTestRequest, 
+import type {
+  BloodTestRequest,
   ImagingRequest,
   ApprovedFileRequest,
   PatientFile,
-  ApprovedFile
+  ApprovedFile,
 } from "@/lib/api-client-v2";
 import FilePreviewDialog from "@/components/patients/file-preview-dialog";
 
@@ -51,19 +51,19 @@ interface ApprovalDialogState {
 export default function InstructorLabRequests({ patientId }: InstructorLabRequestsProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Pagination state
   const [bloodTestPage, setBloodTestPage] = useState(1);
   const [imagingRequestPage, setImagingRequestPage] = useState(1);
   const [pageSize] = useState(10);
-  
+
   // Approval dialog state
   const [approvalDialog, setApprovalDialog] = useState<ApprovalDialogState>({
     open: false,
     requestType: null,
     request: null,
   });
-  
+
   // File selection state for approval
   const [selectedFiles, setSelectedFiles] = useState<ApprovedFileRequest[]>([]);
   const [pageRangeInput, setPageRangeInput] = useState<Record<string, string>>({});
@@ -81,7 +81,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
   // Fetch blood test requests (with pagination)
   const { data: bloodTestsData, isLoading: isLoadingBloodTests } = useQuery({
     queryKey: ["instructors", "blood-test-requests", bloodTestPage, pageSize, patientId],
-    queryFn: () => 
+    queryFn: () =>
       apiClientV2.instructors.bloodTestRequests.list({
         page: bloodTestPage,
         page_size: pageSize,
@@ -114,18 +114,18 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
 
   // Update blood test request status
   const updateBloodTestMutation = useMutation({
-    mutationFn: async ({ 
-      id, 
-      status, 
-      approved_files 
-    }: { 
-      id: number; 
-      status: "pending" | "completed"; 
-      approved_files?: ApprovedFileRequest[]
+    mutationFn: async ({
+      id,
+      status,
+      approved_files,
+    }: {
+      id: number;
+      status: "pending" | "completed";
+      approved_files?: ApprovedFileRequest[];
     }) => {
-      return apiClientV2.instructors.bloodTestRequests.updateStatus(id, { 
-        status, 
-        approved_files 
+      return apiClientV2.instructors.bloodTestRequests.updateStatus(id, {
+        status,
+        approved_files,
       });
     },
     onSuccess: () => {
@@ -147,18 +147,18 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
 
   // Update imaging request status
   const updateImagingMutation = useMutation({
-    mutationFn: async ({ 
-      id, 
-      status, 
-      approved_files 
-    }: { 
-      id: number; 
-      status: "pending" | "completed"; 
-      approved_files?: ApprovedFileRequest[]
+    mutationFn: async ({
+      id,
+      status,
+      approved_files,
+    }: {
+      id: number;
+      status: "pending" | "completed";
+      approved_files?: ApprovedFileRequest[];
     }) => {
-      return apiClientV2.instructors.imagingRequests.updateStatus(id, { 
-        status, 
-        approved_files 
+      return apiClientV2.instructors.imagingRequests.updateStatus(id, {
+        status,
+        approved_files,
       });
     },
     onSuccess: () => {
@@ -189,14 +189,14 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
     });
     // Pre-populate with existing approved files if any
     if (request.approved_files && request.approved_files.length > 0) {
-      const existingFiles = request.approved_files.map(af => ({
+      const existingFiles = request.approved_files.map((af) => ({
         file_id: af.file_id,
         page_range: af.page_range || undefined,
       }));
       setSelectedFiles(existingFiles);
-      
+
       const pageRanges: Record<string, string> = {};
-      request.approved_files.forEach(af => {
+      request.approved_files.forEach((af) => {
         if (af.page_range) {
           pageRanges[af.file_id] = af.page_range;
         }
@@ -220,13 +220,13 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
 
   const handleFileSelection = (file: PatientFile, checked: boolean) => {
     if (checked) {
-      setSelectedFiles(prev => [
+      setSelectedFiles((prev) => [
         ...prev,
-        { file_id: file.id, page_range: pageRangeInput[file.id] || undefined }
+        { file_id: file.id, page_range: pageRangeInput[file.id] || undefined },
       ]);
     } else {
-      setSelectedFiles(prev => prev.filter(f => f.file_id !== file.id));
-      setPageRangeInput(prev => {
+      setSelectedFiles((prev) => prev.filter((f) => f.file_id !== file.id));
+      setPageRangeInput((prev) => {
         const newState = { ...prev };
         delete newState[file.id];
         return newState;
@@ -235,13 +235,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
   };
 
   const handlePageRangeChange = (fileId: string, pageRange: string) => {
-    setPageRangeInput(prev => ({ ...prev, [fileId]: pageRange }));
-    setSelectedFiles(prev => 
-      prev.map(f => 
-        f.file_id === fileId 
-          ? { ...f, page_range: pageRange || undefined }
-          : f
-      )
+    setPageRangeInput((prev) => ({ ...prev, [fileId]: pageRange }));
+    setSelectedFiles((prev) =>
+      prev.map((f) => (f.file_id === fileId ? { ...f, page_range: pageRange || undefined } : f))
     );
   };
 
@@ -276,11 +272,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
   const imagingRequests = imagingRequestsData?.results || [];
   const patientFiles = patientFilesData?.results || [];
 
-  const totalBloodTestPages = bloodTestsData 
-    ? Math.ceil(bloodTestsData.count / pageSize) 
-    : 1;
-  const totalImagingPages = imagingRequestsData 
-    ? Math.ceil(imagingRequestsData.count / pageSize) 
+  const totalBloodTestPages = bloodTestsData ? Math.ceil(bloodTestsData.count / pageSize) : 1;
+  const totalImagingPages = imagingRequestsData
+    ? Math.ceil(imagingRequestsData.count / pageSize)
     : 1;
 
   const renderRequestCard = (
@@ -294,7 +288,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
                 <h3 className="font-semibold text-lg">{request.test_type}</h3>
-                <Badge 
+                <Badge
                   variant={request.status === "completed" ? "default" : "secondary"}
                   className={request.status === "completed" ? "bg-green-600" : ""}
                 >
@@ -306,7 +300,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                   {request.status}
                 </Badge>
               </div>
-              
+
               <div className="space-y-2 text-sm text-gray-600">
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
@@ -320,7 +314,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                 </div>
                 <div className="flex items-center gap-2">
                   <User className="h-4 w-4" />
-                  <span>Requested by: {request.name} ({request.role})</span>
+                  <span>
+                    Requested by: {request.name} ({request.role})
+                  </span>
                 </div>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
@@ -349,13 +345,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                         <div className="flex-1 min-w-0 flex items-center gap-2">
                           <FileText className="h-3 w-3 flex-shrink-0" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">
-                              {file.display_name}
-                            </p>
+                            <p className="text-sm font-medium truncate">{file.display_name}</p>
                             {file.page_range && (
-                              <p className="text-xs text-gray-500">
-                                Pages: {file.page_range}
-                              </p>
+                              <p className="text-xs text-gray-500">Pages: {file.page_range}</p>
                             )}
                           </div>
                         </div>
@@ -408,7 +400,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
         <ChevronLeft className="h-4 w-4 mr-1" />
         Previous
       </Button>
-      
+
       <div className="flex items-center gap-2">
         <span className="text-sm text-gray-600">
           Page {currentPage} of {totalPages}
@@ -445,9 +437,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
       <div className="h-full flex flex-col">
         <Tabs defaultValue="blood" className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="blood">
-              Blood Tests ({bloodTestsData?.count || 0})
-            </TabsTrigger>
+            <TabsTrigger value="blood">Blood Tests ({bloodTestsData?.count || 0})</TabsTrigger>
             <TabsTrigger value="imaging">
               Imaging Requests ({imagingRequestsData?.count || 0})
             </TabsTrigger>
@@ -458,19 +448,11 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               {isLoadingBloodTests ? (
                 <p className="text-center text-gray-500 py-8">Loading...</p>
               ) : bloodTests.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
-                  No blood test requests found
-                </p>
+                <p className="text-center text-gray-500 py-8">No blood test requests found</p>
               ) : (
                 <>
-                  {bloodTests.map((request) => 
-                    renderRequestCard(request, "blood")
-                  )}
-                  {renderPagination(
-                    bloodTestPage,
-                    totalBloodTestPages,
-                    setBloodTestPage
-                  )}
+                  {bloodTests.map((request) => renderRequestCard(request, "blood"))}
+                  {renderPagination(bloodTestPage, totalBloodTestPages, setBloodTestPage)}
                 </>
               )}
             </ScrollArea>
@@ -481,19 +463,11 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               {isLoadingImagingRequests ? (
                 <p className="text-center text-gray-500 py-8">Loading...</p>
               ) : imagingRequests.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">
-                  No imaging requests found
-                </p>
+                <p className="text-center text-gray-500 py-8">No imaging requests found</p>
               ) : (
                 <>
-                  {imagingRequests.map((request) =>
-                    renderRequestCard(request, "imaging")
-                  )}
-                  {renderPagination(
-                    imagingRequestPage,
-                    totalImagingPages,
-                    setImagingRequestPage
-                  )}
+                  {imagingRequests.map((request) => renderRequestCard(request, "imaging"))}
+                  {renderPagination(imagingRequestPage, totalImagingPages, setImagingRequestPage)}
                 </>
               )}
             </ScrollArea>
@@ -515,9 +489,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
             {approvalDialog.request && (
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex items-center justify-between">
-                  <h4 className="font-semibold">
-                    {approvalDialog.request.test_type}
-                  </h4>
+                  <h4 className="font-semibold">{approvalDialog.request.test_type}</h4>
                   <Badge>{approvalDialog.request.status}</Badge>
                 </div>
                 <p className="text-sm text-gray-600">
@@ -540,14 +512,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                 ) : (
                   <div className="space-y-3">
                     {patientFiles.map((file) => {
-                      const isSelected = selectedFiles.some(
-                        f => f.file_id === file.id
-                      );
+                      const isSelected = selectedFiles.some((f) => f.file_id === file.id);
                       return (
-                        <div
-                          key={file.id}
-                          className="flex items-start gap-3 p-3 border rounded-lg"
-                        >
+                        <div key={file.id} className="flex items-start gap-3 p-3 border rounded-lg">
                           <Checkbox
                             id={`file-${file.id}`}
                             checked={isSelected}
@@ -556,10 +523,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                             }
                           />
                           <div className="flex-1 space-y-2">
-                            <Label
-                              htmlFor={`file-${file.id}`}
-                              className="cursor-pointer"
-                            >
+                            <Label htmlFor={`file-${file.id}`} className="cursor-pointer">
                               {file.display_name}
                               {file.category && (
                                 <Badge variant="outline" className="ml-2">
@@ -574,19 +538,14 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                             </Label>
                             {isSelected && file.requires_pagination && (
                               <div className="space-y-1">
-                                <Label
-                                  htmlFor={`page-range-${file.id}`}
-                                  className="text-xs"
-                                >
+                                <Label htmlFor={`page-range-${file.id}`} className="text-xs">
                                   Page Range (required for paginated files, e.g., "1-5" or "1,3,5"):
                                 </Label>
                                 <Input
                                   id={`page-range-${file.id}`}
                                   placeholder="e.g., 1-5 or 1,3,5"
                                   value={pageRangeInput[file.id] || ""}
-                                  onChange={(e) =>
-                                    handlePageRangeChange(file.id, e.target.value)
-                                  }
+                                  onChange={(e) => handlePageRangeChange(file.id, e.target.value)}
                                   className="text-sm"
                                   required
                                 />
@@ -613,10 +572,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
             </Button>
             <Button
               onClick={handleApprove}
-              disabled={
-                updateBloodTestMutation.isPending ||
-                updateImagingMutation.isPending
-              }
+              disabled={updateBloodTestMutation.isPending || updateImagingMutation.isPending}
               className="bg-green-600 hover:bg-green-700"
             >
               <CheckCircle className="h-4 w-4 mr-2" />

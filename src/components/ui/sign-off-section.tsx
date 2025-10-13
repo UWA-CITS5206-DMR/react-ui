@@ -12,7 +12,7 @@ interface SignOffSectionProps {
 
 /**
  * Sign-off information component - Reusable component for all forms requiring sign-off
- * 
+ *
  * Note: In shared group account mode, name and role fields should be left empty
  * so the actual student operating the system can manually enter their own information
  * rather than using the group account information.

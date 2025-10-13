@@ -33,7 +33,7 @@ interface ObservationChartProps {
 
 /**
  * Observation Chart Component
- * 
+ *
  * Displays vital signs data in interactive charts using Recharts library.
  * Shows historical trends for different observation types.
  */
@@ -139,9 +139,7 @@ export function ObservationChart({
     <Card>
       <CardHeader>
         <CardTitle className="text-lg">Observations Chart</CardTitle>
-        <p className="text-sm text-gray-600">
-          Historical trends of vital signs over time
-        </p>
+        <p className="text-sm text-gray-600">Historical trends of vital signs over time</p>
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="blood-pressure" className="w-full">
@@ -277,10 +275,7 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [
-                        `${value} /min`,
-                        "Respiratory Rate",
-                      ]}
+                      formatter={(value: number) => [`${value} /min`, "Respiratory Rate"]}
                     />
                     <Legend />
                     <Line
@@ -312,10 +307,7 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [
-                        `${value} mg/dL`,
-                        "Blood Sugar",
-                      ]}
+                      formatter={(value: number) => [`${value} mg/dL`, "Blood Sugar"]}
                     />
                     <Legend />
                     <Line

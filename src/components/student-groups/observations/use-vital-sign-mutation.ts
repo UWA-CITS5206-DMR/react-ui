@@ -24,12 +24,12 @@ export function useVitalSignMutation({ patientId, user, onSuccess }: UseVitalSig
       }
       return apiClientV2.studentGroups.observations.createBundle(payload);
     },
-    onSuccess: (data, variables) => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/patients", patientId, "vitals"] });
-      
+
       const vitalSignType = Object.keys(variables)[0]
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
 
       toast({
         title: "Success",
@@ -39,9 +39,9 @@ export function useVitalSignMutation({ patientId, user, onSuccess }: UseVitalSig
     },
     onError: (error: any, variables) => {
       const vitalSignType = Object.keys(variables)[0]
-        .replace(/_/g, ' ')
-        .replace(/\b\w/g, l => l.toUpperCase());
-        
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
+
       toast({
         title: "Error",
         description: `Failed to submit ${vitalSignType}. ${getErrorMessage(error)}`,

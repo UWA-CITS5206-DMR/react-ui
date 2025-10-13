@@ -10,7 +10,7 @@ interface CurrentObservationsProps {
 
 /**
  * Current observations main component
- * 
+ *
  * This component fetches real observation data from Django backend API
  * and displays:
  * 1. Latest observations summary
@@ -33,19 +33,21 @@ export default function CurrentObservations({ patient }: CurrentObservationsProp
   const observations = observationsResponse?.results;
 
   // Extract the latest value for each vital sign type for display
-  const latestVitals = observations ? {
-    bloodPressure: observations.blood_pressures[0] 
-      ? `${observations.blood_pressures[0].systolic}/${observations.blood_pressures[0].diastolic}`
-      : undefined,
-    heartRate: observations.heart_rates[0]?.heart_rate,
-    temperature: observations.body_temperatures[0]?.temperature,
-    respiratoryRate: observations.respiratory_rates[0]?.respiratory_rate,
-    oxygenSaturation: observations.oxygen_saturations[0]?.saturation_percentage,
-    bloodSugar: observations.blood_sugars[0] 
-      ? Number(observations.blood_sugars[0].sugar_level)
-      : undefined,
-    painScore: observations.pain_scores[0]?.score,
-  } : undefined;
+  const latestVitals = observations
+    ? {
+        bloodPressure: observations.blood_pressures[0]
+          ? `${observations.blood_pressures[0].systolic}/${observations.blood_pressures[0].diastolic}`
+          : undefined,
+        heartRate: observations.heart_rates[0]?.heart_rate,
+        temperature: observations.body_temperatures[0]?.temperature,
+        respiratoryRate: observations.respiratory_rates[0]?.respiratory_rate,
+        oxygenSaturation: observations.oxygen_saturations[0]?.saturation_percentage,
+        bloodSugar: observations.blood_sugars[0]
+          ? Number(observations.blood_sugars[0].sugar_level)
+          : undefined,
+        painScore: observations.pain_scores[0]?.score,
+      }
+    : undefined;
 
   // Extract arrays for chart (already in the correct format from API)
   const allBloodPressures = observations?.blood_pressures || [];

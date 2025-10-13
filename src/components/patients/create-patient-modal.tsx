@@ -15,10 +15,10 @@ interface CreatePatientModalProps {
   onPatientCreated?: (patient: any) => void;
 }
 
-export default function CreatePatientModal({ 
-  isOpen, 
-  onClose, 
-  onPatientCreated 
+export default function CreatePatientModal({
+  isOpen,
+  onClose,
+  onPatientCreated,
 }: CreatePatientModalProps) {
   const [formData, setFormData] = useState({
     first_name: "",
@@ -26,15 +26,14 @@ export default function CreatePatientModal({
     date_of_birth: "",
     email: "",
     phone_number: "",
-    gender: "unspecified"
+    gender: "unspecified",
   });
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createPatientMutation = useMutation({
-    mutationFn: (patientData: any) =>
-      apiClientV2.patients.create(patientData),
+    mutationFn: (patientData: any) => apiClientV2.patients.create(patientData),
     onSuccess: (createdPatient) => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       toast({
@@ -48,8 +47,8 @@ export default function CreatePatientModal({
         last_name: "",
         date_of_birth: "",
         email: "",
-          phone_number: "",
-          gender: "unspecified"
+        phone_number: "",
+        gender: "unspecified",
       });
     },
     onError: (error: any) => {
@@ -67,7 +66,7 @@ export default function CreatePatientModal({
   };
 
   const handleChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   if (!isOpen) return null;
@@ -146,7 +145,9 @@ export default function CreatePatientModal({
               required
             >
               {GENDER_OPTIONS.map((g) => (
-                <option key={g} value={g}>{getGenderLabel(g)}</option>
+                <option key={g} value={g}>
+                  {getGenderLabel(g)}
+                </option>
               ))}
             </select>
           </div>
@@ -155,10 +156,7 @@ export default function CreatePatientModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              type="submit" 
-              disabled={createPatientMutation.isPending}
-            >
+            <Button type="submit" disabled={createPatientMutation.isPending}>
               {createPatientMutation.isPending ? "Creating..." : "Create Patient"}
             </Button>
           </div>

@@ -9,14 +9,10 @@ import { Info } from "lucide-react";
 interface PageRangeInputProps {
   onConfirm: (pageRange: string) => void;
   onCancel: () => void;
-  fileName: string;
+  fileName?: string;
 }
 
-export default function PageRangeInput({
-  onConfirm,
-  onCancel,
-  fileName,
-}: PageRangeInputProps) {
+export default function PageRangeInput({ onConfirm, onCancel, fileName }: PageRangeInputProps) {
   const [pageRange, setPageRange] = useState("");
   const [error, setError] = useState("");
   const [previewEntireFile, setPreviewEntireFile] = useState(false);
@@ -66,6 +62,11 @@ export default function PageRangeInput({
 
   return (
     <div className="space-y-4">
+      {fileName && (
+        <div className="text-sm text-muted-foreground">
+          Previewing: <span className="font-medium">{fileName}</span>
+        </div>
+      )}
       {/* Toggle for previewing entire file */}
       <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
         <Switch
@@ -73,10 +74,7 @@ export default function PageRangeInput({
           checked={previewEntireFile}
           onCheckedChange={setPreviewEntireFile}
         />
-        <Label 
-          htmlFor="preview-entire-file" 
-          className="text-sm font-medium cursor-pointer"
-        >
+        <Label htmlFor="preview-entire-file" className="text-sm font-medium cursor-pointer">
           Preview entire file (recommended)
         </Label>
       </div>
@@ -95,11 +93,11 @@ export default function PageRangeInput({
                 setError("");
               }}
               onKeyDown={handleKeyDown}
-              className={error ? "border-red-500 focus-visible:ring-offset-0" : "focus-visible:ring-offset-0"}
+              className={
+                error ? "border-red-500 focus-visible:ring-offset-0" : "focus-visible:ring-offset-0"
+              }
             />
-            {error && (
-              <p className="text-sm text-red-500">{error}</p>
-            )}
+            {error && <p className="text-sm text-red-500">{error}</p>}
           </div>
 
           <Alert>
@@ -107,9 +105,15 @@ export default function PageRangeInput({
             <AlertDescription className="text-sm">
               <strong>Page Range Format:</strong>
               <ul className="mt-2 space-y-1 list-disc list-inside">
-                <li>Single page: <code className="bg-gray-100 px-1 rounded">5</code></li>
-                <li>Range: <code className="bg-gray-100 px-1 rounded">1-7</code></li>
-                <li>Multiple: <code className="bg-gray-100 px-1 rounded">1-7,8-9,15</code></li>
+                <li>
+                  Single page: <code className="bg-gray-100 px-1 rounded">5</code>
+                </li>
+                <li>
+                  Range: <code className="bg-gray-100 px-1 rounded">1-7</code>
+                </li>
+                <li>
+                  Multiple: <code className="bg-gray-100 px-1 rounded">1-7,8-9,15</code>
+                </li>
               </ul>
             </AlertDescription>
           </Alert>
@@ -129,9 +133,7 @@ export default function PageRangeInput({
         <Button variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button onClick={handleConfirm}>
-          Confirm Preview
-        </Button>
+        <Button onClick={handleConfirm}>Confirm Preview</Button>
       </div>
     </div>
   );

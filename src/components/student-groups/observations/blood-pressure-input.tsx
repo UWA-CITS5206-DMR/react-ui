@@ -61,10 +61,7 @@ export function BloodPressureInput({
               onChange={(e) => onDiastolicChange(e.target.value)}
             />
           </div>
-          <Button
-            onClick={onSubmit}
-            disabled={!isValid || isLoading}
-          >
+          <Button onClick={onSubmit} disabled={!isValid || isLoading}>
             {isLoading ? "Recording..." : "Record"}
           </Button>
         </div>

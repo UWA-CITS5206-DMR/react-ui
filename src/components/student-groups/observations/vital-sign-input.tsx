@@ -16,12 +16,12 @@ interface VitalSignInputProps {
 /**
  * Single vital sign input component
  */
-export function VitalSignInput({ 
-  config, 
-  value, 
-  onChange, 
-  onSubmit, 
-  isLoading = false 
+export function VitalSignInput({
+  config,
+  value,
+  onChange,
+  onSubmit,
+  isLoading = false,
 }: VitalSignInputProps) {
   return (
     <Card>
@@ -48,10 +48,7 @@ export function VitalSignInput({
               max={config.max}
             />
           </div>
-          <Button
-            onClick={onSubmit}
-            disabled={!value || isLoading}
-          >
+          <Button onClick={onSubmit} disabled={!value || isLoading}>
             {isLoading ? "Recording..." : "Record"}
           </Button>
         </div>

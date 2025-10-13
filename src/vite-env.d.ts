@@ -2,7 +2,7 @@
 
 /**
  * Type definitions for Vite environment variables
- * 
+ *
  * Note: Only define environment variables that are actually used in the project.
  * All Vite environment variables must be prefixed with VITE_ to be exposed to the client.
  */

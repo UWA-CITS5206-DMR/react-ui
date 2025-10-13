@@ -9,7 +9,7 @@ interface MedicationOrdersProps {
 
 /**
  * Main medication orders component
- * 
+ *
  * This component has been refactored into smaller, more focused sub-components
  * Includes functionality for creating and viewing medication orders
  */

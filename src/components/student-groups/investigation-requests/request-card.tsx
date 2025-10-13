@@ -57,7 +57,7 @@ export function RequestCard({
     <Card>
       <CardContent className="pt-6">
         <div className="flex justify-between items-start mb-3">
-            <div>
+          <div>
             <h3 className="font-semibold text-lg">{testType}</h3>
             <p className="text-sm text-muted-foreground">{formatDate(createdAt)}</p>
           </div>
@@ -98,13 +98,9 @@ export function RequestCard({
                     className="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
                   >
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
-                        {file.display_name}
-                      </p>
+                      <p className="text-sm font-medium truncate">{file.display_name}</p>
                       {file.page_range && (
-                        <p className="text-xs text-muted-foreground">
-                          Pages: {file.page_range}
-                        </p>
+                        <p className="text-xs text-muted-foreground">Pages: {file.page_range}</p>
                       )}
                     </div>
                     <Button

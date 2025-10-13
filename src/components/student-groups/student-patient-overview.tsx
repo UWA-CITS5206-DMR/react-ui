@@ -77,20 +77,27 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
   const latestO2Sat = observations?.oxygen_saturations?.[0];
 
   // Format latest observation display
-  const latestObservationText = latestBloodPressure || latestHeartRate || latestTemperature
-    ? [
-        latestBloodPressure ? `BP: ${latestBloodPressure.systolic}/${latestBloodPressure.diastolic}` : null,
-        latestHeartRate ? `HR: ${latestHeartRate.heart_rate} bpm` : null,
-        latestTemperature ? `Temp: ${latestTemperature.temperature}°C` : null,
-      ].filter(Boolean).join(" • ")
-    : "No observations recorded";
+  const latestObservationText =
+    latestBloodPressure || latestHeartRate || latestTemperature
+      ? [
+          latestBloodPressure
+            ? `BP: ${latestBloodPressure.systolic}/${latestBloodPressure.diastolic}`
+            : null,
+          latestHeartRate ? `HR: ${latestHeartRate.heart_rate} bpm` : null,
+          latestTemperature ? `Temp: ${latestTemperature.temperature}°C` : null,
+        ]
+          .filter(Boolean)
+          .join(" • ")
+      : "No observations recorded";
 
   // Get latest investigation request
   const latestBloodTest = bloodTests[0];
   const latestImaging = imagingRequests[0];
   const latestInvestigation = latestBloodTest || latestImaging;
   const investigationText = latestInvestigation
-    ? `${latestBloodTest ? latestBloodTest.test_type : latestImaging?.test_type} - ${latestInvestigation.status}`
+    ? `${latestBloodTest ? latestBloodTest.test_type : latestImaging?.test_type} - ${
+        latestInvestigation.status
+      }`
     : "No investigation requests";
 
   // Get latest medication order
@@ -100,23 +107,28 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
     : "No medication orders";
 
   // Calculate status badges
-  const observationStatus = observations && (
-    observations.blood_pressures?.length > 0 ||
-    observations.heart_rates?.length > 0 ||
-    observations.body_temperatures?.length > 0
-  ) ? "Recent Data" : "No Data";
+  const observationStatus =
+    observations &&
+    (observations.blood_pressures?.length > 0 ||
+      observations.heart_rates?.length > 0 ||
+      observations.body_temperatures?.length > 0)
+      ? "Recent Data"
+      : "No Data";
 
   const investigationStatus = (() => {
-    const pending = [...bloodTests, ...imagingRequests].filter(r => r.status === "pending").length;
-    const completed = [...bloodTests, ...imagingRequests].filter(r => r.status === "completed").length;
+    const pending = [...bloodTests, ...imagingRequests].filter(
+      (r) => r.status === "pending"
+    ).length;
+    const completed = [...bloodTests, ...imagingRequests].filter(
+      (r) => r.status === "completed"
+    ).length;
     if (pending > 0) return `${pending} Pending`;
     if (completed > 0) return "Completed";
     return "No Requests";
   })();
 
-  const medicationStatus = medicationOrders.length > 0
-    ? `${medicationOrders.length} Active`
-    : "No Orders";
+  const medicationStatus =
+    medicationOrders.length > 0 ? `${medicationOrders.length} Active` : "No Orders";
 
   return (
     <div className="bg-bg-light p-6">
@@ -127,7 +139,9 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-500">Name</label>
-              <p className="text-sm text-gray-900">{patient.first_name} {patient.last_name}</p>
+              <p className="text-sm text-gray-900">
+                {patient.first_name} {patient.last_name}
+              </p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Patient ID</label>
@@ -135,7 +149,9 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Date of Birth</label>
-              <p className="text-sm text-gray-900">{new Date(patient.date_of_birth).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-900">
+                {new Date(patient.date_of_birth).toLocaleDateString()}
+              </p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">MRN</label>
@@ -181,17 +197,17 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
               <CardContent>
                 <p className="text-sm text-gray-600 mb-2">{latestObservationText}</p>
                 {latestRespRate && (
-                  <p className="text-xs text-gray-500">RR: {latestRespRate.respiratory_rate} • O2: {latestO2Sat?.saturation_percentage}%</p>
+                  <p className="text-xs text-gray-500">
+                    RR: {latestRespRate.respiratory_rate} • O2: {latestO2Sat?.saturation_percentage}
+                    %
+                  </p>
                 )}
-                <Badge 
-                  variant="outline" 
-                  className="mt-2"
-                >
+                <Badge variant="outline" className="mt-2">
                   {observationStatus}
                 </Badge>
               </CardContent>
             </Card>
-            
+
             {/* Investigation Requests Card */}
             <Card>
               <CardHeader className="pb-3">
@@ -207,15 +223,12 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
                     Created: {new Date(latestInvestigation.created_at).toLocaleDateString()}
                   </p>
                 )}
-                <Badge 
-                  variant="outline" 
-                  className="mt-2"
-                >
+                <Badge variant="outline" className="mt-2">
                   {investigationStatus}
                 </Badge>
               </CardContent>
             </Card>
-            
+
             {/* Medication Orders Card */}
             <Card>
               <CardHeader className="pb-3">
@@ -231,10 +244,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
                     Instructions: {latestMedication.instructions}
                   </p>
                 )}
-                <Badge 
-                  variant="outline" 
-                  className="mt-2"
-                >
+                <Badge variant="outline" className="mt-2">
                   {medicationStatus}
                 </Badge>
               </CardContent>
@@ -248,23 +258,20 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
           {files.length > 0 ? (
             <div className="space-y-2">
               {files.map((file) => (
-                <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={file.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div>
                     <p className="font-medium text-gray-900">{file.display_name}</p>
                     <p className="text-sm text-gray-500">
-                      Category: {file.category || "Unspecified"} • 
-                      Created: {new Date(file.created_at).toLocaleDateString()}
+                      Category: {file.category || "Unspecified"} • Created:{" "}
+                      {new Date(file.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline">
-                      {file.category || "Document"}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setPreviewFile(file)}
-                    >
+                    <Badge variant="outline">{file.category || "Document"}</Badge>
+                    <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
                       <Eye className="h-4 w-4 mr-1" />
                       Preview
                     </Button>

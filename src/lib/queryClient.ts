@@ -9,26 +9,29 @@ function getAuthToken(): string | null {
       const userData = JSON.parse(user);
       return userData.token || null;
     }
-  } catch (e) {
+  } catch {
     console.warn("Failed to parse user data from localStorage");
   }
   return null;
 }
 
 // Custom fetcher that adds authentication token
-async function authenticatedFetch(input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> {
+async function authenticatedFetch(
+  input: RequestInfo | URL,
+  init: RequestInit = {}
+): Promise<Response> {
   const token = getAuthToken();
-  
+
   // Don't add token for login requests
-  const url = typeof input === 'string' ? input : input.toString();
-  const isLoginRequest = url.includes('/auth/login');
-  
+  const url = typeof input === "string" ? input : input.toString();
+  const isLoginRequest = url.includes("/auth/login");
+
   const headers = new Headers(init.headers);
-  
+
   if (token && !isLoginRequest) {
-    headers.set('Authorization', `Token ${token}`);
+    headers.set("Authorization", `Token ${token}`);
   }
-  
+
   return fetch(input, {
     ...init,
     headers,
