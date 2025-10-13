@@ -2,7 +2,7 @@
 
 A React-based frontend application for the Digital Medical Record (DMR) simulation system, designed for medical education and clinical practice training.
 
-> **Backend Repository**: [UWA-CITS5206-DMR/dmrserver](https://github.com/UWA-CITS5206-DMR/dmrserver)
+> If you're an end-user (student, instructor, or admin), see the [User Manual](docs/User_Manual.md) instead.
 
 ## System Overview
 
@@ -14,7 +14,7 @@ For detailed information about the system architecture, user roles, and features
 
 - **Node.js** (v20 or higher recommended)
 - **npm** (v8 or higher)
-- **Django Backend** (running separately)
+- **Django Backend** (running separately) - see [UWA-CITS5206-DMR/dmrserver](https://github.com/UWA-CITS5206-DMR/dmrserver)
 
 ## Quick Start
 
