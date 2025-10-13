@@ -1,3 +1,4 @@
+import { formatDate } from "@/lib/utils";
 import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -42,16 +43,6 @@ export function RequestCard({
     requiresPagination: boolean;
   } | null>(null);
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-AU", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const handlePreviewFile = (file: ApprovedFile) => {
     setSelectedFile({
       fileId: file.file_id,
@@ -66,7 +57,7 @@ export function RequestCard({
     <Card>
       <CardContent className="pt-6">
         <div className="flex justify-between items-start mb-3">
-          <div>
+            <div>
             <h3 className="font-semibold text-lg">{testType}</h3>
             <p className="text-sm text-muted-foreground">{formatDate(createdAt)}</p>
           </div>
