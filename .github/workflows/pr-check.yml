@@ -1,4 +1,4 @@
-name: PR Type Check
+name: PR Quality Check
 
 on:
   pull_request:
@@ -25,11 +25,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run type check
-        run: npm run check:type
-
-      - name: Run ESLint
-        run: npm run check:lint
-
-      - name: Run Prettier check
-        run: npm run check:format
+      - name: Run quality check
+        run: npm run check

@@ -10,6 +10,7 @@
     "check:type": "tsc",
     "check:lint": "eslint . --max-warnings=0",
     "check:format": "prettier --check .",
+    "check": "npm run check:type && npm run check:lint && npm run check:format",
     "preview": "vite preview"
   },
   "dependencies": {
