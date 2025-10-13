@@ -12,27 +12,18 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Send } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { BloodTestType } from "@/lib/api-client-v2";
+import { BLOOD_TEST_OPTIONS } from "@/lib/constants";
 
 interface BloodTestRequestFormProps {
   patientId: string;
 }
-
-const BLOOD_TEST_OPTIONS: BloodTestType[] = [
-  "FBC",
-  "EUC",
-  "LFTs",
-  "Coags",
-  "CRP",
-  "TFT",
-  "Group and Hold",
-];
 
 /**
  * Blood test request form component
  */
 export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
   const [testType, setTestType] = useState<BloodTestType | "">("");
-  const [reason, setReason] = useState("");
+  const [details, setDetails] = useState("");
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
 
@@ -54,7 +45,7 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
         patient: parseInt(patientId),
         user: user.id,
         test_type: testType as BloodTestType,
-        reason: reason,
+        details: details,
         status: "pending",
         name: signOffName,
         role: signOffRole,
@@ -68,7 +59,7 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
       });
       // Reset form
       setTestType("");
-      setReason("");
+      setDetails("");
       setSignOffName("");
       setSignOffRole("");
     },
@@ -84,7 +75,7 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!testType || !reason || !signOffName || !signOffRole) {
+    if (!testType || !details || !signOffName || !signOffRole) {
       toast({
         title: "Validation Error",
         description: "Please fill in all required fields including your name and role.",
@@ -121,14 +112,14 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
             </Select>
           </div>
 
-          {/* Clinical Reason */}
+          {/* Clinical Details */}
           <div className="space-y-2">
-            <Label htmlFor="blood-test-reason">Clinical Reasoning *</Label>
+            <Label htmlFor="blood-test-details">Clinical Details *</Label>
             <Textarea
-              id="blood-test-reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              placeholder="Explain your reasoning for this blood test request..."
+              id="blood-test-details"
+              value={details}
+              onChange={(e) => setDetails(e.target.value)}
+              placeholder="Provide clinical details for this blood test request..."
               rows={4}
             />
           </div>

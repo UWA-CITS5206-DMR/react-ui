@@ -1,5 +1,6 @@
 import { Calendar, Phone } from "lucide-react";
 import type { Patient } from "@/lib/api-client-v2";
+import { formatGender } from "@/lib/utils";
 
 interface PatientHeaderProps {
   patient: Patient;
@@ -44,6 +45,11 @@ export default function PatientHeader({ patient }: PatientHeaderProps) {
               <span className="text-gray-600">DOB:</span>
               <span className="font-medium">{formatDate(patient.date_of_birth)}</span>
               <span className="text-gray-500">({calculateAge(patient.date_of_birth)}y)</span>
+            </div>
+
+            <div className="flex items-center space-x-2">
+              <span className="text-gray-600">Gender:</span>
+              <span className="font-medium">{formatGender(patient.gender)}</span>
             </div>
             
             {patient.phone_number && (

@@ -31,6 +31,12 @@ export type ImagingTestType =
 	| "MRI scan"
 	| "Ultrasound scan"
 	| "Echocardiogram";
+export type InfectionControlPrecaution =
+	| "Airborne"
+	| "Droplet"
+	| "Contact"
+	| "Chemotherapy"
+	| "None";
 export type FileCategory =
 	| "Admission"
 	| "Pathology"
@@ -38,6 +44,7 @@ export type FileCategory =
 	| "Diagnostics"
 	| "Lab Results"
 	| "Other";
+export type Gender = "female" | "male" | "other" | "unspecified";
 
 export type ISODateString = string;
 
@@ -80,7 +87,7 @@ export interface BloodTestRequest {
 	patient: Patient;
 	user: User;
 	test_type: BloodTestType;
-	reason: string;
+	details: string;
 	status: Status;
 	name: string;
 	role: string;
@@ -93,7 +100,7 @@ export interface BloodTestRequestCreate {
 	patient: number;
 	user: number;
 	test_type: BloodTestType;
-	reason: string;
+	details: string;
 	status?: Status;
 	name: string;
 	role: string;
@@ -110,7 +117,9 @@ export interface ImagingRequest {
 	patient: Patient;
 	user: User;
 	test_type: ImagingTestType;
-	reason: string;
+	details: string;
+	infection_control_precautions: InfectionControlPrecaution;
+	imaging_focus: string;
 	status: Status;
 	name: string;
 	role: string;
@@ -123,7 +132,9 @@ export interface ImagingRequestCreate {
 	patient: number;
 	user: number;
 	test_type: ImagingTestType;
-	reason: string;
+	details: string;
+	infection_control_precautions?: InfectionControlPrecaution;
+	imaging_focus?: string;
 	status?: Status;
 	name: string;
 	role: string;
@@ -218,6 +229,10 @@ export interface Patient {
 	first_name: string;
 	last_name: string;
 	date_of_birth: string;
+	gender: Gender;
+	mrn: string;
+	ward: string;
+	bed: string;
 	email: string;
 	phone_number?: string;
 	created_at: ISODateString;
@@ -229,6 +244,10 @@ export interface PatientCreate {
 	first_name: string;
 	last_name: string;
 	date_of_birth: string;
+	gender: Gender;
+	mrn: string;
+	ward: string;
+	bed: string;
 	email: string;
 	phone_number?: string;
 }

@@ -1,6 +1,7 @@
 import { User, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Patient } from "@/lib/api-client-v2";
+import { formatGender } from "@/lib/utils";
 
 interface PatientListProps {
   patients: Patient[];
@@ -47,7 +48,7 @@ export default function PatientList({
   };
 
   return (
-    <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-64'}`}>
+    <div data-testid="patient-list" className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-64'}`}>
       {/* Collapse Toggle Button */}
       {onToggleCollapse && (
         <Button
@@ -82,6 +83,7 @@ export default function PatientList({
         {patients.map((patient) => (
           <div
             key={patient.id}
+            data-testid={`patient-item-${patient.id}`}
             onClick={() => onPatientSelect(patient.id.toString())}
             className={`p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
               selectedPatientId === patient.id.toString() ? "bg-hospital-blue/5 border-hospital-blue/20" : ""
@@ -102,7 +104,9 @@ export default function PatientList({
                       {getStatusLabel()}
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500">ID: {patient.id} • Age: {calculateAge(patient.date_of_birth)}y</p>
+                  <p className="text-xs text-gray-500">
+                    {patient.ward}-{patient.bed} • Age: {calculateAge(patient.date_of_birth)}y • Gender: {formatGender(patient.gender)}
+                  </p>
                   {patient.phone_number && (
                     <p className="text-xs text-gray-500 mt-1">{patient.phone_number}</p>
                   )}

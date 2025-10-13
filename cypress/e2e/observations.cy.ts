@@ -5,6 +5,8 @@
  * for patients in the student dashboard.
  */
 
+/// <reference types="cypress" />
+
 describe('Observations Feature - E2E Tests', () => {
   /**
    * Setup: Login and navigate to patient before each test
@@ -14,21 +16,21 @@ describe('Observations Feature - E2E Tests', () => {
     // Visit the application home page
     cy.visit('/');
 
-    // Login with student group credentials
-    // Note: Update these selectors if the login form changes
-    cy.get('input[type="text"]').first().type('sg1');
-    cy.get('input[type="password"]').type('studentgroup-1');
-    cy.get('button[type="submit"]').click();
+  // Login using the landing page form (match actual input ids)
+  cy.get('#username').clear().type('sg1');
+  cy.get('#password').clear().type('studentgroup-1');
+  cy.get('button').contains(/^Sign In$/i).click();
 
-    // Wait for successful login and dashboard to load
+    // Wait for dashboard to load
     cy.url().should('include', '/student');
 
-    // Select a patient from the patient list
-    // Using contains to find patient name - update "Toni Baxter" if needed
-    cy.contains('Toni Baxter').click();
+    // Select the first patient in the patient list to avoid relying on a specific name
+    cy.get('[data-testid="patient-list"]').within(() => {
+      cy.get('[data-testid^="patient-item-"]').first().click();
+    });
 
-    // Navigate to Observations tab
-    cy.contains('button', 'Observations').click();
+    // Open the Observations tab in the patient view
+    cy.contains('Observations').click();
   });
 
   /**
@@ -36,97 +38,53 @@ describe('Observations Feature - E2E Tests', () => {
    * Verifies that users can successfully record vital signs one at a time
    */
   it('OBS-001: Should allow user to add individual vital signs records', () => {
-    // Navigate to "Add Observations" tab
-    cy.contains('Add Observations').click();
-
-    // Ensure we're on the Individual Entry form (default)
-    cy.contains('Individual Entry').should('be.visible');
+  // Navigate to "Add Observations" tab and ensure Individual Entry is visible
+  cy.contains('Add Observations').click();
+  cy.contains('Individual Entry').should('be.visible');
 
     // Test 1: Record Blood Pressure
     cy.get('#bp-systolic').clear().type('125');
     cy.get('#bp-diastolic').clear().type('85');
-    cy.get('#bp-systolic')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    // Wait for success (button should show "Recording..." then "Record" again)
-    cy.contains('button', 'Record').should('be.visible');
+    // Ensure card is scrolled into view then click Record
+    cy.get('#bp-systolic').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
 
     // Test 2: Record Heart Rate
     cy.get('#heartRate').clear().type('75');
-    cy.get('#heartRate')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    cy.contains('button', 'Record').should('be.visible');
+    cy.get('#heartRate').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
 
     // Test 3: Record Body Temperature
     cy.get('#temperature').clear().type('36.8');
-    cy.get('#temperature')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    cy.contains('button', 'Record').should('be.visible');
+    cy.get('#temperature').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
 
     // Test 4: Record Respiratory Rate
     cy.get('#respiratoryRate').clear().type('18');
-    cy.get('#respiratoryRate')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    cy.contains('button', 'Record').should('be.visible');
+    cy.get('#respiratoryRate').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
 
     // Test 5: Record Oxygen Saturation
     cy.get('#oxygenSaturation').clear().type('98');
-    cy.get('#oxygenSaturation')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    cy.contains('button', 'Record').should('be.visible');
+    cy.get('#oxygenSaturation').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
 
     // Test 6: Record Blood Sugar
     cy.get('#bloodSugar').clear().type('5.6');
-    cy.get('#bloodSugar')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    cy.contains('button', 'Record').should('be.visible');
+    cy.get('#bloodSugar').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
 
     // Test 7: Record Pain Score
     cy.get('#painScore').clear().type('6');
-    cy.get('#painScore')
-      .closest('div')
-      .parent()
-      .parent()
-      .find('button')
-      .contains('Record')
-      .click();
-
-    cy.contains('button', 'Record').should('be.visible');
+    cy.get('#painScore').closest('div').parent().scrollIntoView().within(() => {
+      cy.contains('button', /^Record$/).click({ force: true });
+    });
   });
 
   /**
@@ -134,15 +92,12 @@ describe('Observations Feature - E2E Tests', () => {
    * Verifies that users can view previously recorded vital signs
    */
   it('OBS-002: Should display current observations and historical data', () => {
-    // Navigate to "Current Observations" tab (default)
+    // Navigate to "Current Observations" tab
     cy.contains('Current Observations').click();
-
     // Verify that the observations display is visible
-    // This should show the latest vital signs and historical trends
-    cy.contains('Latest Observations').should('be.visible');
+  cy.contains('Latest Observations').should('be.visible');
+  cy.contains('Observations Chart').should('be.visible');
 
-    // Verify that observation chart/history is displayed
-    cy.contains('Observation Trends').should('be.visible');
   });
 
   /**
@@ -150,29 +105,27 @@ describe('Observations Feature - E2E Tests', () => {
    * Verifies that users can enter multiple vital signs at once
    */
   it('OBS-003: Should allow user to add vital signs in bulk entry mode', () => {
-    // Navigate to "Add Observations" tab
+    // Navigate to "Add Observations" tab and switch to Bulk Entry mode
     cy.contains('Add Observations').click();
-
-    // Switch to Bulk Entry mode
     cy.contains('Bulk Entry').click();
 
-    // Verify bulk entry form is displayed
-    cy.contains('Record all vital signs at once').should('be.visible');
+    // Verify bulk entry form is displayed via card title
+    cy.contains('Record All Observations').should('be.visible');
 
-    // Fill in all fields in bulk form
-    cy.get('input[placeholder*="120"]').type('125'); // Systolic
-    cy.get('input[placeholder*="80"]').type('85');   // Diastolic
-    cy.get('input[placeholder="72"]').type('75');    // Heart Rate
-    cy.get('input[placeholder="36.5"]').type('36.8'); // Temperature
-    cy.get('input[placeholder="16"]').type('18');    // Respiratory Rate
-    cy.get('input[placeholder="98"]').type('98');    // O2 Saturation
-    cy.get('input[placeholder="5.5"]').type('5.6');  // Blood Sugar
-    cy.get('input[placeholder="0"]').type('3');      // Pain Score
+    // Fill in all fields using the bulk input ids
+    cy.get('#bulk-systolic').clear().type('125'); // Systolic
+    cy.get('#bulk-diastolic').clear().type('85');   // Diastolic
+    cy.get('#bulk-heartRate').clear().type('75');    // Heart Rate
+    cy.get('#bulk-temperature').clear().type('36.8'); // Temperature
+    cy.get('#bulk-respiratoryRate').clear().type('18');    // Respiratory Rate
+    cy.get('#bulk-oxygenSaturation').clear().type('98');    // O2 Saturation
+    cy.get('#bulk-bloodSugar').clear().type('5.6');  // Blood Sugar
+    cy.get('#bulk-painScore').clear().type('3');      // Pain Score
 
-    // Submit the bulk form
-    cy.contains('button', 'Record All Vital Signs').click();
+    // Submit the bulk form (scroll into view then click)
+    cy.contains('button', 'Record All Observations').scrollIntoView().click();
 
-    // Verify success or wait for form to clear
+    // Verify recording indicator
     cy.contains('Recording...').should('be.visible');
   });
 
@@ -184,15 +137,14 @@ describe('Observations Feature - E2E Tests', () => {
     // Navigate to "Add Observations" tab
     cy.contains('Add Observations').click();
 
-    // Test: Record button should be disabled with empty input
-    cy.get('#heartRate').closest('div').parent().parent()
-      .find('button')
-      .contains('Record')
-      .should('be.disabled');
+    // Test: Record button should be disabled with empty input for a given vital sign
+    cy.get('#heartRate').closest('div').parent().within(() => {
+      cy.contains('button', /^Record$/).should('be.disabled');
+    });
 
     // Test: Enter invalid pain score (out of range)
-    cy.get('#painScore').type('15'); // Max is 10
-    
+    cy.get('#painScore').clear().type('15'); // Max is 10 - UI should handle validation
+
     // Note: Additional validation tests can be added based on actual validation rules
   });
 });

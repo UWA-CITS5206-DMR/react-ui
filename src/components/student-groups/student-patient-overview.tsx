@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StudentFilePreviewDialog from "./investigation-requests/student-file-preview-dialog";
+import { formatGender } from "@/lib/utils";
 
 interface StudentPatientOverviewProps {
   patient: Patient;
@@ -135,6 +136,22 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
             <div>
               <label className="text-sm font-medium text-gray-500">Date of Birth</label>
               <p className="text-sm text-gray-900">{new Date(patient.date_of_birth).toLocaleDateString()}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">MRN</label>
+              <p className="text-sm text-gray-900">{patient.mrn}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Gender</label>
+              <p className="text-sm text-gray-900">{formatGender(patient.gender)}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Ward</label>
+              <p className="text-sm text-gray-900">{patient.ward}</p>
+            </div>
+            <div>
+              <label className="text-sm font-medium text-gray-500">Bed</label>
+              <p className="text-sm text-gray-900">{patient.bed}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Email</label>

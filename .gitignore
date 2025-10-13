@@ -9,4 +9,6 @@ vite.config.ts.*
 .env.local
 
 # Build output
-dist/public
+dist/
+
+cypress/screenshots/

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -12,13 +12,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -339,7 +332,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                 <div className="flex items-start gap-2">
                   <FileText className="h-4 w-4 mt-0.5" />
                   <span className="flex-1">
-                    <strong>Reason:</strong> {request.reason}
+                    <strong>Details:</strong> {request.details}
                   </span>
                 </div>
               </div>
@@ -528,7 +521,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
                   <Badge>{approvalDialog.request.status}</Badge>
                 </div>
                 <p className="text-sm text-gray-600">
-                  <strong>Reason:</strong> {approvalDialog.request.reason}
+                  <strong>Details:</strong> {approvalDialog.request.details}
                 </p>
                 <p className="text-sm text-gray-600">
                   <strong>Requested by:</strong> {approvalDialog.request.name} (
