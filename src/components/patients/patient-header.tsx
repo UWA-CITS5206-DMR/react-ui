@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Calendar, Phone, Mail, Edit } from "lucide-react";
+import { Calendar, Edit } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Patient } from "@/lib/api-client-v2";
 import EditPatientModal from "./edit-patient-modal";
+import { getGenderLabel } from "@/lib/constants";
+import { formatDate } from "@/lib/utils";
 
 interface PatientHeaderProps {
   patient: Patient;
@@ -21,14 +23,6 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
       age--;
     }
     return age;
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-AU', {
-      day: '2-digit',
-      month: '2-digit', 
-      year: 'numeric'
-    });
   };
 
   const handlePatientUpdated = (updatedPatient: Patient) => {
@@ -63,23 +57,14 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-gray-400" />
                 <span className="text-gray-600">DOB:</span>
-                <span className="font-medium">{formatDate(patient.date_of_birth)}</span>
+                <span className="font-medium">{formatDate(patient.date_of_birth, { year: "numeric", month: "short", day: "numeric" })}</span>
                 <span className="text-gray-500">({calculateAge(patient.date_of_birth)}y)</span>
               </div>
               
               <div className="flex items-center space-x-2">
-                <Mail className="h-4 w-4 text-gray-400" />
-                <span className="text-gray-600">Email:</span>
-                <span className="font-medium">{patient.email}</span>
+                <span className="text-gray-600">Gender:</span>
+                <span className="font-medium">{getGenderLabel(patient.gender)}</span>
               </div>
-              
-              {patient.phone_number && (
-                <div className="flex items-center space-x-2">
-                  <Phone className="h-4 w-4 text-gray-400" />
-                  <span className="text-gray-600">Phone:</span>
-                  <span className="font-medium">{patient.phone_number}</span>
-                </div>
-              )}
             </div>
           </div>
         </div>

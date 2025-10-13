@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { getErrorMessage } from "@/lib/error-utils";
 import type { Patient, PatientUpdate } from "@/lib/api-client-v2";
+import { GENDER_OPTIONS, getGenderLabel } from "@/lib/constants";
 
 interface EditPatientModalProps {
   isOpen: boolean;
@@ -27,7 +28,8 @@ export default function EditPatientModal({
     last_name: "",
     date_of_birth: "",
     email: "",
-    phone_number: ""
+    phone_number: "",
+    gender: "unspecified"
   });
   
   const { toast } = useToast();
@@ -41,7 +43,8 @@ export default function EditPatientModal({
         last_name: patient.last_name,
         date_of_birth: patient.date_of_birth,
         email: patient.email,
-        phone_number: patient.phone_number || ""
+        phone_number: patient.phone_number || "",
+        gender: patient.gender
       });
     }
   }, [isOpen, patient]);
@@ -76,7 +79,8 @@ export default function EditPatientModal({
       last_name: formData.last_name,
       date_of_birth: formData.date_of_birth,
       email: formData.email,
-      phone_number: formData.phone_number || undefined // Convert empty string to undefined
+      phone_number: formData.phone_number || undefined, // Convert empty string to undefined
+      gender: (formData.gender as any) || undefined
     };
     
     updatePatientMutation.mutate(submitData);
@@ -153,14 +157,18 @@ export default function EditPatientModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="patient_id">Patient ID</Label>
-            <Input
-              id="patient_id"
-              value={patient.id}
-              disabled
-              className="bg-gray-100"
-            />
-            <p className="text-xs text-gray-500">Patient ID cannot be changed</p>
+            <Label htmlFor="gender">Gender *</Label>
+            <select
+              id="gender"
+              value={(formData.gender as string) ?? "unspecified"}
+              onChange={(e) => handleChange("gender", e.target.value)}
+              className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2"
+              required
+            >
+              {GENDER_OPTIONS.map((g) => (
+                <option key={g} value={g}>{getGenderLabel(g)}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">

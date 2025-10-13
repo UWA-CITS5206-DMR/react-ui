@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { getErrorMessage } from "@/lib/error-utils";
+import { GENDER_OPTIONS, getGenderLabel } from "@/lib/constants";
 
 interface CreatePatientModalProps {
   isOpen: boolean;
@@ -24,29 +25,31 @@ export default function CreatePatientModal({
     last_name: "",
     date_of_birth: "",
     email: "",
-    phone_number: ""
+    phone_number: "",
+    gender: "unspecified"
   });
   
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const createPatientMutation = useMutation({
-    mutationFn: (patientData: any) => 
-      apiClientV2.post("/patients/", patientData),
-    onSuccess: (response) => {
+    mutationFn: (patientData: any) =>
+      apiClientV2.patients.create(patientData),
+    onSuccess: (createdPatient) => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       toast({
         title: "Patient Created",
         description: "Patient has been created successfully.",
       });
-      onPatientCreated?.(response.data);
+      onPatientCreated?.(createdPatient);
       onClose();
       setFormData({
         first_name: "",
         last_name: "",
         date_of_birth: "",
         email: "",
-        phone_number: ""
+          phone_number: "",
+          gender: "unspecified"
       });
     },
     onError: (error: any) => {
@@ -131,6 +134,21 @@ export default function CreatePatientModal({
               onChange={(e) => handleChange("phone_number", e.target.value)}
               placeholder="Optional"
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="gender">Gender *</Label>
+            <select
+              id="gender"
+              value={formData.gender}
+              onChange={(e) => handleChange("gender", e.target.value)}
+              className="block w-full rounded-md border border-gray-300 bg-white px-3 py-2"
+              required
+            >
+              {GENDER_OPTIONS.map((g) => (
+                <option key={g} value={g}>{getGenderLabel(g)}</option>
+              ))}
+            </select>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">

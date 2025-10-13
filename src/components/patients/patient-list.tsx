@@ -3,15 +3,16 @@ import { User, Plus, ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import type { Patient } from "@/lib/api-client-v2";
 import CreatePatientModal from "./create-patient-modal";
+import { getGenderLabel } from "@/lib/constants";
 
 interface PatientListProps {
   patients: Patient[];
   selectedPatientId?: string;
   onPatientSelect: (patientId: string) => void;
-  onPatientCreated?: (patient: Patient) => void; // YOUR: Patient creation callback
-  isCollapsed?: boolean; // FROM MAIN: Collapse functionality
-  onToggleCollapse?: () => void; // FROM MAIN: Collapse toggle
-  showCreateButton?: boolean; // YOUR: Control Add Patient button visibility
+  onPatientCreated?: (patient: Patient) => void; // Patient creation callback
+  isCollapsed?: boolean; // Collapse functionality
+  onToggleCollapse?: () => void; // Collapse toggle
+  showCreateButton?: boolean; // Control Add Patient button visibility
 }
 
 export default function PatientList({ 
@@ -19,9 +20,9 @@ export default function PatientList({
   selectedPatientId, 
   onPatientSelect, 
   onPatientCreated,
-  isCollapsed = false, // FROM MAIN: Default to not collapsed
-  onToggleCollapse, // FROM MAIN: Optional collapse toggle
-  showCreateButton = true // YOUR: Default to showing create button
+  isCollapsed = false, // Default to not collapsed
+  onToggleCollapse, // Optional collapse toggle
+  showCreateButton = true // Default to showing create button
 }: PatientListProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -62,7 +63,7 @@ export default function PatientList({
   return (
     <>
       <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-80'}`}>
-        {/* Collapse Toggle Button - FROM MAIN */}
+        {/* Collapse Toggle Button */}
         {onToggleCollapse && (
           <Button
             variant="ghost"
@@ -79,13 +80,13 @@ export default function PatientList({
           </Button>
         )}
         
-        {/* Header with conditional Create Patient button - COMBINED */}
+        {/* Header with conditional Create Patient button */}
         <div className="p-4 border-b border-gray-200">
           {!isCollapsed ? (
             <>
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold text-gray-900">Patient List</h2>
-                {showCreateButton && ( // YOUR: ONLY show if showCreateButton is true
+                {showCreateButton && ( // ONLY show if showCreateButton is true
                   <Button 
                     onClick={() => setIsCreateModalOpen(true)}
                     size="sm"
@@ -116,7 +117,7 @@ export default function PatientList({
               title={isCollapsed ? `${patient.first_name} ${patient.last_name}` : undefined}
             >
               {!isCollapsed ? (
-                // Expanded view - YOUR layout with MAIN improvements
+                // Expanded view 
                 <div className="flex items-start space-x-3">
                   <div className="w-10 h-10 bg-hospital-blue/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <User className="h-5 w-5 text-hospital-blue" />
@@ -130,19 +131,11 @@ export default function PatientList({
                         {getStatusLabel()}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">ID: {patient.id} • Age: {calculateAge(patient.date_of_birth)}y</p>
-                    <div className="flex items-center space-x-4 mt-1">
-                      {patient.email && (
-                        <span className="text-xs text-gray-500 truncate">{patient.email}</span>
-                      )}
-                    </div>
-                    {patient.phone_number && (
-                      <p className="text-xs text-gray-500 mt-1">{patient.phone_number}</p>
-                    )}
+                    <p className="text-xs text-gray-500">{patient.ward}-{patient.bed} • Age: {calculateAge(patient.date_of_birth)}y • Gender: {getGenderLabel(patient.gender)}</p>
                   </div>
                 </div>
               ) : (
-                // Collapsed view - FROM MAIN
+                // Collapsed view
                 <div className="flex justify-center">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
                     selectedPatientId === patient.id.toString() 
@@ -158,7 +151,7 @@ export default function PatientList({
         </div>
       </div>
 
-      {/* Create Patient Modal - YOUR feature */}
+      {/* Create Patient Modal */}
       <CreatePatientModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}

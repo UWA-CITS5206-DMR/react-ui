@@ -12,6 +12,7 @@ import { useToast } from "@/hooks/use-toast";
 import { FileText, Plus, List } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { NoteEntry } from "@/lib/api-client-v2";
+import { formatDate } from "@/lib/utils";
 
 interface SOAPNotesFormProps {
   patientId: string;
@@ -88,16 +89,6 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
     }
 
     createNotesMutation.mutate();
-  };
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString('en-AU', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
   };
 
   return (
