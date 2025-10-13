@@ -52,3 +52,13 @@ type AssertQueryParamTyping = Expect<
     ? true
     : false
 >;
+
+// Prevent "declared but never used" errors by creating a composite type
+// that references the assertions. This has no runtime effect.
+type _AllAssertions = AssertLogin & AssertInstructorBloodTests & AssertPatientList & AssertObservationBundle & AssertQueryParamTyping;
+const _assertionsPresent: _AllAssertions = true as unknown as _AllAssertions;
+// Reference in a never-taken branch to satisfy the compiler's "value is never read" check
+if (false) {
+  // eslint-disable-next-line no-console
+  console.log(_assertionsPresent);
+}

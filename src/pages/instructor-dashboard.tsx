@@ -9,7 +9,7 @@ import InstructorLabRequests from "@/components/instructors/instructor-lab-reque
 import FileManagement from "@/components/patients/file-management";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import type { Patient } from "@/lib/api-client-v2";
+// Patient type intentionally not imported here to avoid unused-type errors
 
 const LAST_PATIENT_KEY = "lastSelectedPatientId";
 const LAST_TAB_KEY = "instructorDashboardLastTab";

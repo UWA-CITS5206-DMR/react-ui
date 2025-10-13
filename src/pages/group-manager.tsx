@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,6 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileText, Image, FileIcon, Eye, EyeOff, Users, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { apiClientV2 } from "@/lib/queryClient";
 // TODO: Group, Asset, AssetGroupVisibility types not available in API Client v2
 // These may need to be implemented in instructor APIs or redefined locally
 interface Group {
@@ -23,13 +22,6 @@ interface Asset {
   name: string;
   type: string;
   filename?: string;
-}
-
-interface AssetGroupVisibility {
-  id: string;
-  assetId: string;
-  groupId: string;
-  visible: boolean;
 }
 
 const sessionId = "session-1"; // Using test session

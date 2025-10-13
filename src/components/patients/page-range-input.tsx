@@ -9,7 +9,7 @@ import { Info } from "lucide-react";
 interface PageRangeInputProps {
   onConfirm: (pageRange: string) => void;
   onCancel: () => void;
-  fileName: string;
+  fileName?: string;
 }
 
 export default function PageRangeInput({
@@ -66,6 +66,11 @@ export default function PageRangeInput({
 
   return (
     <div className="space-y-4">
+      {fileName && (
+        <div className="text-sm text-muted-foreground">
+          Previewing: <span className="font-medium">{fileName}</span>
+        </div>
+      )}
       {/* Toggle for previewing entire file */}
       <div className="flex items-center space-x-3 p-3 bg-blue-50 rounded-lg border border-blue-200">
         <Switch

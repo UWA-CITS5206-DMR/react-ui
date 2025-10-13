@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -24,7 +22,6 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
   
-  const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

@@ -12,7 +12,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { getErrorMessage } from "@/lib/error-utils";
 
 export default function Landing() {
-  const [, setLocation] = useLocation();
+  useLocation();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const { toast } = useToast();

@@ -1,36 +1,19 @@
-import { useState, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClientV2 } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
-import { 
-  Users, 
-  Database, 
-  UserPlus, 
-  Settings, 
-  Activity, 
-  Shield,
-  Edit3,
-  Trash2,
-  Eye,
-  Plus,
-  AlertTriangle,
-  CheckCircle,
-  Clock
-} from "lucide-react";
+import { Users, Database, UserPlus, Settings, Activity, Shield, Edit3, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
 import TopNavigation from "@/components/layout/top-navigation";
 
 // Form schemas
@@ -39,12 +22,6 @@ const createDataVersionSchema = z.object({
   description: z.string().optional(),
   version: z.string().min(1, "Version is required"),
   sessionId: z.string().min(1, "Session is required"),
-});
-
-const createGroupAccountSchema = z.object({
-  groupId: z.string().min(1, "Group is required"),
-  username: z.string().min(3, "Username must be at least 3 characters"),
-  password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 const createUserSchema = z.object({
@@ -56,7 +33,6 @@ const createUserSchema = z.object({
 });
 
 type CreateDataVersionForm = z.infer<typeof createDataVersionSchema>;
-type CreateGroupAccountForm = z.infer<typeof createGroupAccountSchema>;
 type CreateUserForm = z.infer<typeof createUserSchema>;
 
 export default function AdminDashboard() {
@@ -117,14 +93,7 @@ export default function AdminDashboard() {
     },
   });
 
-  const groupAccountForm = useForm<CreateGroupAccountForm>({
-    resolver: zodResolver(createGroupAccountSchema),
-    defaultValues: {
-      groupId: "",
-      username: "",
-      password: "",
-    },
-  });
+  // Group account admin forms are placeholders until admin APIs are implemented
 
   const userForm = useForm<CreateUserForm>({
     resolver: zodResolver(createUserSchema),
@@ -161,28 +130,7 @@ export default function AdminDashboard() {
     },
   });
 
-  const createGroupAccountMutation = useMutation({
-    mutationFn: async (data: CreateGroupAccountForm) => {
-      // TODO: apiClientV2.admin.groupAccounts.create() does not exist
-      console.log("Would create group account:", data);
-      return Promise.resolve({ id: Date.now(), ...data });
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["admin", "group-accounts"] });
-      groupAccountForm.reset();
-      toast({
-        title: "Success",
-        description: "Group account created successfully",
-      });
-    },
-    onError: (error: any) => {
-      toast({
-        title: "Error",
-        description: getErrorMessage(error, "Failed to create group account"),
-        variant: "destructive",
-      });
-    },
-  });
+  // Group account creation mutation intentionally omitted until admin APIs are available.
 
   const createUserMutation = useMutation({
     mutationFn: async (data: CreateUserForm) => {
@@ -245,9 +193,7 @@ export default function AdminDashboard() {
     createDataVersionMutation.mutate(data);
   };
 
-  const onCreateGroupAccount = (data: CreateGroupAccountForm) => {
-    createGroupAccountMutation.mutate(data);
-  };
+  // Group account creation is currently a placeholder until backend admin APIs are provided
 
   const onCreateUser = (data: CreateUserForm) => {
     createUserMutation.mutate(data);

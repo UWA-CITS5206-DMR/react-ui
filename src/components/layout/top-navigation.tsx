@@ -6,7 +6,7 @@ interface TopNavigationProps {
   // Empty for now, but kept for future extensions
 }
 
-export default function TopNavigation(props: TopNavigationProps) {
+export default function TopNavigation(_: TopNavigationProps) {
   const { user, logout } = useAuth();
 
   return (
