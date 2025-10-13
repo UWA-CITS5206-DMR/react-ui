@@ -128,9 +128,9 @@ Viewing Requests
 
 Students can only access files when all are true:
 
-1) An Approved File record exists that links a file to your specific request
-2) A page range is defined (for paginated PDFs)
-3) The request status is “completed”
+1. An Approved File record exists that links a file to your specific request
+2. A page range is defined (for paginated PDFs)
+3. The request status is “completed”
 
 How it works
 
@@ -198,23 +198,29 @@ Administration for Admin users is handled via the Django Admin (backend), not wi
 ## Tips and Troubleshooting
 
 - I can’t log in
+
   - Verify username/password; ensure correct role/account
   - If still failing, contact your instructor or admin
 
 - I can’t see a patient
+
   - Your cohort might be restricted; refresh and confirm with staff
 
 - My request is pending
+
   - Instructors must review and complete it; ask them to approve
 
 - I can’t open a file or some pages are missing
+
   - Student access depends on Approved Files + page ranges + completed request
   - Ask instructors to verify approved files for your request
 
 - Forms won’t submit
+
   - Check required fields; errors appear as toasts or inline messages
 
 - Navigation feels stuck on a previous tab/patient
+
   - The app remembers your last selection; switch patients/tabs or clear browser storage if needed
 
 - Supported browsers
