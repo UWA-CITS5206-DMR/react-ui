@@ -6,11 +6,12 @@
   "scripts": {
     "dev": "vite dev",
     "build": "vite build",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --max-warnings=0",
-    "format:check": "prettier --ignore-path .prettierignore --check \"**/*.{js,jsx,ts,tsx,css,md,mdx,json,yml,yaml}\"",
-    "preview": "vite preview",
-    "check": "tsc",
-    "format": "prettier --ignore-path .prettierignore --write \"**/*.{js,jsx,ts,tsx,css,md,mdx,json,yml,yaml}\""
+    "format": "prettier --write .",
+    "check:type": "tsc",
+    "check:lint": "eslint . --max-warnings=0",
+    "check:format": "prettier --check .",
+    "check": "npm run check:type && npm run check:lint && npm run check:format",
+    "preview": "vite preview"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
