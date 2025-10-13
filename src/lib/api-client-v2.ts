@@ -44,6 +44,7 @@ export type FileCategory =
 	| "Diagnostics"
 	| "Lab Results"
 	| "Other";
+export type Gender = "female" | "male" | "other" | "unspecified";
 
 export type ISODateString = string;
 
@@ -228,6 +229,7 @@ export interface Patient {
 	first_name: string;
 	last_name: string;
 	date_of_birth: string;
+	gender: Gender;
 	mrn: string;
 	ward: string;
 	bed: string;
@@ -242,6 +244,7 @@ export interface PatientCreate {
 	first_name: string;
 	last_name: string;
 	date_of_birth: string;
+	gender: Gender;
 	mrn: string;
 	ward: string;
 	bed: string;
