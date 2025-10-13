@@ -29,9 +29,7 @@ export function MedicationOrderList({ patientId }: MedicationOrderListProps) {
       </CardHeader>
       <CardContent>
         {!medicationOrders || medicationOrders.results.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">
-            No medication orders found
-          </p>
+          <p className="text-muted-foreground text-center py-8">No medication orders found</p>
         ) : (
           <div className="space-y-4">
             {medicationOrders.results.map((order: MedicationOrder) => (

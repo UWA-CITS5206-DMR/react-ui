@@ -10,7 +10,7 @@ interface ObservationsProps {
 
 /**
  * Main observations component with tabs for viewing and adding observations
- * 
+ *
  * Updated to use the new CurrentObservations component which includes:
  * - Real Django API data fetching
  * - Latest observations display

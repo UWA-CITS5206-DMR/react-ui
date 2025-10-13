@@ -20,25 +20,25 @@ export default function InstructorDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
   const [activeTab, setActiveTab] = useState<InstructorTabValue>("overview");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-  const [notifications, setNotifications] = useState<Array<{
-    id: string;
-    type: "success" | "warning" | "error";
-    message: string;
-  }>>([]);
+  const [notifications, setNotifications] = useState<
+    Array<{
+      id: string;
+      type: "success" | "warning" | "error";
+      message: string;
+    }>
+  >([]);
 
   const { data: patientsResponse } = useQuery({
     queryKey: ["/api/patients"],
     queryFn: () => apiClientV2.patients.list(),
   });
 
-  const patients = useMemo(
-    () => patientsResponse?.results ?? [],
-    [patientsResponse]
-  );
+  const patients = useMemo(() => patientsResponse?.results ?? [], [patientsResponse]);
 
   const { data: selectedPatient } = useQuery({
     queryKey: ["/api/patients", selectedPatientId],
-    queryFn: () => selectedPatientId ? apiClientV2.patients.retrieve(Number(selectedPatientId)) : null,
+    queryFn: () =>
+      selectedPatientId ? apiClientV2.patients.retrieve(Number(selectedPatientId)) : null,
     enabled: !!selectedPatientId,
   });
 
@@ -85,7 +85,7 @@ export default function InstructorDashboard() {
   };
 
   const dismissNotification = (id: string) => {
-    setNotifications(prev => prev.filter(n => n.id !== id));
+    setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
   if (!selectedPatient) {
@@ -111,7 +111,7 @@ export default function InstructorDashboard() {
   return (
     <div className="h-screen flex flex-col overflow-x-hidden">
       <TopNavigation />
-      
+
       <div className="flex flex-1 overflow-hidden min-w-0">
         <PatientList
           patients={patients}
@@ -120,10 +120,10 @@ export default function InstructorDashboard() {
           isCollapsed={isSidebarCollapsed}
           onToggleCollapse={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
         />
-        
+
         <main className="flex-1 flex flex-col min-h-0 min-w-0">
           <PatientHeader patient={selectedPatient} />
-          
+
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
@@ -155,27 +155,18 @@ export default function InstructorDashboard() {
                 </TabsList>
               </div>
             </div>
-            
-            <TabsContent
-              value="overview"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+
+            <TabsContent value="overview" className="flex-1 min-h-0 overflow-auto m-0">
               <InstructorPatientOverview patient={selectedPatient} />
             </TabsContent>
-            
-            <TabsContent
-              value="files"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+
+            <TabsContent value="files" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <FileManagement patientId={selectedPatient.id} />
               </div>
             </TabsContent>
-            
-            <TabsContent
-              value="requests"
-              className="flex-1 min-h-0 overflow-auto m-0"
-            >
+
+            <TabsContent value="requests" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <InstructorLabRequests patientId={selectedPatient.id} />
               </div>
@@ -183,11 +174,8 @@ export default function InstructorDashboard() {
           </Tabs>
         </main>
       </div>
-      
-      <NotificationToast
-        notifications={notifications}
-        onDismiss={dismissNotification}
-      />
+
+      <NotificationToast notifications={notifications} onDismiss={dismissNotification} />
     </div>
   );
 }

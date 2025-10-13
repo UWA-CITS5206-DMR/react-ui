@@ -41,7 +41,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         free_text: data.freeText,
         name: data.name,
         role: data.role,
-        patient: patient.id
+        patient: patient.id,
       });
     },
     onSuccess: () => {
@@ -67,8 +67,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         <CardHeader>
           <CardTitle className="text-lg">Discharge Summary</CardTitle>
           <p className="text-sm text-gray-600">
-            Complete the discharge summary for {patient.first_name}{" "}
-            {patient.last_name}
+            Complete the discharge summary for {patient.first_name} {patient.last_name}
           </p>
         </CardHeader>
         <CardContent>
@@ -80,9 +79,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
                 id="diagnosis"
                 placeholder="Primary and secondary diagnoses"
                 value={formData.diagnosis}
-                onChange={(e) =>
-                  setFormData({ ...formData, diagnosis: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
                 required
               />
             </div>
@@ -95,9 +92,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
                 placeholder="Detailed clinical summary of patient's stay, treatment provided, and response to treatment..."
                 rows={6}
                 value={formData.freeText}
-                onChange={(e) =>
-                  setFormData({ ...formData, freeText: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, freeText: e.target.value })}
                 required
               />
             </div>
@@ -110,9 +105,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
                 placeholder="Follow-up appointments, medications, instructions for patient care, lifestyle modifications..."
                 rows={4}
                 value={formData.plan}
-                onChange={(e) =>
-                  setFormData({ ...formData, plan: e.target.value })
-                }
+                onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
                 required
               />
             </div>
@@ -131,13 +124,8 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
             {/* Submit Button */}
             <div className="flex items-center justify-between pt-4">
               <p className="text-sm text-gray-500">* Required fields</p>
-              <Button
-                type="submit"
-                disabled={createDischargeSummaryMutation.isPending}
-              >
-                {createDischargeSummaryMutation.isPending
-                  ? "Saving..."
-                  : "Save Discharge Summary"}
+              <Button type="submit" disabled={createDischargeSummaryMutation.isPending}>
+                {createDischargeSummaryMutation.isPending ? "Saving..." : "Save Discharge Summary"}
               </Button>
             </div>
           </form>
@@ -150,9 +138,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
           <CardContent className="pt-6">
             <div className="flex items-center space-x-2 text-green-800">
               <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium">
-                Discharge summary saved successfully
-              </span>
+              <span className="text-sm font-medium">Discharge summary saved successfully</span>
             </div>
           </CardContent>
         </Card>

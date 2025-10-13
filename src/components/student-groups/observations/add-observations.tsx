@@ -10,7 +10,7 @@ interface AddObservationsProps {
 
 /**
  * Main component for adding observation records
- * 
+ *
  * This component has been refactored into smaller, more focused sub-components following Single Responsibility Principle
  */
 export default function AddObservations({ patient }: AddObservationsProps) {

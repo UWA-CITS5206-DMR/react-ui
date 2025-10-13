@@ -15,14 +15,14 @@ interface PatientListProps {
   showCreateButton?: boolean; // Control Add Patient button visibility
 }
 
-export default function PatientList({ 
-  patients, 
-  selectedPatientId, 
-  onPatientSelect, 
+export default function PatientList({
+  patients,
+  selectedPatientId,
+  onPatientSelect,
   onPatientCreated,
   isCollapsed = false, // Default to not collapsed
   onToggleCollapse, // Optional collapse toggle
-  showCreateButton = true // Default to showing create button
+  showCreateButton = true, // Default to showing create button
 }: PatientListProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
@@ -62,7 +62,11 @@ export default function PatientList({
 
   return (
     <>
-      <div className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${isCollapsed ? 'w-16' : 'w-80'}`}>
+      <div
+        className={`bg-white border-r border-gray-200 flex flex-col transition-all duration-300 relative ${
+          isCollapsed ? "w-16" : "w-80"
+        }`}
+      >
         {/* Collapse Toggle Button */}
         {onToggleCollapse && (
           <Button
@@ -79,7 +83,7 @@ export default function PatientList({
             )}
           </Button>
         )}
-        
+
         {/* Header with conditional Create Patient button */}
         <div className="p-4 border-b border-gray-200">
           {!isCollapsed ? (
@@ -87,7 +91,7 @@ export default function PatientList({
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold text-gray-900">Patient List</h2>
                 {showCreateButton && ( // ONLY show if showCreateButton is true
-                  <Button 
+                  <Button
                     onClick={() => setIsCreateModalOpen(true)}
                     size="sm"
                     className="bg-hospital-blue hover:bg-hospital-blue/90"
@@ -105,19 +109,21 @@ export default function PatientList({
             </div>
           )}
         </div>
-        
+
         <div className="flex-1 overflow-y-auto">
           {patients.map((patient) => (
             <div
               key={patient.id}
               onClick={() => onPatientSelect(patient.id.toString())}
               className={`border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${
-                selectedPatientId === patient.id.toString() ? "bg-hospital-blue/5 border-hospital-blue/20" : ""
-              } ${isCollapsed ? 'p-2' : 'p-4'}`}
+                selectedPatientId === patient.id.toString()
+                  ? "bg-hospital-blue/5 border-hospital-blue/20"
+                  : ""
+              } ${isCollapsed ? "p-2" : "p-4"}`}
               title={isCollapsed ? `${patient.first_name} ${patient.last_name}` : undefined}
             >
               {!isCollapsed ? (
-                // Expanded view 
+                // Expanded view
                 <div className="flex items-start space-x-3">
                   <div className="w-10 h-10 bg-hospital-blue/10 rounded-full flex items-center justify-center flex-shrink-0">
                     <User className="h-5 w-5 text-hospital-blue" />
@@ -127,21 +133,28 @@ export default function PatientList({
                       <h3 className="text-sm font-medium text-gray-900 truncate">
                         {patient.first_name} {patient.last_name}
                       </h3>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}>
+                      <span
+                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getStatusColor()}`}
+                      >
                         {getStatusLabel()}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-500">{patient.ward}-{patient.bed} • Age: {calculateAge(patient.date_of_birth)}y • Gender: {getGenderLabel(patient.gender)}</p>
+                    <p className="text-xs text-gray-500">
+                      {patient.ward}-{patient.bed} • Age: {calculateAge(patient.date_of_birth)}y •
+                      Gender: {getGenderLabel(patient.gender)}
+                    </p>
                   </div>
                 </div>
               ) : (
                 // Collapsed view
                 <div className="flex justify-center">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                    selectedPatientId === patient.id.toString() 
-                      ? "bg-hospital-blue text-white" 
-                      : "bg-hospital-blue/10 text-hospital-blue"
-                  }`}>
+                  <div
+                    className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                      selectedPatientId === patient.id.toString()
+                        ? "bg-hospital-blue text-white"
+                        : "bg-hospital-blue/10 text-hospital-blue"
+                    }`}
+                  >
                     <User className="h-5 w-5" />
                   </div>
                 </div>

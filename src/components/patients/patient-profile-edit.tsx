@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface Patient {
   id: string;
@@ -13,7 +19,7 @@ interface Patient {
   lastName: string;
   dateOfBirth: string;
   gender: string;
-  location: string;  // Your actual field name
+  location: string; // Your actual field name
   status: string;
   chiefComplaint: string; // Your actual field name
   sessionId: string;
@@ -31,18 +37,18 @@ interface PatientProfileEditProps {
   onCancel: () => void;
 }
 
-export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({ 
-  patient, 
-  onSave, 
-  onCancel 
+export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
+  patient,
+  onSave,
+  onCancel,
 }) => {
   const [formData, setFormData] = useState<Patient>({
     ...patient,
     // Initialize optional fields if they don't exist
-    allergies: patient.allergies || '',
-    currentMedications: patient.currentMedications || '',
-    bed: patient.bed || '',
-    ward: patient.ward || '',
+    allergies: patient.allergies || "",
+    currentMedications: patient.currentMedications || "",
+    bed: patient.bed || "",
+    ward: patient.ward || "",
   });
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -51,9 +57,9 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
   };
 
   const handleChange = (field: keyof Patient, value: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [field]: value
+      [field]: value,
     }));
   };
 
@@ -72,7 +78,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Input
                   id="firstName"
                   value={formData.firstName}
-                  onChange={(e) => handleChange('firstName', e.target.value)}
+                  onChange={(e) => handleChange("firstName", e.target.value)}
                   required
                 />
               </div>
@@ -81,7 +87,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Input
                   id="lastName"
                   value={formData.lastName}
-                  onChange={(e) => handleChange('lastName', e.target.value)}
+                  onChange={(e) => handleChange("lastName", e.target.value)}
                   required
                 />
               </div>
@@ -91,7 +97,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                   id="dateOfBirth"
                   type="date"
                   value={formData.dateOfBirth}
-                  onChange={(e) => handleChange('dateOfBirth', e.target.value)}
+                  onChange={(e) => handleChange("dateOfBirth", e.target.value)}
                   required
                 />
               </div>
@@ -99,7 +105,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Label htmlFor="gender">Gender</Label>
                 <Select
                   value={formData.gender}
-                  onValueChange={(value) => handleChange('gender', value)}
+                  onValueChange={(value) => handleChange("gender", value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -116,7 +122,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Input
                   id="mrn"
                   value={formData.mrn}
-                  onChange={(e) => handleChange('mrn', e.target.value)}
+                  onChange={(e) => handleChange("mrn", e.target.value)}
                   required
                 />
               </div>
@@ -124,7 +130,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Label htmlFor="status">Status</Label>
                 <Select
                   value={formData.status}
-                  onValueChange={(value) => handleChange('status', value)}
+                  onValueChange={(value) => handleChange("status", value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -151,7 +157,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Label htmlFor="location">Location</Label>
                 <Select
                   value={formData.location}
-                  onValueChange={(value) => handleChange('location', value)}
+                  onValueChange={(value) => handleChange("location", value)}
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -171,8 +177,8 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
                 <Label htmlFor="bed">Bed (Optional)</Label>
                 <Input
                   id="bed"
-                  value={formData.bed || ''}
-                  onChange={(e) => handleChange('bed', e.target.value)}
+                  value={formData.bed || ""}
+                  onChange={(e) => handleChange("bed", e.target.value)}
                   placeholder="Bed number"
                 />
               </div>
@@ -191,29 +197,29 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
               <Textarea
                 id="chiefComplaint"
                 value={formData.chiefComplaint}
-                onChange={(e) => handleChange('chiefComplaint', e.target.value)}
+                onChange={(e) => handleChange("chiefComplaint", e.target.value)}
                 placeholder="Patient's chief complaint..."
                 rows={3}
               />
             </div>
-            
+
             <div>
               <Label htmlFor="allergies">Allergies (Optional)</Label>
               <Textarea
                 id="allergies"
-                value={formData.allergies || ''}
-                onChange={(e) => handleChange('allergies', e.target.value)}
+                value={formData.allergies || ""}
+                onChange={(e) => handleChange("allergies", e.target.value)}
                 placeholder="List any known allergies..."
                 rows={2}
               />
             </div>
-            
+
             <div>
               <Label htmlFor="currentMedications">Current Medications (Optional)</Label>
               <Textarea
                 id="currentMedications"
-                value={formData.currentMedications || ''}
-                onChange={(e) => handleChange('currentMedications', e.target.value)}
+                value={formData.currentMedications || ""}
+                onChange={(e) => handleChange("currentMedications", e.target.value)}
                 placeholder="List current medications..."
                 rows={2}
               />
@@ -227,9 +233,7 @@ export const PatientProfileEdit: React.FC<PatientProfileEditProps> = ({
         <Button type="button" variant="outline" onClick={onCancel}>
           Cancel
         </Button>
-        <Button type="submit">
-          Save Changes
-        </Button>
+        <Button type="submit">Save Changes</Button>
       </div>
     </form>
   );

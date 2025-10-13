@@ -33,14 +33,17 @@ For setup and running instructions, see `README.md` in the root directory.
 The application follows a feature-based component structure:
 
 - **`components/ui/`**: Reusable UI primitives (shadcn/ui components)
+
   - Form elements (Button, Input, Select, etc.)
   - Layout components (Card, Dialog, Sheet, Tabs)
   - Data display (Table, Avatar, Badge, etc.)
 
 - **`components/layout/`**: Application layout components
+
   - Navigation bars, sidebars, and page containers
 
 - **`components/patients/`**: Patient management features
+
   - `patient-list.tsx`: Patient browsing and search
   - `patient-overview.tsx`: Patient detail view
   - `patient-header.tsx`: Patient information header
@@ -51,16 +54,19 @@ The application follows a feature-based component structure:
   - `discharge-summary.tsx`: Discharge summary creation
 
 - **`components/student-groups/`**: Student collaboration features
+
   - `observations/`: Vital signs recording (blood pressure, heart rate, temperature, etc.)
   - `investigation-requests/`: Lab request forms (imaging, blood tests)
   - `medication-orders/`: Medication order management
   - `student-patient-overview.tsx`: Student view of patient data
 
 - **`components/instructors/`**: Instructor management features
+
   - `instructor-lab-requests.tsx`: Request approval and management
   - `instructor-patient-overview.tsx`: Instructor view with full control
 
 - **`pages/`**: Top-level page components
+
   - `landing.tsx`: Landing page with login
   - `login.tsx`: Authentication page
   - `student-dashboard.tsx`: Student interface
@@ -262,14 +268,17 @@ For detailed backend implementation, see the [Backend Repository](https://github
 **Example User Flow:**
 
 1. **Student submits request**: Student Group A creates an imaging request through the frontend form
+
    - Request status: "pending"
    - Associated with: Student Group A's account
 
 2. **Instructor reviews**: Instructor views all pending requests in their dashboard
+
    - Reviews the imaging request from Student Group A
    - Changes request status to "completed"
 
 3. **Instructor grants access**: Instructor creates an approved file record
+
    - Links a radiology report PDF to the request
    - Specifies accessible pages: "1-3"
 

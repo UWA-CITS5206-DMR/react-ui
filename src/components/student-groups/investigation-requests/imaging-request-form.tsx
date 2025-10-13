@@ -7,7 +7,13 @@ import { getErrorMessage } from "@/lib/error-utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Send } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
@@ -24,7 +30,8 @@ interface ImagingRequestFormProps {
 export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
   const [testType, setTestType] = useState<ImagingTestType | "">("");
   const [details, setDetails] = useState("");
-  const [infectionControlPrecautions, setInfectionControlPrecautions] = useState<InfectionControlPrecaution>("None");
+  const [infectionControlPrecautions, setInfectionControlPrecautions] =
+    useState<InfectionControlPrecaution>("None");
   const [imagingFocus, setImagingFocus] = useState("");
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
@@ -104,7 +111,10 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
           {/* Test Type Selection */}
           <div className="space-y-2">
             <Label htmlFor="imaging-test-type">Imaging Type *</Label>
-            <Select value={testType} onValueChange={(value) => setTestType(value as ImagingTestType)}>
+            <Select
+              value={testType}
+              onValueChange={(value) => setTestType(value as ImagingTestType)}
+            >
               <SelectTrigger id="imaging-test-type">
                 <SelectValue placeholder="Select imaging type" />
               </SelectTrigger>
@@ -133,7 +143,12 @@ export function ImagingRequestForm({ patientId }: ImagingRequestFormProps) {
           {/* Infection Control Precautions */}
           <div className="space-y-2">
             <Label htmlFor="infection-control">Infection Control Precautions *</Label>
-            <Select value={infectionControlPrecautions} onValueChange={(value) => setInfectionControlPrecautions(value as InfectionControlPrecaution)}>
+            <Select
+              value={infectionControlPrecautions}
+              onValueChange={(value) =>
+                setInfectionControlPrecautions(value as InfectionControlPrecaution)
+              }
+            >
               <SelectTrigger id="infection-control">
                 <SelectValue placeholder="Select precautions" />
               </SelectTrigger>

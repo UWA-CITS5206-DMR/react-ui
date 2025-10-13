@@ -17,7 +17,7 @@ export default function TopNavigation() {
           Simulation System
         </span>
       </div>
-      
+
       <div className="flex items-center space-x-2 sm:space-x-3 md:space-x-6 flex-shrink-0">
         <div className="flex items-center space-x-1 sm:space-x-2">
           <div className="w-7 h-7 sm:w-8 sm:h-8 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
@@ -27,10 +27,10 @@ export default function TopNavigation() {
             {user?.first_name} {user?.last_name}
           </span>
         </div>
-        
-        <Button 
+
+        <Button
           onClick={logout}
-          variant="ghost" 
+          variant="ghost"
           size="sm"
           className="bg-white/10 hover:bg-white/20 text-white text-xs px-2 sm:px-4 flex-shrink-0"
         >

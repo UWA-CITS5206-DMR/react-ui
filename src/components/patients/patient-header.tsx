@@ -41,8 +41,8 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
               <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800 whitespace-nowrap">
                 Patient ID: {patient.id}
               </span>
-              
-              <Button 
+
+              <Button
                 onClick={() => setIsEditing(true)}
                 variant="outline"
                 size="sm"
@@ -52,15 +52,21 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
                 <span>Edit</span>
               </Button>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
               <div className="flex items-center space-x-2">
                 <Calendar className="h-4 w-4 text-gray-400" />
                 <span className="text-gray-600">DOB:</span>
-                <span className="font-medium">{formatDate(patient.date_of_birth, { year: "numeric", month: "short", day: "numeric" })}</span>
+                <span className="font-medium">
+                  {formatDate(patient.date_of_birth, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </span>
                 <span className="text-gray-500">({calculateAge(patient.date_of_birth)}y)</span>
               </div>
-              
+
               <div className="flex items-center space-x-2">
                 <span className="text-gray-600">Gender:</span>
                 <span className="font-medium">{getGenderLabel(patient.gender)}</span>

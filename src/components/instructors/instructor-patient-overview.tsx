@@ -47,11 +47,11 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
   // Calculate lab request statistics
   const bloodTests = bloodTestsData?.results || [];
   const imagingRequests = imagingRequestsData?.results || [];
-  
+
   const totalLabRequests = bloodTests.length + imagingRequests.length;
-  const completedLabRequests = 
-    bloodTests.filter(req => req.status === "completed").length +
-    imagingRequests.filter(req => req.status === "completed").length;
+  const completedLabRequests =
+    bloodTests.filter((req) => req.status === "completed").length +
+    imagingRequests.filter((req) => req.status === "completed").length;
   const pendingLabRequests = totalLabRequests - completedLabRequests;
 
   return (
@@ -63,7 +63,9 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div>
               <label className="text-sm font-medium text-gray-500">Name</label>
-              <p className="text-sm text-gray-900">{patient.first_name} {patient.last_name}</p>
+              <p className="text-sm text-gray-900">
+                {patient.first_name} {patient.last_name}
+              </p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Patient ID</label>
@@ -71,7 +73,9 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Date of Birth</label>
-              <p className="text-sm text-gray-900">{new Date(patient.date_of_birth).toLocaleDateString()}</p>
+              <p className="text-sm text-gray-900">
+                {new Date(patient.date_of_birth).toLocaleDateString()}
+              </p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">MRN</label>
@@ -114,15 +118,11 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-green-600">
-                  {completedLabRequests}
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Requests completed and approved
-                </p>
+                <div className="text-3xl font-bold text-green-600">{completedLabRequests}</div>
+                <p className="text-sm text-gray-500 mt-1">Requests completed and approved</p>
               </CardContent>
             </Card>
-            
+
             <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="text-base font-medium flex items-center">
@@ -131,16 +131,12 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold text-yellow-600">
-                  {pendingLabRequests}
-                </div>
-                <p className="text-sm text-gray-500 mt-1">
-                  Requests awaiting review
-                </p>
+                <div className="text-3xl font-bold text-yellow-600">{pendingLabRequests}</div>
+                <p className="text-sm text-gray-500 mt-1">Requests awaiting review</p>
               </CardContent>
             </Card>
           </div>
-          
+
           {totalLabRequests > 0 && (
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
               <div className="flex justify-between items-center">
@@ -160,23 +156,20 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
           {files.length > 0 ? (
             <div className="space-y-2">
               {files.map((file) => (
-                <div key={file.id} className="flex items-center justify-between p-3 border rounded-lg">
+                <div
+                  key={file.id}
+                  className="flex items-center justify-between p-3 border rounded-lg"
+                >
                   <div>
                     <p className="font-medium text-gray-900">{file.display_name}</p>
                     <p className="text-sm text-gray-500">
-                      Category: {file.category || "Unspecified"} • 
-                      Created: {new Date(file.created_at).toLocaleDateString()}
+                      Category: {file.category || "Unspecified"} • Created:{" "}
+                      {new Date(file.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant="outline">
-                      {file.category || "Document"}
-                    </Badge>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setPreviewFile(file)}
-                    >
+                    <Badge variant="outline">{file.category || "Document"}</Badge>
+                    <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
                       <Eye className="h-4 w-4 mr-1" />
                       Preview
                     </Button>

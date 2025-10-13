@@ -1,11 +1,6 @@
 import { useMemo, useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Loader2, AlertCircle } from "lucide-react";
 import { apiClientV2 } from "@/lib/queryClient";
@@ -47,7 +42,11 @@ export default function FilePreviewDialog({
   }, [open, requiresPagination]);
 
   // Fetch file blob
-  const { data: fileBlob, isLoading, error } = useQuery({
+  const {
+    data: fileBlob,
+    isLoading,
+    error,
+  } = useQuery({
     queryKey: ["patients", patientId, "files", fileId, "view", pageRange],
     queryFn: () => apiClientV2.patients.files.view(patientId, fileId, pageRange),
     enabled: open && (!requiresPagination || pageRange !== undefined), // Only fetch when dialog is open and page range is set (if required)
@@ -73,18 +72,18 @@ export default function FilePreviewDialog({
   // Determine file type from blob or filename
   const fileType = useMemo(() => {
     if (!fileBlob) return "unknown";
-    
+
     const mimeType = fileBlob.type;
     if (mimeType.startsWith("image/")) return "image";
     if (mimeType === "application/pdf") return "pdf";
-    
+
     // Fallback to filename extension
     const extension = fileName.toLowerCase().split(".").pop();
     if (["jpg", "jpeg", "png", "gif", "webp", "svg"].includes(extension || "")) {
       return "image";
     }
     if (extension === "pdf") return "pdf";
-    
+
     return "unknown";
   }, [fileBlob, fileName]);
 
@@ -94,11 +93,7 @@ export default function FilePreviewDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <span className="truncate">{fileName}</span>
-            {category && (
-              <span className="text-sm font-normal text-gray-500">
-                ({category})
-              </span>
-            )}
+            {category && <span className="text-sm font-normal text-gray-500">({category})</span>}
           </DialogTitle>
         </DialogHeader>
 

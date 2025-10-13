@@ -7,37 +7,37 @@
     "tsBuildInfoFile": "./node_modules/typescript/tsbuildinfo",
     "noEmit": true,
     "target": "ES2020",
-    
+
     /* Module System */
     "module": "ESNext",
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    
+
     /* Type Checking */
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "forceConsistentCasingInFileNames": true,
-    
+
     /* Libraries */
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    
+
     /* JSX */
     "jsx": "react-jsx",
-    
+
     /* Interop */
     "esModuleInterop": true,
     "skipLibCheck": true,
-    
+
     /* Path Mapping */
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
-    
+
     /* Types */
     "types": ["node", "vite/client", "cypress"]
   }

@@ -5,7 +5,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileText, Image, FileIcon, Eye, EyeOff, Users, AlertTriangle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -42,7 +52,7 @@ export default function GroupManager() {
       console.log("Groups API not available, using mock data");
       return Promise.resolve([
         { id: "group-1", name: "Group 1", description: "Mock group 1" },
-        { id: "group-2", name: "Group 2", description: "Mock group 2" }
+        { id: "group-2", name: "Group 2", description: "Mock group 2" },
       ]);
     },
   });
@@ -55,7 +65,7 @@ export default function GroupManager() {
       console.log("Assets API not available, using mock data");
       return Promise.resolve([
         { id: "asset-1", name: "Asset 1", type: "document", filename: "document1.pdf" },
-        { id: "asset-2", name: "Asset 2", type: "image", filename: "image1.jpg" }
+        { id: "asset-2", name: "Asset 2", type: "image", filename: "image1.jpg" },
       ]);
     },
   });
@@ -75,10 +85,23 @@ export default function GroupManager() {
 
   // Update asset visibility mutation
   const updateVisibilityMutation = useMutation({
-    mutationFn: async ({ assetId, groupId, visible }: { assetId: string; groupId: string; visible: boolean }) => {
+    mutationFn: async ({
+      assetId,
+      groupId,
+      visible,
+    }: {
+      assetId: string;
+      groupId: string;
+      visible: boolean;
+    }) => {
       // TODO: apiClientV2.assets.visibility.update() does not exist
       // Should use instructor APIs to control file access through approved_files
-      console.log("Would update visibility:", { assetId, groupId, visible, changedBy: user?.id?.toString() });
+      console.log("Would update visibility:", {
+        assetId,
+        groupId,
+        visible,
+        changedBy: user?.id?.toString(),
+      });
       return Promise.resolve({ assetId, groupId, visible });
     },
     onSuccess: () => {
@@ -99,10 +122,23 @@ export default function GroupManager() {
 
   // Bulk update visibility mutation
   const bulkUpdateMutation = useMutation({
-    mutationFn: async ({ assetIds, groupId, visible }: { assetIds: string[]; groupId: string; visible: boolean }) => {
+    mutationFn: async ({
+      assetIds,
+      groupId,
+      visible,
+    }: {
+      assetIds: string[];
+      groupId: string;
+      visible: boolean;
+    }) => {
       // TODO: apiClientV2.assets.visibility.bulkUpdate() does not exist
       // Should use instructor APIs to bulk update file access through approved_files
-      console.log("Would bulk update visibility:", { assetIds, groupId, visible, changedBy: user?.id?.toString() });
+      console.log("Would bulk update visibility:", {
+        assetIds,
+        groupId,
+        visible,
+        changedBy: user?.id?.toString(),
+      });
       return Promise.resolve({ assetIds, groupId, visible });
     },
     onSuccess: () => {
@@ -139,15 +175,15 @@ export default function GroupManager() {
 
   const handleAssetSelection = (assetId: string, checked: boolean) => {
     if (checked) {
-      setSelectedAssets(prev => [...prev, assetId]);
+      setSelectedAssets((prev) => [...prev, assetId]);
     } else {
-      setSelectedAssets(prev => prev.filter(id => id !== assetId));
+      setSelectedAssets((prev) => prev.filter((id) => id !== assetId));
     }
   };
 
   const handleBulkAction = () => {
     if (!selectedGroup || !bulkAction || selectedAssets.length === 0) return;
-    
+
     bulkUpdateMutation.mutate({
       assetIds: selectedAssets,
       groupId: selectedGroup,
@@ -156,7 +192,7 @@ export default function GroupManager() {
   };
 
   const AssetVisibilityRow = ({ asset, group }: { asset: Asset; group: Group }) => {
-  const { data: visibility } = useAssetVisibility(asset.id, group.id);
+    const { data: visibility } = useAssetVisibility(asset.id, group.id);
     const isVisible = visibility?.visible || false;
 
     return (
@@ -199,7 +235,8 @@ export default function GroupManager() {
                   Confirm Document Visibility Change
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Are you sure you want to {isVisible ? "hide" : "show"} "{asset.filename}" for group "{group.name}"?
+                  Are you sure you want to {isVisible ? "hide" : "show"} "{asset.filename}" for
+                  group "{group.name}"?
                   <br />
                   <span className="text-amber-600 font-medium mt-2 block">
                     ⚠️ This action will immediately affect what students in this group can see.
@@ -209,12 +246,16 @@ export default function GroupManager() {
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
                 <AlertDialogAction
-                  onClick={() => updateVisibilityMutation.mutate({
-                    assetId: asset.id,
-                    groupId: group.id,
-                    visible: !isVisible,
-                  })}
-                  className={isVisible ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"}
+                  onClick={() =>
+                    updateVisibilityMutation.mutate({
+                      assetId: asset.id,
+                      groupId: group.id,
+                      visible: !isVisible,
+                    })
+                  }
+                  className={
+                    isVisible ? "bg-red-600 hover:bg-red-700" : "bg-green-600 hover:bg-green-700"
+                  }
                 >
                   {isVisible ? "Hide Document" : "Show Document"}
                 </AlertDialogAction>
@@ -242,7 +283,8 @@ export default function GroupManager() {
       <div className="border-b border-gray-200 pb-4">
         <h1 className="text-2xl font-bold text-[#005EB8]">Group Manager</h1>
         <p className="text-gray-600 mt-1">
-          Control document visibility for different student groups with safety confirmations and audit trails.
+          Control document visibility for different student groups with safety confirmations and
+          audit trails.
         </p>
       </div>
 
@@ -286,10 +328,12 @@ export default function GroupManager() {
                       Confirm Bulk Show Documents
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to show {selectedAssets.length} documents to group "{groups.find(g => g.id === selectedGroup)?.name}"?
+                      Are you sure you want to show {selectedAssets.length} documents to group "
+                      {groups.find((g) => g.id === selectedGroup)?.name}"?
                       <br />
                       <span className="text-amber-600 font-medium mt-2 block">
-                        ⚠️ This action will immediately make these documents visible to all students in this group.
+                        ⚠️ This action will immediately make these documents visible to all students
+                        in this group.
                       </span>
                     </AlertDialogDescription>
                   </AlertDialogHeader>
@@ -304,7 +348,7 @@ export default function GroupManager() {
                   </AlertDialogFooter>
                 </AlertDialogContent>
               </AlertDialog>
-              
+
               <AlertDialog>
                 <AlertDialogTrigger asChild>
                   <Button
@@ -322,10 +366,12 @@ export default function GroupManager() {
                       Confirm Bulk Hide Documents
                     </AlertDialogTitle>
                     <AlertDialogDescription>
-                      Are you sure you want to hide {selectedAssets.length} documents from group "{groups.find(g => g.id === selectedGroup)?.name}"?
+                      Are you sure you want to hide {selectedAssets.length} documents from group "
+                      {groups.find((g) => g.id === selectedGroup)?.name}"?
                       <br />
                       <span className="text-amber-600 font-medium mt-2 block">
-                        ⚠️ This action will immediately hide these documents from all students in this group.
+                        ⚠️ This action will immediately hide these documents from all students in
+                        this group.
                       </span>
                     </AlertDialogDescription>
                   </AlertDialogHeader>

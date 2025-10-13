@@ -125,7 +125,11 @@ export function IndividualVitalSignsForm({ patient }: IndividualVitalSignsFormPr
         value={respiratoryRate}
         onChange={setRespiratoryRate}
         onSubmit={() => {
-          const payload = createRespiratoryRatePayload(Number(respiratoryRate), patient.id, user.id);
+          const payload = createRespiratoryRatePayload(
+            Number(respiratoryRate),
+            patient.id,
+            user.id
+          );
           respiratoryRateMutation.mutate(payload);
         }}
         isLoading={respiratoryRateMutation.isPending}
@@ -136,7 +140,11 @@ export function IndividualVitalSignsForm({ patient }: IndividualVitalSignsFormPr
         value={oxygenSaturation}
         onChange={setOxygenSaturation}
         onSubmit={() => {
-          const payload = createOxygenSaturationPayload(Number(oxygenSaturation), patient.id, user.id);
+          const payload = createOxygenSaturationPayload(
+            Number(oxygenSaturation),
+            patient.id,
+            user.id
+          );
           oxygenSaturationMutation.mutate(payload);
         }}
         isLoading={oxygenSaturationMutation.isPending}

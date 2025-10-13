@@ -17,11 +17,11 @@ interface EditPatientModalProps {
   onPatientUpdated?: (patient: Patient) => void;
 }
 
-export default function EditPatientModal({ 
-  isOpen, 
-  onClose, 
-  patient, 
-  onPatientUpdated 
+export default function EditPatientModal({
+  isOpen,
+  onClose,
+  patient,
+  onPatientUpdated,
 }: EditPatientModalProps) {
   const [formData, setFormData] = useState<PatientUpdate>({
     first_name: "",
@@ -29,9 +29,9 @@ export default function EditPatientModal({
     date_of_birth: "",
     email: "",
     phone_number: "",
-    gender: "unspecified"
+    gender: "unspecified",
   });
-  
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -44,13 +44,13 @@ export default function EditPatientModal({
         date_of_birth: patient.date_of_birth,
         email: patient.email,
         phone_number: patient.phone_number || "",
-        gender: patient.gender
+        gender: patient.gender,
       });
     }
   }, [isOpen, patient]);
 
   const updatePatientMutation = useMutation({
-    mutationFn: (patientData: PatientUpdate) => 
+    mutationFn: (patientData: PatientUpdate) =>
       apiClientV2.patients.partialUpdate(patient.id, patientData),
     onSuccess: (updatedPatient) => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
@@ -72,7 +72,7 @@ export default function EditPatientModal({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Prepare data for API - remove empty strings for optional fields
     const submitData: PatientUpdate = {
       first_name: formData.first_name,
@@ -80,14 +80,14 @@ export default function EditPatientModal({
       date_of_birth: formData.date_of_birth,
       email: formData.email,
       phone_number: formData.phone_number || undefined, // Convert empty string to undefined
-      gender: (formData.gender as any) || undefined
+      gender: (formData.gender as any) || undefined,
     };
-    
+
     updatePatientMutation.mutate(submitData);
   };
 
   const handleChange = (field: keyof PatientUpdate, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   if (!isOpen) return null;
@@ -166,22 +166,24 @@ export default function EditPatientModal({
               required
             >
               {GENDER_OPTIONS.map((g) => (
-                <option key={g} value={g}>{getGenderLabel(g)}</option>
+                <option key={g} value={g}>
+                  {getGenderLabel(g)}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="flex justify-end space-x-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
+            <Button
+              type="button"
+              variant="outline"
               onClick={onClose}
               disabled={updatePatientMutation.isPending}
             >
               Cancel
             </Button>
-            <Button 
-              type="submit" 
+            <Button
+              type="submit"
               disabled={updatePatientMutation.isPending}
               className="bg-hospital-blue hover:bg-hospital-blue/90"
             >

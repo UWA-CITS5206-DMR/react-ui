@@ -40,9 +40,7 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
     mutationFn: async () => {
       const orders = medications.filter(
         (med) =>
-          med.medication.trim() !== "" &&
-          med.dosage.trim() !== "" &&
-          med.instructions.trim() !== ""
+          med.medication.trim() !== "" && med.dosage.trim() !== "" && med.instructions.trim() !== ""
       );
 
       if (!user) {
@@ -88,11 +86,7 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
     },
   });
 
-  const updateMedication = (
-    index: number,
-    field: keyof MedicationFormData,
-    value: string
-  ) => {
+  const updateMedication = (index: number, field: keyof MedicationFormData, value: string) => {
     const updated = [...medications];
     updated[index] = { ...updated[index], [field]: value };
     setMedications(updated);
@@ -120,9 +114,7 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
 
     const validMedications = medications.filter(
       (med) =>
-        med.medication.trim() !== "" &&
-        med.dosage.trim() !== "" &&
-        med.instructions.trim() !== ""
+        med.medication.trim() !== "" && med.dosage.trim() !== "" && med.instructions.trim() !== ""
     );
 
     if (validMedications.length === 0) {
@@ -170,12 +162,7 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
       />
 
       <div className="flex gap-2 mt-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={addMedication}
-          className="flex-1"
-        >
+        <Button type="button" variant="outline" onClick={addMedication} className="flex-1">
           <Plus className="h-4 w-4 mr-2" />
           Add Another Medication
         </Button>
@@ -186,9 +173,7 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
           disabled={createMedicationOrdersMutation.isPending}
         >
           <Pill className="h-4 w-4 mr-2" />
-          {createMedicationOrdersMutation.isPending
-            ? "Submitting..."
-            : "Submit Medication Orders"}
+          {createMedicationOrdersMutation.isPending ? "Submitting..." : "Submit Medication Orders"}
         </Button>
       </div>
     </form>

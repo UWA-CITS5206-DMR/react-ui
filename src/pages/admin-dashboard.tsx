@@ -3,17 +3,41 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
-import { Users, Database, UserPlus, Settings, Activity, Shield, Edit3, Trash2, AlertTriangle, CheckCircle } from "lucide-react";
+import {
+  Users,
+  Database,
+  UserPlus,
+  Settings,
+  Activity,
+  Shield,
+  Edit3,
+  Trash2,
+  AlertTriangle,
+  CheckCircle,
+} from "lucide-react";
 import TopNavigation from "@/components/layout/top-navigation";
 
 // Form schemas
@@ -41,7 +65,7 @@ export default function AdminDashboard() {
 
   // Queries using API Client v2
   // Note: Sessions API removed as backend uses token auth instead of session auth
-  
+
   // TODO: Admin API endpoints not available in API Client v2 - implement when backend provides these endpoints
   const { data: usersResponse } = useQuery({
     queryKey: ["admin", "users"],
@@ -142,8 +166,8 @@ export default function AdminDashboard() {
         last_name: data.lastName,
         role: data.role,
       });
-      return Promise.resolve({ 
-        id: Date.now(), 
+      return Promise.resolve({
+        id: Date.now(),
         username: data.username,
         first_name: data.firstName,
         last_name: data.lastName,
@@ -208,7 +232,7 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <TopNavigation />
-      
+
       <div className="container mx-auto px-4 sm:px-6 py-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">System Administration</h1>
@@ -252,13 +276,23 @@ export default function AdminDashboard() {
                   <CardContent>
                     <div className="space-y-4">
                       {users?.map((user: any) => (
-                        <div key={user.id} className="flex items-center justify-between p-4 border rounded-lg">
+                        <div
+                          key={user.id}
+                          className="flex items-center justify-between p-4 border rounded-lg"
+                        >
                           <div>
-                            <div className="font-medium">{user.first_name} {user.last_name}</div>
+                            <div className="font-medium">
+                              {user.first_name} {user.last_name}
+                            </div>
                             <div className="text-sm text-gray-500">@{user.username}</div>
-                            <Badge 
-                              variant={user.role === 'admin' ? 'destructive' : 
-                                      user.role === 'instructor' ? 'default' : 'outline'}
+                            <Badge
+                              variant={
+                                user.role === "admin"
+                                  ? "destructive"
+                                  : user.role === "instructor"
+                                  ? "default"
+                                  : "outline"
+                              }
                             >
                               {user.role}
                             </Badge>
@@ -267,11 +301,11 @@ export default function AdminDashboard() {
                             <Button variant="ghost" size="sm">
                               <Edit3 className="h-4 w-4" />
                             </Button>
-                            <Button 
-                              variant="ghost" 
+                            <Button
+                              variant="ghost"
                               size="sm"
                               onClick={() => handleDeleteUser(user.id)}
-                              disabled={user.role === 'admin'}
+                              disabled={user.role === "admin"}
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -365,8 +399,8 @@ export default function AdminDashboard() {
                             </FormItem>
                           )}
                         />
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="submit"
                           className="w-full"
                           disabled={createUserMutation.isPending}
                         >
@@ -414,7 +448,10 @@ export default function AdminDashboard() {
                   </CardHeader>
                   <CardContent>
                     <Form {...dataVersionForm}>
-                      <form onSubmit={dataVersionForm.handleSubmit(onCreateDataVersion)} className="space-y-4">
+                      <form
+                        onSubmit={dataVersionForm.handleSubmit(onCreateDataVersion)}
+                        className="space-y-4"
+                      >
                         <FormField
                           control={dataVersionForm.control}
                           name="name"
@@ -475,8 +512,8 @@ export default function AdminDashboard() {
                             </FormItem>
                           )}
                         />
-                        <Button 
-                          type="submit" 
+                        <Button
+                          type="submit"
                           className="w-full"
                           disabled={createDataVersionMutation.isPending}
                         >
@@ -522,7 +559,8 @@ export default function AdminDashboard() {
                     <Alert className="mb-4">
                       <AlertTriangle className="h-4 w-4" />
                       <AlertDescription>
-                        Group accounts provide shared access for student groups to assigned patient data versions.
+                        Group accounts provide shared access for student groups to assigned patient
+                        data versions.
                       </AlertDescription>
                     </Alert>
                     {/* Group account creation form would go here */}
@@ -546,7 +584,7 @@ export default function AdminDashboard() {
                       Configure role-based permissions for different user types.
                     </AlertDescription>
                   </Alert>
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                     <Card>
                       <CardHeader className="pb-3">
@@ -622,7 +660,10 @@ export default function AdminDashboard() {
               <CardContent>
                 <div className="space-y-4">
                   {auditLogs?.slice(0, 10).map((log: any) => (
-                    <div key={log.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div
+                      key={log.id}
+                      className="flex items-center justify-between p-4 border rounded-lg"
+                    >
                       <div className="flex items-center gap-3">
                         <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
                           <Activity className="h-4 w-4 text-blue-600" />

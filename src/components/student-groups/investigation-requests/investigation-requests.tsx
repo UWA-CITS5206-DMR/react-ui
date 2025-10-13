@@ -11,7 +11,7 @@ interface InvestigationRequestsProps {
 
 /**
  * Main investigation requests component
- * 
+ *
  * This component has been refactored into smaller, more focused sub-components
  * Includes blood test and imaging request types
  */
