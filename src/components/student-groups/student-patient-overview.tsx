@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StudentFilePreviewDialog from "./investigation-requests/student-file-preview-dialog";
-import { formatGender } from "@/lib/utils";
+import { getGenderLabel } from "@/lib/constants";
 
 interface StudentPatientOverviewProps {
   patient: Patient;
@@ -143,7 +143,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Gender</label>
-              <p className="text-sm text-gray-900">{formatGender(patient.gender)}</p>
+              <p className="text-sm text-gray-900">{getGenderLabel(patient.gender)}</p>
             </div>
             <div>
               <label className="text-sm font-medium text-gray-500">Ward</label>

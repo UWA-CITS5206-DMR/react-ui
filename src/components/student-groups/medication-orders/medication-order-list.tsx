@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiClientV2 } from "@/lib/queryClient";
+import { formatDate } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Pill } from "lucide-react";
@@ -18,15 +19,7 @@ export function MedicationOrderList({ patientId }: MedicationOrderListProps) {
     queryFn: () => apiClientV2.studentGroups.medicationOrders.list({ patient: patientId }),
   });
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-AU", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
+  // use shared formatDate with time
 
   return (
     <Card>
