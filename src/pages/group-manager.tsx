@@ -61,7 +61,7 @@ export default function GroupManager() {
   });
 
   // Fetch visibility for each group-asset combination
-  const getAssetVisibilityForGroup = (assetId: string, groupId: string) => {
+  const useAssetVisibility = (assetId: string, groupId: string) => {
     return useQuery<{ visible: boolean } | null>({
       queryKey: ["/api/assets", assetId, "visibility", groupId],
       // TODO: apiClientV2.assets.visibility.get() does not exist
@@ -156,7 +156,7 @@ export default function GroupManager() {
   };
 
   const AssetVisibilityRow = ({ asset, group }: { asset: Asset; group: Group }) => {
-    const { data: visibility } = getAssetVisibilityForGroup(asset.id, group.id);
+  const { data: visibility } = useAssetVisibility(asset.id, group.id);
     const isVisible = visibility?.visible || false;
 
     return (

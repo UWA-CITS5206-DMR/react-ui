@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
@@ -36,7 +36,10 @@ export default function StudentDashboard() {
     queryFn: () => apiClientV2.patients.list(),
   });
 
-  const patients = patientsResponse?.results || [];
+  const patients = useMemo(
+    () => patientsResponse?.results ?? [],
+    [patientsResponse]
+  );
 
   // Fetch selected patient details
   const { data: selectedPatient } = useQuery({

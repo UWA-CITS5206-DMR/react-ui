@@ -57,8 +57,5 @@ type AssertQueryParamTyping = Expect<
 // that references the assertions. This has no runtime effect.
 type _AllAssertions = AssertLogin & AssertInstructorBloodTests & AssertPatientList & AssertObservationBundle & AssertQueryParamTyping;
 const _assertionsPresent: _AllAssertions = true as unknown as _AllAssertions;
-// Reference in a never-taken branch to satisfy the compiler's "value is never read" check
-if (false) {
-  // eslint-disable-next-line no-console
-  console.log(_assertionsPresent);
-}
+// Explicitly mark the composite type as used without affecting runtime behavior
+void _assertionsPresent;

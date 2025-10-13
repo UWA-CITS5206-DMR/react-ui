@@ -2,11 +2,7 @@ import { Hospital, User } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 
-interface TopNavigationProps {
-  // Empty for now, but kept for future extensions
-}
-
-export default function TopNavigation(_: TopNavigationProps) {
+export default function TopNavigation() {
   const { user, logout } = useAuth();
 
   return (

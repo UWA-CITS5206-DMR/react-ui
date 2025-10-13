@@ -252,7 +252,7 @@ export interface PatientCreate {
 	phone_number?: string;
 }
 
-export interface PatientUpdate extends Partial<PatientCreate> {}
+export type PatientUpdate = Partial<PatientCreate>;
 
 export interface BloodPressureRecord {
 	id: number;
@@ -524,7 +524,7 @@ export class ApiClientV2 {
 				} else {
 					details = await response.text();
 				}
-			} catch (error) {
+			} catch {
 				details = undefined;
 			}
 

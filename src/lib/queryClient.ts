@@ -9,7 +9,7 @@ function getAuthToken(): string | null {
       const userData = JSON.parse(user);
       return userData.token || null;
     }
-  } catch (e) {
+  } catch {
     console.warn("Failed to parse user data from localStorage");
   }
   return null;
