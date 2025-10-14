@@ -3,7 +3,7 @@ import type { Patient } from "@/lib/api-client-v2";
 import { useAuth } from "@/hooks/use-auth";
 import { VitalSignInput } from "./vital-sign-input";
 import { BloodPressureInput } from "./blood-pressure-input";
-import { VITAL_SIGN_CONFIGS } from "./vital-sign-config";
+import { VITAL_SIGN_CONFIGS } from "@/lib/vital-signs";
 import {
   useVitalSignMutation,
   createBloodPressurePayload,

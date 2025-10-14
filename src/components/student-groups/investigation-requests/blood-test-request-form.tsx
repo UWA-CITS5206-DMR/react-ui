@@ -18,7 +18,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Send } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { BloodTestType } from "@/lib/api-client-v2";
-import { BLOOD_TEST_OPTIONS } from "@/lib/constants";
+import { BLOOD_TEST_OPTIONS, getBloodTestLabel } from "@/lib/constants";
 
 interface BloodTestRequestFormProps {
   patientId: string;
@@ -111,7 +111,7 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
               <SelectContent>
                 {BLOOD_TEST_OPTIONS.map((test) => (
                   <SelectItem key={test} value={test}>
-                    {test}
+                    {getBloodTestLabel(test)}
                   </SelectItem>
                 ))}
               </SelectContent>

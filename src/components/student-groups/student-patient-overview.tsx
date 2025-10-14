@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import StudentFilePreviewDialog from "./investigation-requests/student-file-preview-dialog";
 import { getGenderLabel } from "@/lib/constants";
+import { getVitalSignAbbreviation, getBloodPressureAbbreviation } from "@/lib/vital-signs";
 
 interface StudentPatientOverviewProps {
   patient: Patient;
@@ -81,10 +82,17 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
     latestBloodPressure || latestHeartRate || latestTemperature
       ? [
           latestBloodPressure
-            ? `BP: ${latestBloodPressure.systolic}/${latestBloodPressure.diastolic}`
+            ? getBloodPressureAbbreviation(
+                latestBloodPressure.systolic,
+                latestBloodPressure.diastolic
+              )
             : null,
-          latestHeartRate ? `HR: ${latestHeartRate.heart_rate} bpm` : null,
-          latestTemperature ? `Temp: ${latestTemperature.temperature}°C` : null,
+          latestHeartRate
+            ? getVitalSignAbbreviation("heartRate", latestHeartRate.heart_rate)
+            : null,
+          latestTemperature
+            ? getVitalSignAbbreviation("temperature", latestTemperature.temperature)
+            : null,
         ]
           .filter(Boolean)
           .join(" • ")

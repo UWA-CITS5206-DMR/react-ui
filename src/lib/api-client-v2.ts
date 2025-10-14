@@ -16,7 +16,22 @@ type QueryValue = Primitive | Primitive[];
 export type QueryParams = Record<string, QueryValue>;
 
 export type Status = "pending" | "completed";
-export type BloodTestType = "FBC" | "EUC" | "LFTs" | "Coags" | "CRP" | "TFT" | "Group and Hold";
+export type BloodTestType =
+  | "FBC"
+  | "EUC"
+  | "LFTs"
+  | "Lipase"
+  | "Troponin"
+  | "Coag"
+  | "D-dimer"
+  | "CRP"
+  | "VBG"
+  | "Haptoglobin"
+  | "LDH"
+  | "Group & Hold"
+  | "Crossmatch"
+  | "Blood Culture"
+  | "TFT";
 export type ImagingTestType =
   | "X-ray"
   | "CT scan"

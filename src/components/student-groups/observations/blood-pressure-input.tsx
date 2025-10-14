@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Activity } from "lucide-react";
-import { BLOOD_PRESSURE_CONFIG } from "./vital-sign-config";
+import { BLOOD_PRESSURE_CONFIG } from "@/lib/vital-signs";
 
 interface BloodPressureInputProps {
   systolic: string;
