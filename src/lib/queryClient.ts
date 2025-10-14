@@ -70,12 +70,13 @@ export const queryClient = new QueryClient({
       },
       onError: (error: any) => {
         // Handle authentication errors globally
-        if (error?.status === 401 || error?.status === 403) {
-          // Clear stored user data
+        if (error?.status === 401) {
+          // 401 Unauthorized: User is not authenticated, clear stored user data and redirect to login
           localStorage.removeItem("user");
           // Redirect to login page
           window.location.href = "/";
         }
+        // 403 Forbidden: User is authenticated but not authorized - do not clear user data or redirect
       },
     },
   },

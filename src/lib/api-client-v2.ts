@@ -556,8 +556,8 @@ export class ApiClientV2 {
       }
 
       // Handle authentication errors globally
-      if (response.status === 401 || response.status === 403) {
-        // Clear stored user data
+      if (response.status === 401) {
+        // 401 Unauthorized: User is not authenticated, clear stored user data and redirect to login
         if (typeof window !== "undefined" && window.localStorage) {
           localStorage.removeItem("user");
         }
@@ -566,6 +566,7 @@ export class ApiClientV2 {
           window.location.href = "/";
         }
       }
+      // 403 Forbidden: User is authenticated but not authorized - do not clear user data or redirect
 
       throw new ApiError({
         message: `Request failed with status ${response.status}`,
@@ -716,6 +717,18 @@ export class ApiClientV2 {
         this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "GET",
         }),
+      update: (id: number, payload: BloodTestRequestCreate) =>
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
+          method: "PUT",
+          body: payload,
+        }),
+      partialUpdate: (id: number, payload: Partial<BloodTestRequestCreate>) =>
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
+          method: "PATCH",
+          body: payload,
+        }),
+      delete: (id: number) =>
+        this.request<void>(`/api/student-groups/blood-test-requests/${id}/`, { method: "DELETE" }),
     },
     dischargeSummaries: {
       list: (query?: QueryParams) =>
@@ -731,6 +744,16 @@ export class ApiClientV2 {
       retrieve: (id: number) =>
         this.request<DischargeSummary>(`/api/student-groups/discharge-summaries/${id}/`, {
           method: "GET",
+        }),
+      update: (id: number, payload: DischargeSummaryCreate) =>
+        this.request<DischargeSummary>(`/api/student-groups/discharge-summaries/${id}/`, {
+          method: "PUT",
+          body: payload,
+        }),
+      partialUpdate: (id: number, payload: Partial<DischargeSummaryCreate>) =>
+        this.request<DischargeSummary>(`/api/student-groups/discharge-summaries/${id}/`, {
+          method: "PATCH",
+          body: payload,
         }),
     },
     imagingRequests: {
@@ -748,6 +771,18 @@ export class ApiClientV2 {
         this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "GET",
         }),
+      update: (id: number, payload: ImagingRequestCreate) =>
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "PUT",
+          body: payload,
+        }),
+      partialUpdate: (id: number, payload: Partial<ImagingRequestCreate>) =>
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "PATCH",
+          body: payload,
+        }),
+      delete: (id: number) =>
+        this.request<void>(`/api/student-groups/imaging-requests/${id}/`, { method: "DELETE" }),
     },
     medicationOrders: {
       list: (query?: QueryParams) =>
