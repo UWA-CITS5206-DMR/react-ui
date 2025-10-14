@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Activity } from "lucide-react";
-import type { VitalSignConfig } from "./vital-sign-config";
+import type { VitalSignConfig } from "@/lib/vital-signs";
 
 interface VitalSignInputProps {
   config: VitalSignConfig;

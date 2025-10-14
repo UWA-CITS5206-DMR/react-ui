@@ -23,11 +23,37 @@ export const BLOOD_TEST_OPTIONS: readonly BloodTestType[] = [
   "FBC",
   "EUC",
   "LFTs",
-  "Coags",
+  "Lipase",
+  "Troponin",
+  "Coag",
+  "D-dimer",
   "CRP",
+  "VBG",
+  "Haptoglobin",
+  "LDH",
+  "Group & Hold",
+  "Crossmatch",
+  "Blood Culture",
   "TFT",
-  "Group and Hold",
 ] as const;
+
+const BLOOD_TEST_LABELS: Record<BloodTestType, string> = {
+  FBC: "Full Blood Count (FBC)",
+  EUC: "Electrolytes, Urea, Creatinine (EUC)",
+  LFTs: "Liver Function Tests (LFTs)",
+  Lipase: "Lipase",
+  Troponin: "Troponin",
+  Coag: "Coagulation Profile",
+  "D-dimer": "D-dimer",
+  CRP: "C-Reactive Protein (CRP)",
+  VBG: "Venous Blood Gas (VBG)",
+  Haptoglobin: "Haptoglobin",
+  LDH: "Lactate Dehydrogenase (LDH)",
+  "Group & Hold": "Group & Hold",
+  Crossmatch: "Crossmatch",
+  "Blood Culture": "Blood Culture",
+  TFT: "Thyroid Function Tests (TFT)",
+};
 
 /**
  * Imaging test type options
@@ -87,7 +113,7 @@ export const GENDER_OPTIONS: readonly Gender[] = [
  * Get display label for blood test type
  */
 export function getBloodTestLabel(type: BloodTestType): string {
-  return type;
+  return BLOOD_TEST_LABELS[type] ?? type;
 }
 
 /**

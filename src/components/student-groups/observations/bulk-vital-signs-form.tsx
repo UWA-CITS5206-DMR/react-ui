@@ -225,7 +225,7 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Blood Sugar */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-bloodSugar">Blood Sugar (mmol/L)</Label>
+              <Label htmlFor="bulk-bloodSugar">Blood Sugar (mg/dL)</Label>
               <Input
                 id="bulk-bloodSugar"
                 type="number"

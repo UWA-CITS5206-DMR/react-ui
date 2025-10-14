@@ -20,6 +20,12 @@ import type {
   OxygenSaturationRecord,
   PainScoreRecord,
 } from "@/lib/api-client-v2";
+import {
+  VITAL_SIGN_CONFIGS,
+  BLOOD_PRESSURE,
+  BLOOD_PRESSURE_CONFIG,
+  formatVitalSignForChart,
+} from "@/lib/vital-signs";
 
 interface ObservationChartProps {
   bloodPressures?: BloodPressureRecord[];
@@ -144,13 +150,37 @@ export function ObservationChart({
       <CardContent>
         <Tabs defaultValue="blood-pressure" className="w-full">
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
-            {bpData.length > 0 && <TabsTrigger value="blood-pressure">BP</TabsTrigger>}
-            {hrData.length > 0 && <TabsTrigger value="heart-rate">HR</TabsTrigger>}
-            {tempData.length > 0 && <TabsTrigger value="temperature">Temp</TabsTrigger>}
-            {rrData.length > 0 && <TabsTrigger value="respiratory">RR</TabsTrigger>}
-            {bsData.length > 0 && <TabsTrigger value="blood-sugar">BS</TabsTrigger>}
-            {o2Data.length > 0 && <TabsTrigger value="oxygen">O2</TabsTrigger>}
-            {painData.length > 0 && <TabsTrigger value="pain">Pain</TabsTrigger>}
+            {bpData.length > 0 && (
+              <TabsTrigger value="blood-pressure">{BLOOD_PRESSURE.abbreviation}</TabsTrigger>
+            )}
+            {hrData.length > 0 && (
+              <TabsTrigger value="heart-rate">
+                {VITAL_SIGN_CONFIGS.heartRate.abbreviation}
+              </TabsTrigger>
+            )}
+            {tempData.length > 0 && (
+              <TabsTrigger value="temperature">
+                {VITAL_SIGN_CONFIGS.temperature.abbreviation}
+              </TabsTrigger>
+            )}
+            {rrData.length > 0 && (
+              <TabsTrigger value="respiratory">
+                {VITAL_SIGN_CONFIGS.respiratoryRate.abbreviation}
+              </TabsTrigger>
+            )}
+            {bsData.length > 0 && (
+              <TabsTrigger value="blood-sugar">
+                {VITAL_SIGN_CONFIGS.bloodSugar.abbreviation}
+              </TabsTrigger>
+            )}
+            {o2Data.length > 0 && (
+              <TabsTrigger value="oxygen">
+                {VITAL_SIGN_CONFIGS.oxygenSaturation.abbreviation}
+              </TabsTrigger>
+            )}
+            {painData.length > 0 && (
+              <TabsTrigger value="pain">{VITAL_SIGN_CONFIGS.painScore.abbreviation}</TabsTrigger>
+            )}
           </TabsList>
 
           {/* Blood Pressure Chart */}
@@ -161,7 +191,7 @@ export function ObservationChart({
                   <LineChart data={bpData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[60, 180]} />
+                    <YAxis domain={BLOOD_PRESSURE.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -170,24 +200,26 @@ export function ObservationChart({
                         return `Time: ${value}`;
                       }}
                       formatter={(value: number, name: string) => [
-                        `${value} mmHg`,
-                        name === "systolic" ? "Systolic" : "Diastolic",
+                        `${value} ${BLOOD_PRESSURE.unit}`,
+                        name === "systolic"
+                          ? BLOOD_PRESSURE_CONFIG.systolic.label
+                          : BLOOD_PRESSURE_CONFIG.diastolic.label,
                       ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="systolic"
-                      stroke="#ef4444"
+                      stroke={BLOOD_PRESSURE_CONFIG.systolic.chartColor}
                       strokeWidth={2}
-                      name="Systolic"
+                      name={BLOOD_PRESSURE_CONFIG.systolic.label}
                     />
                     <Line
                       type="monotone"
                       dataKey="diastolic"
-                      stroke="#3b82f6"
+                      stroke={BLOOD_PRESSURE_CONFIG.diastolic.chartColor}
                       strokeWidth={2}
-                      name="Diastolic"
+                      name={BLOOD_PRESSURE_CONFIG.diastolic.label}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -203,7 +235,7 @@ export function ObservationChart({
                   <LineChart data={hrData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[40, 140]} />
+                    <YAxis domain={VITAL_SIGN_CONFIGS.heartRate.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -211,15 +243,18 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [`${value} bpm`, "Heart Rate"]}
+                      formatter={(value: number) => [
+                        formatVitalSignForChart("heartRate", value),
+                        VITAL_SIGN_CONFIGS.heartRate.label,
+                      ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="heartRate"
-                      stroke="#10b981"
+                      stroke={VITAL_SIGN_CONFIGS.heartRate.chartColor}
                       strokeWidth={2}
-                      name="Heart Rate (bpm)"
+                      name={`${VITAL_SIGN_CONFIGS.heartRate.label} (${VITAL_SIGN_CONFIGS.heartRate.unit})`}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -235,7 +270,7 @@ export function ObservationChart({
                   <LineChart data={tempData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[35, 40]} />
+                    <YAxis domain={VITAL_SIGN_CONFIGS.temperature.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -243,15 +278,18 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [`${value}°C`, "Temperature"]}
+                      formatter={(value: number) => [
+                        formatVitalSignForChart("temperature", value),
+                        VITAL_SIGN_CONFIGS.temperature.label,
+                      ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="temperature"
-                      stroke="#f59e0b"
+                      stroke={VITAL_SIGN_CONFIGS.temperature.chartColor}
                       strokeWidth={2}
-                      name="Temperature (°C)"
+                      name={`${VITAL_SIGN_CONFIGS.temperature.label} (${VITAL_SIGN_CONFIGS.temperature.unit})`}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -267,7 +305,7 @@ export function ObservationChart({
                   <LineChart data={rrData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[10, 30]} />
+                    <YAxis domain={VITAL_SIGN_CONFIGS.respiratoryRate.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -275,15 +313,18 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [`${value} /min`, "Respiratory Rate"]}
+                      formatter={(value: number) => [
+                        formatVitalSignForChart("respiratoryRate", value),
+                        VITAL_SIGN_CONFIGS.respiratoryRate.label,
+                      ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="respiratoryRate"
-                      stroke="#8b5cf6"
+                      stroke={VITAL_SIGN_CONFIGS.respiratoryRate.chartColor}
                       strokeWidth={2}
-                      name="Respiratory Rate (/min)"
+                      name={`${VITAL_SIGN_CONFIGS.respiratoryRate.label} (${VITAL_SIGN_CONFIGS.respiratoryRate.unit})`}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -299,7 +340,7 @@ export function ObservationChart({
                   <LineChart data={bsData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[60, 200]} />
+                    <YAxis domain={VITAL_SIGN_CONFIGS.bloodSugar.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -307,15 +348,18 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [`${value} mg/dL`, "Blood Sugar"]}
+                      formatter={(value: number) => [
+                        formatVitalSignForChart("bloodSugar", value),
+                        VITAL_SIGN_CONFIGS.bloodSugar.label,
+                      ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="bloodSugar"
-                      stroke="#ec4899"
+                      stroke={VITAL_SIGN_CONFIGS.bloodSugar.chartColor}
                       strokeWidth={2}
-                      name="Blood Sugar (mg/dL)"
+                      name={`${VITAL_SIGN_CONFIGS.bloodSugar.label} (${VITAL_SIGN_CONFIGS.bloodSugar.unit})`}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -331,7 +375,7 @@ export function ObservationChart({
                   <LineChart data={o2Data}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[90, 100]} />
+                    <YAxis domain={VITAL_SIGN_CONFIGS.oxygenSaturation.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -339,15 +383,18 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [`${value}%`, "O2 Saturation"]}
+                      formatter={(value: number) => [
+                        formatVitalSignForChart("oxygenSaturation", value),
+                        VITAL_SIGN_CONFIGS.oxygenSaturation.label,
+                      ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="oxygenSaturation"
-                      stroke="#06b6d4"
+                      stroke={VITAL_SIGN_CONFIGS.oxygenSaturation.chartColor}
                       strokeWidth={2}
-                      name="O2 Saturation (%)"
+                      name={`${VITAL_SIGN_CONFIGS.oxygenSaturation.label} (${VITAL_SIGN_CONFIGS.oxygenSaturation.unit})`}
                     />
                   </LineChart>
                 </ResponsiveContainer>
@@ -363,7 +410,7 @@ export function ObservationChart({
                   <LineChart data={painData}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="time" angle={-45} textAnchor="end" height={80} />
-                    <YAxis domain={[0, 10]} />
+                    <YAxis domain={VITAL_SIGN_CONFIGS.painScore.chartDomain} />
                     <Tooltip
                       labelFormatter={(value, payload) => {
                         if (payload && payload.length > 0) {
@@ -371,15 +418,18 @@ export function ObservationChart({
                         }
                         return `Time: ${value}`;
                       }}
-                      formatter={(value: number) => [`${value}/10`, "Pain Score"]}
+                      formatter={(value: number) => [
+                        `${value}/10`,
+                        VITAL_SIGN_CONFIGS.painScore.label,
+                      ]}
                     />
                     <Legend />
                     <Line
                       type="monotone"
                       dataKey="painScore"
-                      stroke="#dc2626"
+                      stroke={VITAL_SIGN_CONFIGS.painScore.chartColor}
                       strokeWidth={2}
-                      name="Pain Score"
+                      name={VITAL_SIGN_CONFIGS.painScore.label}
                     />
                   </LineChart>
                 </ResponsiveContainer>
