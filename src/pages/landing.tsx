@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -26,6 +26,26 @@ export default function Landing() {
   const [password, setPassword] = useState("");
   const { toast } = useToast();
   const { login } = useAuth();
+
+  // Check if user is already logged in and redirect
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        const userData = JSON.parse(storedUser);
+        const targetPath =
+          userData.role === "admin"
+            ? "/admin"
+            : userData.role === "instructor"
+            ? "/instructor"
+            : "/student";
+        window.location.href = targetPath;
+      } catch {
+        // If stored user data is invalid, clear it
+        localStorage.removeItem("user");
+      }
+    }
+  }, []);
 
   const loginMutation = useMutation({
     mutationFn: async ({ username, password }: { username: string; password: string }) => {

@@ -555,6 +555,18 @@ export class ApiClientV2 {
         details = undefined;
       }
 
+      // Handle authentication errors globally
+      if (response.status === 401 || response.status === 403) {
+        // Clear stored user data
+        if (typeof window !== "undefined" && window.localStorage) {
+          localStorage.removeItem("user");
+        }
+        // Redirect to login page
+        if (typeof window !== "undefined" && window.location) {
+          window.location.href = "/";
+        }
+      }
+
       throw new ApiError({
         message: `Request failed with status ${response.status}`,
         status: response.status,
