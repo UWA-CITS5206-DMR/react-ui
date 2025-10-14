@@ -8,11 +8,14 @@ import { VITAL_SIGN_CONFIGS, BLOOD_PRESSURE_CONFIG, BLOOD_PRESSURE } from "@/lib
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { ObservationCreateBundle, Patient } from "@/lib/api-client-v2";
 
 interface BulkVitalSignsFormProps {
   patient: Patient;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 interface BulkFormData {
@@ -40,7 +43,7 @@ const initialFormData: BulkFormData = {
 /**
  * Bulk vital signs entry form component
  */
-export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
+export function BulkVitalSignsForm({ patient, onSuccess, onCancel }: BulkVitalSignsFormProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { toast } = useToast();
@@ -122,6 +125,7 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
         title: "Success",
         description: "Bulk vital signs submitted successfully!",
       });
+      onSuccess?.();
     },
     onError: (error: any) => {
       console.error("Failed to record new vitals:", error);
@@ -142,14 +146,16 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
     setFormData({ ...formData, [field]: value });
   };
 
+  // Check if any form field has a value
+  const hasAnyValue = Object.values(formData).some((value) => value.trim() !== "");
+
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg">Record All Observations</CardTitle>
-        <p className="text-sm text-gray-600">Enter multiple observations at once</p>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-6 py-4">
+      <Card className="bg-muted/50">
+        <CardHeader>
+          <CardTitle className="text-sm">Vital Signs</CardTitle>
+        </CardHeader>
+        <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Systolic BP */}
             <div className="space-y-2">
@@ -259,16 +265,26 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
               />
             </div>
           </div>
+        </CardContent>
+      </Card>
 
-          <Button
-            type="submit"
-            disabled={createBulkObservationsMutation.isPending}
-            className="w-full"
-          >
-            {createBulkObservationsMutation.isPending ? "Recording..." : "Record All Observations"}
-          </Button>
-        </form>
-      </CardContent>
-    </Card>
+      <DialogFooter>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={createBulkObservationsMutation.isPending}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={createBulkObservationsMutation.isPending || !hasAnyValue}
+          className="bg-hospital-blue hover:bg-hospital-blue/90"
+        >
+          {createBulkObservationsMutation.isPending ? "Adding..." : "Add All Observations"}
+        </Button>
+      </DialogFooter>
+    </form>
   );
 }

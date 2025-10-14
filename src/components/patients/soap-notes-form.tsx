@@ -5,9 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { FileText, Plus, List } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { NoteEntry } from "@/lib/api-client-v2";
 import { formatDate } from "@/lib/utils";
@@ -17,11 +24,16 @@ interface SOAPNotesFormProps {
 }
 
 export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
+  // Create/Edit modal state - reused for both create and edit
+  const [noteDialogOpen, setNoteDialogOpen] = useState(false);
+  const [editingNote, setEditingNote] = useState<NoteEntry | null>(null);
   const [content, setContent] = useState("");
-
-  // Sign-off fields
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
+
+  // Delete state
+  const [deleteNoteId, setDeleteNoteId] = useState<number | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -36,26 +48,36 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
     queryFn: () => apiClientV2.studentGroups.notes.list({ patient: patientId }),
   });
 
-  const createNotesMutation = useMutation({
+  const saveNoteMutation = useMutation({
     mutationFn: async () => {
-      return apiClientV2.studentGroups.notes.create({
-        patient: parseInt(patientId),
-        name: signOffName,
-        role: signOffRole,
-        content: content,
-      });
+      if (editingNote) {
+        // Update existing note
+        return apiClientV2.studentGroups.notes.partialUpdate(editingNote.id, {
+          content,
+          name: signOffName,
+          role: signOffRole,
+          patient: parseInt(patientId),
+        });
+      } else {
+        // Create new note
+        return apiClientV2.studentGroups.notes.create({
+          patient: parseInt(patientId),
+          name: signOffName,
+          role: signOffRole,
+          content: content,
+        });
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["notes", patientId] });
       toast({
         title: "Success",
-        description: "Note saved successfully!",
+        description: editingNote ? "Note updated successfully!" : "Note created successfully!",
       });
-      // Reset form
-      setContent("");
+      handleCloseDialog();
     },
     onError: (error) => {
-      console.error("Error creating note:", error);
+      console.error("Error saving note:", error);
       toast({
         title: "Error",
         description: "Failed to save note. Please try again.",
@@ -63,6 +85,53 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
       });
     },
   });
+
+  const deleteNoteMutation = useMutation({
+    mutationFn: async (id: number) => {
+      return apiClientV2.studentGroups.notes.delete(id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notes", patientId] });
+      toast({
+        title: "Success",
+        description: "Note deleted successfully!",
+      });
+      setDeleteDialogOpen(false);
+      setDeleteNoteId(null);
+    },
+    onError: (error) => {
+      console.error("Error deleting note:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete note. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleOpenCreateDialog = () => {
+    setEditingNote(null);
+    setContent("");
+    setSignOffName("");
+    setSignOffRole("");
+    setNoteDialogOpen(true);
+  };
+
+  const handleOpenEditDialog = (note: NoteEntry) => {
+    setEditingNote(note);
+    setContent(note.content);
+    setSignOffName(note.name);
+    setSignOffRole(note.role);
+    setNoteDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setNoteDialogOpen(false);
+    setEditingNote(null);
+    setContent("");
+    setSignOffName("");
+    setSignOffRole("");
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,116 +154,181 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
       return;
     }
 
-    createNotesMutation.mutate();
+    saveNoteMutation.mutate();
+  };
+
+  const handleDelete = (noteId: number) => {
+    setDeleteNoteId(noteId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteNoteId !== null) {
+      deleteNoteMutation.mutate(deleteNoteId);
+    }
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <Tabs defaultValue="view" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-6">
-          <TabsTrigger value="view">
-            <List className="h-4 w-4 mr-2" />
-            View Notes
-          </TabsTrigger>
-          <TabsTrigger value="create">
-            <Plus className="h-4 w-4 mr-2" />
-            Create Note
-          </TabsTrigger>
-        </TabsList>
+    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
+      {/* Notes List */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Clinical Notes</CardTitle>
+          <CardDescription>
+            View, edit, and delete clinical notes for this patient. Click the + button to add a new
+            note.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!notes || notes.results.length === 0 ? (
+            <p className="text-muted-foreground text-center py-8">
+              No notes found. Click the + button to create your first note.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              {notes.results.map((note: NoteEntry) => (
+                <Card key={note.id}>
+                  <CardContent className="pt-6">
+                    <div className="flex justify-between items-start mb-3">
+                      <div>
+                        <p className="text-sm text-muted-foreground">
+                          {formatDate(note.created_at)}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleOpenEditDialog(note)}
+                          title="Edit note"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleDelete(note.id)}
+                          title="Delete note"
+                          className="text-destructive hover:text-destructive"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      <div className="bg-muted/30 p-4 rounded-md">
+                        <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
+                      </div>
+                      <div className="border-t pt-2">
+                        <p className="text-xs text-muted-foreground">
+                          Written by: {note.name} ({note.role})
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
-        {/* View Notes */}
-        <TabsContent value="view">
-          <Card>
-            <CardHeader>
-              <CardTitle>Clinical Notes</CardTitle>
-              <CardDescription>View all clinical notes for this patient</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {!notes || notes.results.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">No notes found</p>
-              ) : (
-                <div className="space-y-4">
-                  {notes.results.map((note: NoteEntry) => (
-                    <Card key={note.id}>
-                      <CardContent className="pt-6">
-                        <div className="flex justify-between items-start mb-3">
-                          <div>
-                            <p className="text-sm text-muted-foreground">
-                              {formatDate(note.created_at)}
-                            </p>
-                          </div>
-                          <FileText className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                        <div className="space-y-3">
-                          <div className="bg-muted/30 p-4 rounded-md">
-                            <pre className="whitespace-pre-wrap text-sm font-sans">
-                              {note.content}
-                            </pre>
-                          </div>
-                          <div className="border-t pt-2">
-                            <p className="text-xs text-muted-foreground">
-                              Written by: {note.name} ({note.role})
-                            </p>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
+      {/* Floating Action Button */}
+      <Button
+        onClick={handleOpenCreateDialog}
+        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
+        title="Add new note"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
 
-        {/* Create Note */}
-        <TabsContent value="create">
+      {/* Create/Edit Note Dialog */}
+      <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editingNote ? "Edit Clinical Note" : "Create Clinical Note"}</DialogTitle>
+            <DialogDescription>
+              {editingNote
+                ? "Update the clinical note information below. Fields marked with * are required."
+                : "Fill in the clinical note information below. Fields marked with * are required."}
+            </DialogDescription>
+          </DialogHeader>
           <form onSubmit={handleSubmit}>
-            <Card>
-              <CardHeader>
-                <CardTitle>Clinical Note</CardTitle>
-                <CardDescription>
-                  Document clinical observations, assessment, and plan
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Content */}
-                <div className="space-y-2">
-                  <Label htmlFor="content">Note Content *</Label>
-                  <Textarea
-                    id="content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Enter your clinical notes here. You may structure as SOAP (Subjective, Objective, Assessment, Plan) or use free-form text..."
-                    className="min-h-[300px]"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Tip: Consider organizing your notes using headings like Subjective, Objective,
-                    Assessment, and Plan
-                  </p>
-                </div>
-
-                {/* Sign-off Section */}
-                <SignOffSection
-                  name={signOffName}
-                  role={signOffRole}
-                  onNameChange={setSignOffName}
-                  onRoleChange={setSignOffRole}
-                  idPrefix="soap-signoff"
+            <div className="space-y-4 py-4">
+              <div className="space-y-2">
+                <Label htmlFor="note-content">Note Content *</Label>
+                <Textarea
+                  id="note-content"
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Enter your clinical notes here. You may structure as SOAP (Subjective, Objective, Assessment, Plan) or use free-form text..."
+                  className="min-h-[300px]"
                 />
-
-                <Button
-                  type="submit"
-                  className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
-                  disabled={createNotesMutation.isPending}
-                >
-                  <FileText className="h-4 w-4 mr-2" />
-                  {createNotesMutation.isPending ? "Saving..." : "Save Note"}
-                </Button>
-              </CardContent>
-            </Card>
+                <p className="text-xs text-muted-foreground">
+                  Tip: Consider organizing your notes using headings like Subjective, Objective,
+                  Assessment, and Plan
+                </p>
+              </div>
+              <SignOffSection
+                name={signOffName}
+                role={signOffRole}
+                onNameChange={setSignOffName}
+                onRoleChange={setSignOffRole}
+                idPrefix="note-signoff"
+              />
+            </div>
+            <DialogFooter>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleCloseDialog}
+                disabled={saveNoteMutation.isPending}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={saveNoteMutation.isPending}
+                className="bg-hospital-blue hover:bg-hospital-blue/90"
+              >
+                {saveNoteMutation.isPending
+                  ? "Saving..."
+                  : editingNote
+                  ? "Update Note"
+                  : "Create Note"}
+              </Button>
+            </DialogFooter>
           </form>
-        </TabsContent>
-      </Tabs>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Clinical Note</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this clinical note? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteNoteMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteNoteMutation.isPending}
+            >
+              {deleteNoteMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

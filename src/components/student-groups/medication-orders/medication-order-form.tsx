@@ -5,18 +5,20 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
 import { Button } from "@/components/ui/button";
-import { Plus, Pill } from "lucide-react";
+import { Plus } from "lucide-react";
 import { MedicationOrderCard, type MedicationFormData } from "./medication-order-card";
 import { SignOffSection } from "@/components/ui/sign-off-section";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface MedicationOrderFormProps {
   patientId: string;
+  onSuccess?: () => void;
 }
 
 /**
  * Medication order creation form component
  */
-export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
+export function MedicationOrderForm({ patientId, onSuccess }: MedicationOrderFormProps) {
   const [medications, setMedications] = useState<MedicationFormData[]>([
     {
       medication: "",
@@ -76,6 +78,7 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
       ]);
       setSignOffName("");
       setSignOffRole("");
+      onSuccess?.();
     },
     onError: (error: any) => {
       toast({
@@ -141,40 +144,39 @@ export function MedicationOrderForm({ patientId }: MedicationOrderFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      {medications.map((medication, index) => (
-        <MedicationOrderCard
-          key={index}
-          index={index}
-          medication={medication}
-          canRemove={medications.length > 1}
-          onUpdate={(field, value) => updateMedication(index, field, value)}
-          onRemove={() => removeMedication(index)}
+      <div className="space-y-4">
+        <Card className="bg-muted/50">
+          <CardHeader>
+            <CardTitle className="text-sm">Medication Orders</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {medications.map((medication, index) => (
+              <MedicationOrderCard
+                key={index}
+                index={index}
+                medication={medication}
+                canRemove={medications.length > 1}
+                onUpdate={(field, value) => updateMedication(index, field, value)}
+                onRemove={() => removeMedication(index)}
+              />
+            ))}
+            <div className="flex gap-2 mt-4">
+              <Button type="button" variant="outline" onClick={addMedication} className="flex-1">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Another Medication
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Sign-off Section */}
+        <SignOffSection
+          name={signOffName}
+          role={signOffRole}
+          onNameChange={setSignOffName}
+          onRoleChange={setSignOffRole}
+          idPrefix="medication"
         />
-      ))}
-
-      {/* Sign-off Section */}
-      <SignOffSection
-        name={signOffName}
-        role={signOffRole}
-        onNameChange={setSignOffName}
-        onRoleChange={setSignOffRole}
-        idPrefix="medication"
-      />
-
-      <div className="flex gap-2 mt-4">
-        <Button type="button" variant="outline" onClick={addMedication} className="flex-1">
-          <Plus className="h-4 w-4 mr-2" />
-          Add Another Medication
-        </Button>
-
-        <Button
-          type="submit"
-          className="flex-1 bg-hospital-blue hover:bg-hospital-blue/90"
-          disabled={createMedicationOrdersMutation.isPending}
-        >
-          <Pill className="h-4 w-4 mr-2" />
-          {createMedicationOrdersMutation.isPending ? "Submitting..." : "Submit Medication Orders"}
-        </Button>
       </div>
     </form>
   );
