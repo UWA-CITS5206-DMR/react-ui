@@ -346,6 +346,17 @@ export interface PainScoreCreate {
   score: number;
 }
 
+export interface GoogleFormLink {
+  id: number;
+  title: string;
+  url: string;
+  description: string;
+  display_order: number;
+  is_active: boolean;
+  created_at: ISODateString;
+  updated_at: ISODateString;
+}
+
 export interface ObservationBundle {
   blood_pressures: BloodPressureRecord[];
   heart_rates: HeartRateRecord[];
@@ -1080,6 +1091,17 @@ export class ApiClientV2 {
         body: formData,
       });
     },
+  };
+
+  googleFormLinks = {
+    list: () =>
+      this.request<GoogleFormLink[]>("/api/patients/google-forms/", {
+        method: "GET",
+      }),
+    retrieve: (id: number) =>
+      this.request<GoogleFormLink>(`/api/patients/google-forms/${id}/`, {
+        method: "GET",
+      }),
   };
 }
 
