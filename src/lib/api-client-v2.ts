@@ -225,6 +225,17 @@ export interface PatientFile {
   created_at: ISODateString;
 }
 
+export interface ManualFileReleaseRequest {
+  student_group_ids: number[];
+  page_range?: string;
+}
+
+export interface ManualFileReleaseResponse {
+  file_id: string;
+  page_range: string;
+  released_to: User[];
+}
+
 export interface PatientFileUpload {
   category?: FileCategory;
   file: File | Blob;
@@ -588,6 +599,13 @@ export class ApiClientV2 {
       this.request<InstructorDashboardSummary>("/api/instructors/dashboard/", {
         method: "GET",
       }),
+    studentGroups: {
+      list: (query?: QueryParams) =>
+        this.request<User[]>("/api/instructors/student-groups/", {
+          method: "GET",
+          query,
+        }),
+    },
     bloodTestRequests: {
       list: (query?: QueryParams) =>
         this.request<PaginatedResponse<BloodTestRequest>>("/api/instructors/blood-test-requests/", {
@@ -1088,6 +1106,14 @@ export class ApiClientV2 {
           query: pageRange ? { page_range: pageRange } : undefined,
           parser: (response) => response.blob(),
         }),
+      release: (patientId: number, fileId: string, payload: ManualFileReleaseRequest) =>
+        this.request<ManualFileReleaseResponse>(
+          `/api/patients/patients/${patientId}/files/${fileId}/release/`,
+          {
+            method: "POST",
+            body: payload,
+          }
+        ),
     },
     uploadFile: (patientId: number, payload: PatientFileUpload) => {
       const formData = new FormData();

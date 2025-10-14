@@ -37,7 +37,7 @@ This document provides a comprehensive overview of the DMR frontend application,
 - Instructor-side: Full management of all diagnostic requests from all groups
 - Lab request approval and status tracking
 - File access control through approved file system with page-range authorization
-- Students can only access files linked to their completed requests
+- Students can access files linked to their completed requests or via instructor manual release
 - Request dashboard, to-do lists, and statistics for instructors
 
 ### User Management
@@ -56,7 +56,7 @@ The platform supports three distinct user roles:
 
 Students operate using a **student group shared account model**, where each student group shares a single user account for login. All observations and requests are associated with that group's account.
 
-#### Key Capabilities
+#### Key Capabilities (Students)
 
 - View patient records and documents (with page-level access control)
 - Submit observations (vital signs, clinical notes)
@@ -65,7 +65,7 @@ Students operate using a **student group shared account model**, where each stud
 - Create discharge summaries
 - Access approved files for completed requests only
 
-#### Access Control
+#### Access Control (Students)
 
 - Can only view and modify their own group's records (enforced by backend API)
 - **File Access**: Students can only access files linked to their completed requests, controlled by three combined conditions:
@@ -77,7 +77,7 @@ Students operate using a **student group shared account model**, where each stud
 
 ### 2. Instructors
 
-#### Key Capabilities
+#### Key Capabilities (Instructors)
 
 - Manage all diagnostic requests (imaging, blood tests, medications) from all student groups
 - Review and approve investigation requests
@@ -88,7 +88,7 @@ Students operate using a **student group shared account model**, where each stud
 - Access dashboard with request statistics and to-do lists
 - Monitor student progress across all groups
 
-#### Access Control
+#### Access Control (Instructors)
 
 - Full access to all patient files and request management
 - Can manage requests from all student groups

@@ -16,9 +16,10 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
 import { apiClientV2 } from "@/lib/queryClient";
-import { Upload, FileText, Image, File, Trash2 } from "lucide-react";
+import { Upload, FileText, Image, File, Trash2, Share2 } from "lucide-react";
 import type { PatientFile, FileCategory } from "@/lib/api-client-v2";
 import FilePreviewDialog from "./file-preview-dialog";
+import FileReleaseDialog from "./file-release-dialog";
 
 interface FileManagementProps {
   patientId: number;
@@ -29,6 +30,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
   const [selectedCategory, setSelectedCategory] = useState<FileCategory>("Admission");
   const [requiresPagination, setRequiresPagination] = useState(false);
   const [previewFile, setPreviewFile] = useState<PatientFile | null>(null);
+  const [releaseFile, setReleaseFile] = useState<PatientFile | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -253,6 +255,14 @@ export default function FileManagement({ patientId }: FileManagementProps) {
                         View
                       </Button>
                       <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setReleaseFile(file)}
+                        className="gap-2"
+                      >
+                        <Share2 className="h-3 w-3" /> Release
+                      </Button>
+                      <Button
                         variant="outline"
                         size="sm"
                         onClick={() => handleDelete(file.id)}
@@ -273,9 +283,9 @@ export default function FileManagement({ patientId }: FileManagementProps) {
         <div className="bg-blue-50 p-3 rounded-lg">
           <h4 className="text-sm font-medium text-blue-900 mb-2">File Access Control</h4>
           <p className="text-xs text-blue-700">
-            Files uploaded here can be linked to student Investigation Requests. When you approve a
-            blood test or imaging request in the Instructor Controls, you can specify which files
-            students can access as approved_files.
+            Files uploaded here can be linked to student investigation requests or manually
+            released to selected student groups using the Release button. Use manual release to
+            grant immediate access without waiting for a request approval.
           </p>
         </div>
       </CardContent>
@@ -290,6 +300,16 @@ export default function FileManagement({ patientId }: FileManagementProps) {
           fileName={previewFile.display_name}
           category={previewFile.category}
           requiresPagination={previewFile.requires_pagination}
+        />
+      )}
+
+      {/* File Release Dialog */}
+      {releaseFile && (
+        <FileReleaseDialog
+          open={!!releaseFile}
+          onOpenChange={(open) => !open && setReleaseFile(null)}
+          patientId={patientId}
+          file={releaseFile}
         />
       )}
     </Card>
