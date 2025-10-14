@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { getErrorMessage } from "@/lib/error-utils";
 import { GENDER_OPTIONS, getGenderLabel } from "@/lib/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 interface CreatePatientModalProps {
   isOpen: boolean;
@@ -20,6 +21,9 @@ export default function CreatePatientModal({
   onClose,
   onPatientCreated,
 }: CreatePatientModalProps) {
+  const { user } = useAuth();
+  const isStudent = user?.role === "student";
+
   const [formData, setFormData] = useState({
     first_name: "",
     last_name: "",
@@ -68,6 +72,9 @@ export default function CreatePatientModal({
   const handleChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  // If a student somehow mounts this modal, don't render it.
+  if (isStudent) return null;
 
   if (!isOpen) return null;
 
