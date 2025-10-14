@@ -7,6 +7,7 @@ import PatientHeader from "@/components/patients/patient-header";
 import InstructorPatientOverview from "@/components/instructors/instructor-patient-overview";
 import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
 import FileManagement from "@/components/patients/file-management";
+import GoogleForms from "@/components/patients/google-forms";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // Patient type intentionally not imported here to avoid unused-type errors
@@ -14,7 +15,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 const LAST_PATIENT_KEY = "lastSelectedPatientId";
 const LAST_TAB_KEY = "instructorDashboardLastTab";
 
-type InstructorTabValue = "overview" | "files" | "requests";
+type InstructorTabValue = "overview" | "files" | "requests" | "google-forms";
 
 export default function InstructorDashboard() {
   const [selectedPatientId, setSelectedPatientId] = useState<string | undefined>();
@@ -46,7 +47,7 @@ export default function InstructorDashboard() {
   useEffect(() => {
     const savedTab = localStorage.getItem(LAST_TAB_KEY);
     if (savedTab) {
-      const validTabs: InstructorTabValue[] = ["overview", "files", "requests"];
+      const validTabs: InstructorTabValue[] = ["overview", "files", "requests", "google-forms"];
       if (validTabs.includes(savedTab as InstructorTabValue)) {
         setActiveTab(savedTab as InstructorTabValue);
       }
@@ -151,6 +152,12 @@ export default function InstructorDashboard() {
                     >
                       Lab Requests
                     </TabsTrigger>
+                    <TabsTrigger
+                      value="google-forms"
+                      className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
+                    >
+                      Google Forms
+                    </TabsTrigger>
                   </div>
                 </TabsList>
               </div>
@@ -169,6 +176,12 @@ export default function InstructorDashboard() {
             <TabsContent value="requests" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
                 <InstructorLabRequests patientId={selectedPatient.id} />
+              </div>
+            </TabsContent>
+
+            <TabsContent value="google-forms" className="flex-1 min-h-0 overflow-auto m-0">
+              <div className="bg-bg-light p-6">
+                <GoogleForms />
               </div>
             </TabsContent>
           </Tabs>
