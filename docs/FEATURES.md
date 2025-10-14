@@ -109,7 +109,7 @@ Students operate using a **student group shared account model**, where each stud
 #### Complete Resource Access
 
 - **Observations**: Full CRUD access (create, read, update, delete) to all observations from all groups
-- **Lab Requests**: Full CRUD access to all diagnostic requests (imaging, blood tests, medications) from all groups
+- **Investigation Requests**: Full CRUD access to all diagnostic requests (imaging, blood tests, medications) from all groups
 - **Patient Files**: Complete access to all files and file management operations
 - **File Access Management**: Can create, modify, and delete approved file records for any request
 - **User Management**: Full control over user accounts, roles, and group assignments

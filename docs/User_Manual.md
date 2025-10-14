@@ -53,7 +53,7 @@ Notes
 ### Role-based Homepages
 
 - Student Dashboard: patient list + tabs for Overview, Observations, SOAP Notes, Investigation Requests, Medication Orders, and Discharge Summary.
-- Instructor Dashboard: patient list + tabs for Overview, File Management, and Lab Requests.
+- Instructor Dashboard: patient list + tabs for Overview, File Management, and Investigation Requests.
 - Admin: Administration is performed in the Django Admin (backend), not in this web app. Ask your coordinator for the backend admin URL (commonly your API domain with "/admin").
 
 ### Interface Basics
@@ -170,7 +170,7 @@ Notes
 
 ### Review and Complete Requests (approve files + page ranges)
 
-- Go to Lab Requests tab.
+- Go to Investigation Requests tab.
 - Two lists: Blood Tests and Imaging Requests with pagination.
 - For each pending request:
   - Click “Approve Request”
