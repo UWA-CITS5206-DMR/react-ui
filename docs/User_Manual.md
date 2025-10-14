@@ -26,6 +26,7 @@ This manual helps end-users (students, instructors, and admins) operate the DMR 
   - Overview
   - Manage Patient Files (Upload, Preview, Delete)
   - Review and Complete Requests (approve files + page ranges)
+  - Release File Access to Student Groups (manual)
 - Admins
   - Using Django Admin (backend)
 - Tips and Troubleshooting
@@ -132,6 +133,8 @@ Students can only access files when all are true:
 2. A page range is defined (for paginated PDFs)
 3. The request status is “completed”
 
+In addition, instructors may manually grant access to specific files. If a manual release exists for your group, you will be able to see that file (and, for paginated PDFs, only the released page range) even without a corresponding request.
+
 How it works
 
 - After your request is marked completed, instructors might grant access to specific files and pages. You can then preview allowed pages via the file preview dialog.
@@ -182,6 +185,25 @@ Tips
 
 - Define precise page ranges to limit student access appropriately.
 - If a patient has no files, upload first from File Management.
+
+### Release File Access to Student Groups (manual)
+
+Use manual release to grant a student group immediate access to a file without requiring a request:
+
+1. Go to the File Management tab for the selected patient.
+2. In the “Patient Files” list, click “Release” on the target file.
+3. In the dialog:
+
+- Select one or more student group accounts from the list.
+- If the file is a paginated PDF (requires pagination), enter the allowed page range (e.g., `1-3,5`).
+
+1. Click “Release”. A success toast confirms access has been granted.
+
+Notes
+
+- Manual release creates an internal Approved File entry linked directly to the student group account (no request needed).
+- For paginated PDFs, students can only view the pages specified by your page range.
+- You can revoke access by removing the corresponding Approved File record in the backend admin if necessary.
 
 ---
 

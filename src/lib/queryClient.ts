@@ -52,10 +52,31 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000, // 5 minutes
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        // Don't retry on 401/403 errors
+        if (error?.status === 401 || error?.status === 403) {
+          return false;
+        }
+        return failureCount < 1;
+      },
     },
     mutations: {
-      retry: 1,
+      retry: (failureCount, error: any) => {
+        // Don't retry on 401/403 errors
+        if (error?.status === 401 || error?.status === 403) {
+          return false;
+        }
+        return failureCount < 1;
+      },
+      onError: (error: any) => {
+        // Handle authentication errors globally
+        if (error?.status === 401 || error?.status === 403) {
+          // Clear stored user data
+          localStorage.removeItem("user");
+          // Redirect to login page
+          window.location.href = "/";
+        }
+      },
     },
   },
 });
