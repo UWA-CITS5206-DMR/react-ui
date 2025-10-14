@@ -717,6 +717,18 @@ export class ApiClientV2 {
         this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "GET",
         }),
+      update: (id: number, payload: BloodTestRequestCreate) =>
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
+          method: "PUT",
+          body: payload,
+        }),
+      partialUpdate: (id: number, payload: Partial<BloodTestRequestCreate>) =>
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
+          method: "PATCH",
+          body: payload,
+        }),
+      delete: (id: number) =>
+        this.request<void>(`/api/student-groups/blood-test-requests/${id}/`, { method: "DELETE" }),
     },
     dischargeSummaries: {
       list: (query?: QueryParams) =>
@@ -759,6 +771,18 @@ export class ApiClientV2 {
         this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "GET",
         }),
+      update: (id: number, payload: ImagingRequestCreate) =>
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "PUT",
+          body: payload,
+        }),
+      partialUpdate: (id: number, payload: Partial<ImagingRequestCreate>) =>
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "PATCH",
+          body: payload,
+        }),
+      delete: (id: number) =>
+        this.request<void>(`/api/student-groups/imaging-requests/${id}/`, { method: "DELETE" }),
     },
     medicationOrders: {
       list: (query?: QueryParams) =>

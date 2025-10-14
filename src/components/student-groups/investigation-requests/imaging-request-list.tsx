@@ -1,6 +1,7 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useToast } from "@/hooks/use-toast";
 import { RequestCard } from "./request-card";
 import type { ImagingRequest } from "@/lib/api-client-v2";
 
@@ -9,19 +10,56 @@ interface ImagingRequestListProps {
 }
 
 /**
- * Imaging request list component
+ * Imaging request list component with edit and delete functionality
  */
 export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
   const { data: imagingRequests } = useQuery({
     queryKey: ["imaging-requests", patientId],
     queryFn: () => apiClientV2.studentGroups.imagingRequests.list({ patient: patientId }),
   });
 
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: (requestId: number) => apiClientV2.studentGroups.imagingRequests.delete(requestId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["imaging-requests", patientId] });
+      toast({
+        title: "Success",
+        description: "Imaging request deleted successfully",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete imaging request",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleEdit = (_requestId: number) => {
+    // TODO: Implement edit functionality with a dialog
+    toast({
+      title: "Edit Feature",
+      description: "Edit functionality coming soon!",
+    });
+  };
+
+  const handleDelete = (requestId: number) => {
+    deleteMutation.mutate(requestId);
+  };
+
   return (
     <Card>
       <CardHeader>
         <CardTitle>Imaging Requests</CardTitle>
-        <CardDescription>View all imaging requests for this patient</CardDescription>
+        <CardDescription>
+          View and manage your imaging requests for this patient. You can edit or delete pending
+          requests.
+        </CardDescription>
       </CardHeader>
       <CardContent>
         {!imagingRequests || imagingRequests.results.length === 0 ? (
@@ -42,6 +80,9 @@ export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
                 }}
                 approvedFiles={request.approved_files}
                 patientId={parseInt(patientId)}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                canModify={true}
               />
             ))}
           </div>

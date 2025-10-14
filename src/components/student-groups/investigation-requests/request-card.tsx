@@ -3,9 +3,19 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock, FileText, Eye } from "lucide-react";
+import { CheckCircle, Clock, FileText, Eye, Pencil, Trash2 } from "lucide-react";
 import type { ApprovedFile } from "@/lib/api-client-v2";
 import StudentFilePreviewDialog from "./student-file-preview-dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface RequestCardProps {
   id: number;
@@ -19,13 +29,18 @@ interface RequestCardProps {
   };
   approvedFiles?: ApprovedFile[];
   patientId: number;
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
+  canModify?: boolean;
 }
 
 /**
  * Request card component - Displays details of a single investigation request
  * Shows approved files and provides preview functionality when request is completed
+ * Allows students to edit and delete their own pending requests
  */
 export function RequestCard({
+  id,
   testType,
   details,
   status,
@@ -33,6 +48,9 @@ export function RequestCard({
   requestedBy,
   approvedFiles = [],
   patientId,
+  onEdit,
+  onDelete,
+  canModify = true,
 }: RequestCardProps) {
   // State for file preview dialog
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
@@ -42,6 +60,9 @@ export function RequestCard({
     pageRange?: string;
     requiresPagination: boolean;
   } | null>(null);
+
+  // State for delete confirmation dialog
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handlePreviewFile = (file: ApprovedFile) => {
     setSelectedFile({
@@ -53,85 +74,142 @@ export function RequestCard({
     setPreviewDialogOpen(true);
   };
 
+  const handleEdit = () => {
+    if (onEdit) {
+      onEdit(id);
+    }
+  };
+
+  const handleDeleteConfirm = () => {
+    if (onDelete) {
+      onDelete(id);
+    }
+    setDeleteDialogOpen(false);
+  };
+
+  // Only show edit/delete buttons for pending requests
+  const showModifyButtons = canModify && status === "pending";
+
   return (
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex justify-between items-start mb-3">
-          <div>
-            <h3 className="font-semibold text-lg">{testType}</h3>
-            <p className="text-sm text-muted-foreground">{formatDate(createdAt)}</p>
-          </div>
-          <Badge variant={status === "completed" ? "default" : "secondary"}>
-            {status === "completed" ? (
-              <>
-                <CheckCircle className="h-3 w-3 mr-1" /> Completed
-              </>
-            ) : (
-              <>
-                <Clock className="h-3 w-3 mr-1" /> Pending
-              </>
-            )}
-          </Badge>
-        </div>
-        <div className="space-y-2">
-          <div>
-            <p className="text-sm font-medium">Details:</p>
-            <p className="text-sm text-muted-foreground">{details}</p>
-          </div>
-          <div className="border-t pt-2 mt-2">
-            <p className="text-xs text-muted-foreground">
-              Requested by: {requestedBy.name} ({requestedBy.role})
-            </p>
-          </div>
-
-          {/* Display approved files when request is completed */}
-          {status === "completed" && approvedFiles.length > 0 && (
-            <div className="border-t pt-3 mt-3">
-              <p className="text-sm font-medium mb-2 flex items-center gap-2">
-                <FileText className="h-4 w-4" />
-                Approved Files:
-              </p>
-              <div className="space-y-2">
-                {approvedFiles.map((file) => (
-                  <div
-                    key={file.id}
-                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{file.display_name}</p>
-                      {file.page_range && (
-                        <p className="text-xs text-muted-foreground">Pages: {file.page_range}</p>
-                      )}
-                    </div>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => handlePreviewFile(file)}
-                      className="ml-2"
-                    >
-                      <Eye className="h-4 w-4 mr-1" />
-                      Preview
-                    </Button>
-                  </div>
-                ))}
-              </div>
+    <>
+      <Card>
+        <CardContent className="pt-6">
+          <div className="flex justify-between items-start mb-3">
+            <div className="flex-1">
+              <h3 className="font-semibold text-lg">{testType}</h3>
+              <p className="text-sm text-muted-foreground">{formatDate(createdAt)}</p>
             </div>
-          )}
-        </div>
-      </CardContent>
+            <div className="flex items-center gap-2">
+              <Badge variant={status === "completed" ? "default" : "secondary"}>
+                {status === "completed" ? (
+                  <>
+                    <CheckCircle className="h-3 w-3 mr-1" /> Completed
+                  </>
+                ) : (
+                  <>
+                    <Clock className="h-3 w-3 mr-1" /> Pending
+                  </>
+                )}
+              </Badge>
+              {showModifyButtons && (
+                <div className="flex gap-1">
+                  <Button size="sm" variant="ghost" onClick={handleEdit} title="Edit request">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => setDeleteDialogOpen(true)}
+                    title="Delete request"
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="space-y-2">
+            <div>
+              <p className="text-sm font-medium">Details:</p>
+              <p className="text-sm text-muted-foreground">{details}</p>
+            </div>
+            <div className="border-t pt-2 mt-2">
+              <p className="text-xs text-muted-foreground">
+                Requested by: {requestedBy.name} ({requestedBy.role})
+              </p>
+            </div>
 
-      {/* File Preview Dialog */}
-      {selectedFile && (
-        <StudentFilePreviewDialog
-          open={previewDialogOpen}
-          onOpenChange={setPreviewDialogOpen}
-          patientId={patientId}
-          fileId={selectedFile.fileId}
-          fileName={selectedFile.fileName}
-          requiresPagination={selectedFile.requiresPagination}
-          pageRange={selectedFile.pageRange}
-        />
-      )}
-    </Card>
+            {/* Display approved files when request is completed */}
+            {status === "completed" && approvedFiles.length > 0 && (
+              <div className="border-t pt-3 mt-3">
+                <p className="text-sm font-medium mb-2 flex items-center gap-2">
+                  <FileText className="h-4 w-4" />
+                  Approved Files:
+                </p>
+                <div className="space-y-2">
+                  {approvedFiles.map((file) => (
+                    <div
+                      key={file.id}
+                      className="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.display_name}</p>
+                        {file.page_range && (
+                          <p className="text-xs text-muted-foreground">Pages: {file.page_range}</p>
+                        )}
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handlePreviewFile(file)}
+                        className="ml-2"
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Preview
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+
+        {/* File Preview Dialog */}
+        {selectedFile && (
+          <StudentFilePreviewDialog
+            open={previewDialogOpen}
+            onOpenChange={setPreviewDialogOpen}
+            patientId={patientId}
+            fileId={selectedFile.fileId}
+            fileName={selectedFile.fileName}
+            requiresPagination={selectedFile.requiresPagination}
+            pageRange={selectedFile.pageRange}
+          />
+        )}
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Investigation Request</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this {testType} request? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 }
