@@ -177,12 +177,6 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
               <label className="text-sm font-medium text-gray-500">Bed</label>
               <p className="text-sm text-gray-900">{patient.bed}</p>
             </div>
-            {patient.phone_number ? (
-              <div>
-                <label className="text-sm font-medium text-gray-500">Phone</label>
-                <p className="text-sm text-gray-900">{patient.phone_number}</p>
-              </div>
-            ) : null}
             {patient.phone_number && (
               <div>
                 <label className="text-sm font-medium text-gray-500">Phone</label>
