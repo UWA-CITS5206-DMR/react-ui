@@ -49,14 +49,11 @@ export default function GoogleForms() {
     <div className="space-y-4">
       <div className="mb-6">
         <h2 className="text-2xl font-bold text-gray-900 mb-2">Google Forms</h2>
-        <p className="text-gray-600">
-          Please complete the following forms as required for your patient care documentation.
-        </p>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {googleForms.map((form) => (
-          <Card key={form.id} className="hover:shadow-lg transition-shadow">
+          <Card key={form.id} className="hover:shadow-lg transition-shadow flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-hospital-blue" />
@@ -66,14 +63,16 @@ export default function GoogleForms() {
                 <CardDescription className="mt-2">{form.description}</CardDescription>
               )}
             </CardHeader>
-            <CardContent>
-              <Button
-                onClick={() => window.open(form.url, "_blank", "noopener,noreferrer")}
-                className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
-              >
-                <ExternalLink className="h-4 w-4 mr-2" />
-                Open Form
-              </Button>
+            <CardContent className="flex flex-col flex-1">
+              <div className="mt-auto">
+                <Button
+                  onClick={() => window.open(form.url, "_blank", "noopener,noreferrer")}
+                  className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
+                >
+                  <ExternalLink className="h-4 w-4 mr-2" />
+                  Open Form
+                </Button>
+              </div>
             </CardContent>
           </Card>
         ))}
