@@ -4,6 +4,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
 import { apiClientV2 } from "@/lib/queryClient";
+import { VITAL_SIGN_CONFIGS, BLOOD_PRESSURE_CONFIG, BLOOD_PRESSURE } from "@/lib/vital-signs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -152,11 +153,11 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Systolic BP */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-systolic">Systolic BP (mmHg)</Label>
+              <Label htmlFor="bulk-systolic">{`${BLOOD_PRESSURE_CONFIG.systolic.label} (${BLOOD_PRESSURE.unit})`}</Label>
               <Input
                 id="bulk-systolic"
-                type="number"
-                placeholder="120"
+                type={BLOOD_PRESSURE_CONFIG.systolic.type}
+                placeholder={BLOOD_PRESSURE_CONFIG.systolic.placeholder}
                 value={formData.systolic}
                 onChange={(e) => updateFormData("systolic", e.target.value)}
               />
@@ -164,11 +165,11 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Diastolic BP */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-diastolic">Diastolic BP (mmHg)</Label>
+              <Label htmlFor="bulk-diastolic">{`${BLOOD_PRESSURE_CONFIG.diastolic.label} (${BLOOD_PRESSURE.unit})`}</Label>
               <Input
                 id="bulk-diastolic"
-                type="number"
-                placeholder="80"
+                type={BLOOD_PRESSURE_CONFIG.diastolic.type}
+                placeholder={BLOOD_PRESSURE_CONFIG.diastolic.placeholder}
                 value={formData.diastolic}
                 onChange={(e) => updateFormData("diastolic", e.target.value)}
               />
@@ -176,11 +177,11 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Heart Rate */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-heartRate">Heart Rate (bpm)</Label>
+              <Label htmlFor="bulk-heartRate">{`${VITAL_SIGN_CONFIGS.heartRate.label} (${VITAL_SIGN_CONFIGS.heartRate.unit})`}</Label>
               <Input
                 id="bulk-heartRate"
-                type="number"
-                placeholder="72"
+                type={VITAL_SIGN_CONFIGS.heartRate.type}
+                placeholder={VITAL_SIGN_CONFIGS.heartRate.placeholder}
                 value={formData.heartRate}
                 onChange={(e) => updateFormData("heartRate", e.target.value)}
               />
@@ -188,12 +189,12 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Temperature */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-temperature">Temperature (°C)</Label>
+              <Label htmlFor="bulk-temperature">{`${VITAL_SIGN_CONFIGS.temperature.label} (${VITAL_SIGN_CONFIGS.temperature.unit})`}</Label>
               <Input
                 id="bulk-temperature"
-                type="number"
-                step="0.1"
-                placeholder="36.5"
+                type={VITAL_SIGN_CONFIGS.temperature.type}
+                step={VITAL_SIGN_CONFIGS.temperature.step}
+                placeholder={VITAL_SIGN_CONFIGS.temperature.placeholder}
                 value={formData.temperature}
                 onChange={(e) => updateFormData("temperature", e.target.value)}
               />
@@ -201,11 +202,11 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Respiratory Rate */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-respiratoryRate">Respiratory Rate (/min)</Label>
+              <Label htmlFor="bulk-respiratoryRate">{`${VITAL_SIGN_CONFIGS.respiratoryRate.label} (${VITAL_SIGN_CONFIGS.respiratoryRate.unit})`}</Label>
               <Input
                 id="bulk-respiratoryRate"
-                type="number"
-                placeholder="16"
+                type={VITAL_SIGN_CONFIGS.respiratoryRate.type}
+                placeholder={VITAL_SIGN_CONFIGS.respiratoryRate.placeholder}
                 value={formData.respiratoryRate}
                 onChange={(e) => updateFormData("respiratoryRate", e.target.value)}
               />
@@ -213,11 +214,11 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Oxygen Saturation */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-oxygenSaturation">O2 Saturation (%)</Label>
+              <Label htmlFor="bulk-oxygenSaturation">{`${VITAL_SIGN_CONFIGS.oxygenSaturation.label} (${VITAL_SIGN_CONFIGS.oxygenSaturation.unit})`}</Label>
               <Input
                 id="bulk-oxygenSaturation"
-                type="number"
-                placeholder="98"
+                type={VITAL_SIGN_CONFIGS.oxygenSaturation.type}
+                placeholder={VITAL_SIGN_CONFIGS.oxygenSaturation.placeholder}
                 value={formData.oxygenSaturation}
                 onChange={(e) => updateFormData("oxygenSaturation", e.target.value)}
               />
@@ -225,12 +226,12 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Blood Sugar */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-bloodSugar">Blood Sugar (mg/dL)</Label>
+              <Label htmlFor="bulk-bloodSugar">{`${VITAL_SIGN_CONFIGS.bloodSugar.label} (${VITAL_SIGN_CONFIGS.bloodSugar.unit})`}</Label>
               <Input
                 id="bulk-bloodSugar"
-                type="number"
-                step="0.1"
-                placeholder="5.5"
+                type={VITAL_SIGN_CONFIGS.bloodSugar.type}
+                step={VITAL_SIGN_CONFIGS.bloodSugar.step}
+                placeholder={VITAL_SIGN_CONFIGS.bloodSugar.placeholder}
                 value={formData.bloodSugar}
                 onChange={(e) => updateFormData("bloodSugar", e.target.value)}
               />
@@ -238,13 +239,21 @@ export function BulkVitalSignsForm({ patient }: BulkVitalSignsFormProps) {
 
             {/* Pain Score */}
             <div className="space-y-2">
-              <Label htmlFor="bulk-painScore">Pain Score (0-10)</Label>
+              <Label htmlFor="bulk-painScore">{`${VITAL_SIGN_CONFIGS.painScore.label} (${VITAL_SIGN_CONFIGS.painScore.unit})`}</Label>
               <Input
                 id="bulk-painScore"
-                type="number"
-                min="0"
-                max="10"
-                placeholder="0"
+                type={VITAL_SIGN_CONFIGS.painScore.type}
+                min={
+                  VITAL_SIGN_CONFIGS.painScore.min
+                    ? Number(VITAL_SIGN_CONFIGS.painScore.min)
+                    : undefined
+                }
+                max={
+                  VITAL_SIGN_CONFIGS.painScore.max
+                    ? Number(VITAL_SIGN_CONFIGS.painScore.max)
+                    : undefined
+                }
+                placeholder={VITAL_SIGN_CONFIGS.painScore.placeholder}
                 value={formData.painScore}
                 onChange={(e) => updateFormData("painScore", e.target.value)}
               />

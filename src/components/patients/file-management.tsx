@@ -191,7 +191,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
               </Select>
               {selectedCategory === "Admission" && (
                 <p className="text-xs text-blue-600 mt-1">
-                  ℹ️ Admission files will be visible to all student groups by default
+                  Admission files will be visible to all student groups by default
                 </p>
               )}
             </div>
@@ -273,9 +273,9 @@ export default function FileManagement({ patientId }: FileManagementProps) {
         <div className="bg-blue-50 p-3 rounded-lg">
           <h4 className="text-sm font-medium text-blue-900 mb-2">File Access Control</h4>
           <p className="text-xs text-blue-700">
-            Files uploaded here can be linked to student lab requests. When you approve a blood test
-            or imaging request in the Instructor Controls, you can specify which files students can
-            access as approved_files.
+            Files uploaded here can be linked to student Investigation Requests. When you approve a
+            blood test or imaging request in the Instructor Controls, you can specify which files
+            students can access as approved_files.
           </p>
         </div>
       </CardContent>

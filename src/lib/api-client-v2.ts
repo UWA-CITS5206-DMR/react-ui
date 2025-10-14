@@ -240,7 +240,6 @@ export interface Patient {
   mrn: string;
   ward: string;
   bed: string;
-  email: string;
   phone_number?: string;
   created_at: ISODateString;
   updated_at: ISODateString;
@@ -255,7 +254,6 @@ export interface PatientCreate {
   mrn: string;
   ward: string;
   bed: string;
-  email: string;
   phone_number?: string;
 }
 

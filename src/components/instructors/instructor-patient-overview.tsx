@@ -93,10 +93,6 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
               <label className="text-sm font-medium text-gray-500">Bed</label>
               <p className="text-sm text-gray-900">{patient.bed}</p>
             </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Email</label>
-              <p className="text-sm text-gray-900">{patient.email}</p>
-            </div>
             {patient.phone_number && (
               <div>
                 <label className="text-sm font-medium text-gray-500">Phone</label>
@@ -106,9 +102,11 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
           </div>
         </div>
 
-        {/* Lab Requests Overview */}
+        {/* Investigation Requests Overview */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Lab Requests Overview</h3>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+            Investigation Requests Overview
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Card>
               <CardHeader className="pb-3">
@@ -140,7 +138,9 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
           {totalLabRequests > 0 && (
             <div className="mt-4 p-3 bg-gray-50 rounded-lg">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-700">Total Lab Requests</span>
+                <span className="text-sm font-medium text-gray-700">
+                  Total Investigation Requests
+                </span>
                 <span className="text-lg font-semibold text-gray-900">{totalLabRequests}</span>
               </div>
               <div className="mt-2 text-xs text-gray-500">

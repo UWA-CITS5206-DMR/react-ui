@@ -4,7 +4,7 @@ This document provides a comprehensive project overview, system architecture, co
 
 ## 1. Project Purpose and Context
 
-This is a React + TypeScript-based Digital Medical Records (DMR) simulation frontend for teaching practice: students record observations and notes, and initiate lab requests under shared group accounts; instructors review and manage requests. The system serves approximately 40 student groups rotating through 4 wards during a 5-week simulation period.
+This is a React + TypeScript-based Digital Medical Records (DMR) simulation frontend for teaching practice: students record observations and notes, and initiate investigation requests under shared group accounts; instructors review and manage requests. The system serves approximately 40 student groups rotating through 4 wards during a 5-week simulation period.
 
 **Key Characteristics:**
 

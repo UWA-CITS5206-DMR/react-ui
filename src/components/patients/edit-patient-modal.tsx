@@ -30,7 +30,9 @@ export default function EditPatientModal({
     first_name: "",
     last_name: "",
     date_of_birth: "",
-    email: "",
+    mrn: "",
+    ward: "",
+    bed: "",
     phone_number: "",
     gender: "unspecified",
   });
@@ -45,7 +47,9 @@ export default function EditPatientModal({
         first_name: patient.first_name,
         last_name: patient.last_name,
         date_of_birth: patient.date_of_birth,
-        email: patient.email,
+        mrn: patient.mrn,
+        ward: patient.ward,
+        bed: patient.bed,
         phone_number: patient.phone_number || "",
         gender: patient.gender,
       });
@@ -81,7 +85,9 @@ export default function EditPatientModal({
       first_name: formData.first_name,
       last_name: formData.last_name,
       date_of_birth: formData.date_of_birth,
-      email: formData.email,
+      mrn: formData.mrn,
+      ward: formData.ward,
+      bed: formData.bed,
       phone_number: formData.phone_number || undefined, // Convert empty string to undefined
       gender: (formData.gender as any) || undefined,
     };
@@ -141,14 +147,34 @@ export default function EditPatientModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="mrn">MRN *</Label>
             <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
+              id="mrn"
+              value={(formData.mrn as string) ?? ""}
+              onChange={(e) => handleChange("mrn", e.target.value)}
               required
             />
+          </div>
+
+          <div className="space-y-2 grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="ward">Ward *</Label>
+              <Input
+                id="ward"
+                value={(formData.ward as string) ?? ""}
+                onChange={(e) => handleChange("ward", e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="bed">Bed *</Label>
+              <Input
+                id="bed"
+                value={(formData.bed as string) ?? ""}
+                onChange={(e) => handleChange("bed", e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

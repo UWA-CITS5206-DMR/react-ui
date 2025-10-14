@@ -28,7 +28,9 @@ export default function CreatePatientModal({
     first_name: "",
     last_name: "",
     date_of_birth: "",
-    email: "",
+    mrn: "",
+    ward: "",
+    bed: "",
     phone_number: "",
     gender: "unspecified",
   });
@@ -50,7 +52,9 @@ export default function CreatePatientModal({
         first_name: "",
         last_name: "",
         date_of_birth: "",
-        email: "",
+        mrn: "",
+        ward: "",
+        bed: "",
         phone_number: "",
         gender: "unspecified",
       });
@@ -121,14 +125,34 @@ export default function CreatePatientModal({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email *</Label>
+            <Label htmlFor="mrn">MRN *</Label>
             <Input
-              id="email"
-              type="email"
-              value={formData.email}
-              onChange={(e) => handleChange("email", e.target.value)}
+              id="mrn"
+              value={formData.mrn}
+              onChange={(e) => handleChange("mrn", e.target.value)}
               required
             />
+          </div>
+
+          <div className="space-y-2 grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="ward">Ward *</Label>
+              <Input
+                id="ward"
+                value={formData.ward}
+                onChange={(e) => handleChange("ward", e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <Label htmlFor="bed">Bed *</Label>
+              <Input
+                id="bed"
+                value={formData.bed}
+                onChange={(e) => handleChange("bed", e.target.value)}
+                required
+              />
+            </div>
           </div>
 
           <div className="space-y-2">

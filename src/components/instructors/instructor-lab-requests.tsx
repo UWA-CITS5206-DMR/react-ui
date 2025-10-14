@@ -477,7 +477,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
 
       {/* Approval Dialog */}
       <Dialog open={approvalDialog.open} onOpenChange={closeApprovalDialog}>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden flex flex-col">
+        <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col min-h-0">
           <DialogHeader>
             <DialogTitle>Approve Request</DialogTitle>
             <DialogDescription>
@@ -485,7 +485,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
             </DialogDescription>
           </DialogHeader>
 
-          <div className="flex-1 overflow-hidden flex flex-col gap-4">
+          <div className="flex-1 min-h-0 flex flex-col gap-4">
             {approvalDialog.request && (
               <div className="bg-gray-50 p-4 rounded-lg space-y-2">
                 <div className="flex items-center justify-between">
@@ -502,9 +502,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               </div>
             )}
 
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 min-h-0">
               <Label className="mb-2 block">Select Files to Approve:</Label>
-              <ScrollArea className="h-full border rounded-lg p-4">
+              <ScrollArea className="h-64 overflow-auto border rounded-lg p-4">
                 {patientFiles.length === 0 ? (
                   <p className="text-sm text-gray-500 text-center py-4">
                     No files available for this patient

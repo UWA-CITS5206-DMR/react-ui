@@ -149,7 +149,7 @@ export default function InstructorDashboard() {
                       value="requests"
                       className="border-b-2 border-transparent data-[state=active]:border-hospital-blue data-[state=active]:text-hospital-blue py-3 px-3 rounded-none bg-transparent whitespace-nowrap text-sm font-medium transition-colors hover:text-hospital-blue"
                     >
-                      Lab Requests
+                      Investigation Requests
                     </TabsTrigger>
                     <TabsTrigger
                       value="google-forms"
