@@ -283,9 +283,9 @@ export default function FileManagement({ patientId }: FileManagementProps) {
         <div className="bg-blue-50 p-3 rounded-lg">
           <h4 className="text-sm font-medium text-blue-900 mb-2">File Access Control</h4>
           <p className="text-xs text-blue-700">
-            Files uploaded here can be linked to student investigation requests or manually
-            released to selected student groups using the Release button. Use manual release to
-            grant immediate access without waiting for a request approval.
+            Files uploaded here can be linked to student investigation requests or manually released
+            to selected student groups using the Release button. Use manual release to grant
+            immediate access without waiting for a request approval.
           </p>
         </div>
       </CardContent>

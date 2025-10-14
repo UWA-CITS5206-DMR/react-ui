@@ -53,7 +53,11 @@ export default function FileReleaseDialog({
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
-  const { data: studentGroups, isLoading, error } = useQuery<User[], Error>({
+  const {
+    data: studentGroups,
+    isLoading,
+    error,
+  } = useQuery<User[], Error>({
     queryKey: ["instructors", "student-groups"],
     queryFn: () => apiClientV2.instructors.studentGroups.list(),
     enabled: open,
@@ -184,7 +188,9 @@ export default function FileReleaseDialog({
               {!isLoading && !error && groups.length === 0 && (
                 <Alert>
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>No student groups available for manual release.</AlertDescription>
+                  <AlertDescription>
+                    No student groups available for manual release.
+                  </AlertDescription>
                 </Alert>
               )}
 
@@ -195,7 +201,9 @@ export default function FileReleaseDialog({
                       const fullName = [group.first_name, group.last_name]
                         .filter(Boolean)
                         .join(" ");
-                      const displayName = fullName ? `${fullName} (@${group.username})` : group.username;
+                      const displayName = fullName
+                        ? `${fullName} (@${group.username})`
+                        : group.username;
                       const isChecked = formState.selectedGroups.has(group.id);
                       return (
                         <label
@@ -228,24 +236,24 @@ export default function FileReleaseDialog({
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="pageRange" className="text-sm font-medium text-gray-700">
-                Page Range
-              </Label>
-              <Input
-                id="pageRange"
-                value={formState.pageRange}
-                placeholder={file.requires_pagination ? "e.g. 1-3,5" : "Optional, leave blank to grant full file"}
-                onChange={(event) =>
-                  setFormState((prev) => ({ ...prev, pageRange: event.target.value }))
-                }
-              />
-              <p className="text-xs text-muted-foreground">
-                {file.requires_pagination
-                  ? "Provide the page range students can view. Use comma separated ranges (e.g. 1-3,5)."
-                  : "Optional: supply a page range to limit access for this release."}
-              </p>
-            </div>
+            {file.requires_pagination && (
+              <div className="space-y-2">
+                <Label htmlFor="pageRange" className="text-sm font-medium text-gray-700">
+                  Page Range
+                </Label>
+                <Input
+                  id="pageRange"
+                  value={formState.pageRange}
+                  placeholder="e.g. 1-3,5"
+                  onChange={(event) =>
+                    setFormState((prev) => ({ ...prev, pageRange: event.target.value }))
+                  }
+                />
+                <p className="text-xs text-muted-foreground">
+                  Provide the page range students can view. Use comma separated ranges (e.g. 1-3,5).
+                </p>
+              </div>
+            )}
 
             <div className="text-xs text-gray-500">
               Manual release entries are tracked in the Approved Files list and can be revoked by
@@ -262,7 +270,11 @@ export default function FileReleaseDialog({
         )}
 
         <DialogFooter className="pt-4">
-          <Button variant="outline" onClick={() => onOpenChange(false)} disabled={releaseMutation.isPending}>
+          <Button
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+            disabled={releaseMutation.isPending}
+          >
             Cancel
           </Button>
           <Button

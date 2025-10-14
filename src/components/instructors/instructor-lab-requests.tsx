@@ -18,17 +18,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
+import { formatDate } from "@/lib/utils";
 import { apiClientV2 } from "@/lib/queryClient";
-import {
-  CheckCircle,
-  Clock,
-  ChevronLeft,
-  ChevronRight,
-  FileText,
-  Calendar,
-  User,
-  Eye,
-} from "lucide-react";
+import { CheckCircle, Clock, ChevronLeft, ChevronRight, FileText, User, Eye } from "lucide-react";
 import type {
   BloodTestRequest,
   ImagingRequest,
@@ -284,89 +276,77 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
     <Card key={request.id} className="mb-4">
       <CardContent className="pt-6">
         <div className="space-y-3">
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-2">
-                <h3 className="font-semibold text-lg">{request.test_type}</h3>
-                <Badge
-                  variant={request.status === "completed" ? "default" : "secondary"}
-                  className={request.status === "completed" ? "bg-green-600" : ""}
-                >
-                  {request.status === "completed" ? (
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                  ) : (
-                    <Clock className="h-3 w-3 mr-1" />
-                  )}
-                  {request.status}
-                </Badge>
-              </div>
-
-              <div className="space-y-2 text-sm text-gray-600">
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span>Student Group: {request.user.username}</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span>
-                    Patient: {request.patient.first_name} {request.patient.last_name}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <User className="h-4 w-4" />
-                  <span>
-                    Requested by: {request.name} ({request.role})
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    {new Date(request.created_at).toLocaleDateString()} at{" "}
-                    {new Date(request.created_at).toLocaleTimeString()}
-                  </span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <FileText className="h-4 w-4 mt-0.5" />
-                  <span className="flex-1">
-                    <strong>Details:</strong> {request.details}
-                  </span>
-                </div>
-              </div>
-
-              {request.approved_files && request.approved_files.length > 0 && (
-                <div className="mt-3 pt-3 border-t">
-                  <p className="text-sm font-medium mb-2">Approved Files:</p>
-                  <div className="space-y-2">
-                    {request.approved_files.map((file) => (
-                      <div
-                        key={file.id}
-                        className="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="flex-1 min-w-0 flex items-center gap-2">
-                          <FileText className="h-3 w-3 flex-shrink-0" />
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium truncate">{file.display_name}</p>
-                            {file.page_range && (
-                              <p className="text-xs text-gray-500">Pages: {file.page_range}</p>
-                            )}
-                          </div>
-                        </div>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handlePreviewFile(file, request.patient.id)}
-                          className="ml-2"
-                        >
-                          <Eye className="h-4 w-4 mr-1" />
-                          Preview
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
+          <div className="flex justify-between items-start mb-3">
+            <div>
+              <h3 className="font-semibold text-lg">{request.test_type}</h3>
+              <p className="text-sm text-muted-foreground">{formatDate(request.created_at)}</p>
+            </div>
+            <Badge variant={request.status === "completed" ? "default" : "secondary"}>
+              {request.status === "completed" ? (
+                <>
+                  <CheckCircle className="h-3 w-3 mr-1" />
+                  Completed
+                </>
+              ) : (
+                <>
+                  <Clock className="h-3 w-3 mr-1" />
+                  Pending
+                </>
               )}
+            </Badge>
+          </div>
+
+          <div className="space-y-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>Student Group: {request.user.username}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <User className="h-4 w-4" />
+              <span>
+                Requested by: {request.name} ({request.role})
+              </span>
+            </div>
+            <div className="flex items-start gap-2">
+              <FileText className="h-4 w-4 mt-0.5" />
+              <span className="flex-1">
+                <strong>Details:</strong> {request.details}
+              </span>
             </div>
           </div>
+
+          {request.approved_files && request.approved_files.length > 0 && (
+            <div className="mt-3 pt-3 border-t">
+              <p className="text-sm font-medium mb-2">Approved Files:</p>
+              <div className="space-y-2">
+                {request.approved_files.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between p-2 bg-gray-50 rounded-md hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0 flex items-center gap-2">
+                      <FileText className="h-3 w-3 flex-shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.display_name}</p>
+                        {file.page_range && (
+                          <p className="text-xs text-gray-500">Pages: {file.page_range}</p>
+                        )}
+                      </div>
+                    </div>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handlePreviewFile(file, request.patient.id)}
+                      className="ml-2"
+                    >
+                      <Eye className="h-4 w-4 mr-1" />
+                      Preview
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
           {request.status === "pending" && (
             <div className="flex gap-2 pt-3 border-t">
