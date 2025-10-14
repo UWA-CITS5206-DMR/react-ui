@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Trash2 } from "lucide-react";
 
 export interface MedicationFormData {
@@ -30,9 +29,9 @@ export function MedicationOrderCard({
   onRemove,
 }: MedicationOrderCardProps) {
   return (
-    <Card className="mb-4">
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
-        <CardTitle className="text-lg">Medication {index + 1}</CardTitle>
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-3">
+        <h4 className="text-lg font-medium">Medication {index + 1}</h4>
         {canRemove && (
           <Button
             type="button"
@@ -44,8 +43,8 @@ export function MedicationOrderCard({
             <Trash2 className="h-4 w-4" />
           </Button>
         )}
-      </CardHeader>
-      <CardContent className="space-y-4">
+      </div>
+      <div className="space-y-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <Label htmlFor={`medication-${index}`} className="text-sm font-medium">
@@ -88,7 +87,7 @@ export function MedicationOrderCard({
             Include frequency, route, duration, and indication in your instructions
           </p>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

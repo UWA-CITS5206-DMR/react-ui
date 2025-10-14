@@ -17,12 +17,13 @@ import {
 
 interface IndividualVitalSignsFormProps {
   patient: Patient;
+  onSuccess?: () => void;
 }
 
 /**
  * Individual vital signs entry form component
  */
-export function IndividualVitalSignsForm({ patient }: IndividualVitalSignsFormProps) {
+export function IndividualVitalSignsForm({ patient, onSuccess }: IndividualVitalSignsFormProps) {
   const { user } = useAuth();
 
   const [bloodPressure, setBloodPressure] = useState({ systolic: "", diastolic: "" });
@@ -36,43 +37,64 @@ export function IndividualVitalSignsForm({ patient }: IndividualVitalSignsFormPr
   const bloodPressureMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setBloodPressure({ systolic: "", diastolic: "" }),
+    onSuccess: () => {
+      setBloodPressure({ systolic: "", diastolic: "" });
+      onSuccess?.();
+    },
   });
 
   const heartRateMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setHeartRate(""),
+    onSuccess: () => {
+      setHeartRate("");
+      onSuccess?.();
+    },
   });
 
   const temperatureMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setTemperature(""),
+    onSuccess: () => {
+      setTemperature("");
+      onSuccess?.();
+    },
   });
 
   const respiratoryRateMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setRespiratoryRate(""),
+    onSuccess: () => {
+      setRespiratoryRate("");
+      onSuccess?.();
+    },
   });
 
   const oxygenSaturationMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setOxygenSaturation(""),
+    onSuccess: () => {
+      setOxygenSaturation("");
+      onSuccess?.();
+    },
   });
 
   const bloodSugarMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setBloodSugar(""),
+    onSuccess: () => {
+      setBloodSugar("");
+      onSuccess?.();
+    },
   });
 
   const painScoreMutation = useVitalSignMutation({
     patientId: patient.id,
     user,
-    onSuccess: () => setPainScore(""),
+    onSuccess: () => {
+      setPainScore("");
+      onSuccess?.();
+    },
   });
 
   if (!user) {

@@ -60,7 +60,8 @@ Students operate using a **student group shared account model**, where each stud
 
 - View patient records and documents (with page-level access control)
 - Submit observations (vital signs, clinical notes)
-- Create investigation requests (imaging, blood tests)
+- Create, edit, and delete clinical notes (SOAP notes)
+- Create, edit, and delete investigation requests (imaging, blood tests)
 - Order medications
 - Create discharge summaries
 - Access approved files for completed requests only

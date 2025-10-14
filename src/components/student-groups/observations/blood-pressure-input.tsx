@@ -28,7 +28,7 @@ export function BloodPressureInput({
   const isValid = systolic && diastolic;
 
   return (
-    <Card>
+    <Card className="bg-muted/50">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Activity className="h-4 w-4" />
@@ -36,8 +36,8 @@ export function BloodPressureInput({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
-          <div>
+        <div className="flex gap-4 items-end">
+          <div className="flex-1">
             <Label htmlFor="bp-systolic">
               {BLOOD_PRESSURE_CONFIG.systolic.label} ({BLOOD_PRESSURE_CONFIG.systolic.unit})
             </Label>
@@ -49,7 +49,7 @@ export function BloodPressureInput({
               onChange={(e) => onSystolicChange(e.target.value)}
             />
           </div>
-          <div>
+          <div className="flex-1">
             <Label htmlFor="bp-diastolic">
               {BLOOD_PRESSURE_CONFIG.diastolic.label} ({BLOOD_PRESSURE_CONFIG.diastolic.unit})
             </Label>
@@ -61,8 +61,8 @@ export function BloodPressureInput({
               onChange={(e) => onDiastolicChange(e.target.value)}
             />
           </div>
-          <Button onClick={onSubmit} disabled={!isValid || isLoading}>
-            {isLoading ? "Recording..." : "Record"}
+          <Button onClick={onSubmit} disabled={!isValid || isLoading} className="w-24">
+            {isLoading ? "Adding..." : "Add"}
           </Button>
         </div>
       </CardContent>

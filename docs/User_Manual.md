@@ -53,15 +53,16 @@ Notes
 
 ### Role-based Homepages
 
-- Student Dashboard: patient list + tabs for Overview, Observations, SOAP Notes, Investigation Requests, Medication Orders, and Discharge Summary.
-- Instructor Dashboard: patient list + tabs for Overview, File Management, and Investigation Requests.
+- Student Dashboard: patient list + sections for Overview, Observations, SOAP Notes, Investigation Requests, Medication Orders, and Discharge Summary.
+- Instructor Dashboard: patient list + sections for Overview, File Management, and Investigation Requests.
 - Admin: Administration is performed in the Django Admin (backend), not in this web app. Ask your coordinator for the backend admin URL (commonly your API domain with "/admin").
 
 ### Interface Basics
 
-- Patient List (left sidebar): choose a patient. The app remembers the last selected patient and tab for convenience.
+- Patient List (left sidebar): choose a patient. The app remembers the last selected patient and section for convenience.
 - Top Navigation: shows your role and provides quick access to dashboards.
-- Tabs: switch between feature areas within a patient.
+- Navigation tabs: switch between feature areas within a patient.
+- Floating action buttons: blue + buttons in the bottom-right corner provide quick access to create new records (notes, observations, requests, orders).
 - Toasts: appear at the bottom-right for success/errors.
 
 ---
@@ -79,47 +80,71 @@ Notes
 ### Record Observations
 
 - Go to Observations tab.
-- Two sub-tabs:
-  - Current Observations: view latest vitals and historical trends.
-  - Add Observations: enter new vitals and submit.
+- The screen displays current observations by default, showing latest vitals and historical trends.
+- Click the blue floating + button in the bottom-right corner to add new observations.
+- In the dialog, choose between:
+  - Individual Entry: record one vital sign at a time.
+  - Bulk Entry: record multiple vital signs together.
 - After saving, your entries are associated with your group account.
 
 Tips
 
 - Ensure values are realistic and complete; the backend may validate ranges.
+- The floating button provides quick access to add observations without switching views.
 
 ### Clinical Notes (SOAP)
 
 - Go to SOAP Notes tab.
-- Two sub-tabs:
-  - View Notes: lists all notes with timestamps.
-  - Create Note: write clinical notes; a free-form text area supports SOAP structure.
-- Sign-off: enter your own Name and Role before saving (because the system uses a shared group account, sign-off tracks the individual author).
+- The screen displays all notes by default with timestamps and details.
+- You can edit or delete your own notes using the Edit (pencil) and Delete (trash) buttons on each note card.
+- Click the blue floating + button in the bottom-right corner to create a new note.
+- In the dialog:
+  - Write clinical notes using the free-form text area (supports SOAP structure).
+  - Enter your own Name and Role before saving (because the system uses a shared group account, sign-off tracks the individual author).
 - Click Save Note. A success toast confirms it.
+- Edit Note: Click the Edit button on any note to open the dialog and update its content, name, or role.
+- Delete Note: Click the Delete button and confirm to permanently remove a note.
 
 Validation
 
-- Content, Name, and Role are required. You’ll see a validation error if fields are empty.
+- Content, Name, and Role are required. You'll see a validation error if fields are empty.
+
+Note
+
+- You can edit and delete your own notes at any time. Changes are permanent.
+- The same dialog is reused for both creating and editing notes.
 
 ### Investigation Requests (Blood Tests, Imaging)
 
 - Go to Investigation Requests tab.
-- Select Blood Tests or Imaging.
-- Each section has “View Requests” and “Create Request”.
-- Create Request:
-  - Fill in test type and details.
-  - Submit; the request status starts as “pending”.
-- Instructors will review and may attach “approved files” when marking completed.
+- Select Blood Tests or Imaging using the tabs.
+- The screen displays the request list for the selected category.
+- Click the blue floating + button in the bottom-right corner to create a new request.
+  - The button creates a request for the currently selected tab (Blood Tests or Imaging).
+- In the dialog:
+  - Fill in test type, clinical details, and other required fields.
+  - Enter your name and role for sign-off.
+  - Submit; the request status starts as "pending".
+- Edit Request: Click the Edit button on pending requests to update details.
+- Delete Request: Click the Delete button on pending requests to remove them.
+- Instructors will review and may attach "approved files" when marking completed.
 
 Viewing Requests
 
-- Use the lists to track your requests and statuses. For completed requests with approved files, you’ll see links or previews depending on access.
+- Use the lists to track your requests and statuses. For completed requests with approved files, you'll see links or previews depending on access.
+- You can only edit or delete pending requests. Once a request is completed, it cannot be modified.
+- The floating button adapts to the active tab, making it easy to create the right type of request.
 
 ### Medication Orders
 
 - Go to Medication Orders tab.
-- “View Orders” shows existing orders.
-- “Create Order” enables you to place a new medication order.
+- The screen displays all existing medication orders by default.
+- Click the blue floating + button in the bottom-right corner to create a new medication order.
+- In the dialog:
+  - Add one or more medications with dosage and instructions.
+  - Use the + button to add additional medications.
+  - Enter your name and role for sign-off.
+  - Submit the order(s).
 
 ### Discharge Summary
 
@@ -241,9 +266,9 @@ Administration for Admin users is handled via the Django Admin (backend), not wi
 
   - Check required fields; errors appear as toasts or inline messages
 
-- Navigation feels stuck on a previous tab/patient
+- Navigation feels stuck on a previous section/patient
 
-  - The app remembers your last selection; switch patients/tabs or clear browser storage if needed
+  - The app remembers your last selection; switch patients/sections or clear browser storage if needed
 
 - Supported browsers
   - Use recent versions of Chrome/Edge/Safari. If embedded PDF preview fails, download the file or try another browser.

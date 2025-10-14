@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { getErrorMessage } from "@/lib/error-utils";
@@ -80,19 +87,17 @@ export default function CreatePatientModal({
   // If a student somehow mounts this modal, don't render it.
   if (isStudent) return null;
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Create New Patient</h2>
-          <Button variant="ghost" size="sm" onClick={onClose}>
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Create New Patient</DialogTitle>
+          <DialogDescription>
+            Fill in the patient information below. Fields marked with * are required.
+          </DialogDescription>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="first_name">First Name *</Label>
             <Input
@@ -183,16 +188,16 @@ export default function CreatePatientModal({
             </select>
           </div>
 
-          <div className="flex justify-end space-x-3 pt-4">
+          <DialogFooter>
             <Button type="button" variant="outline" onClick={onClose}>
               Cancel
             </Button>
             <Button type="submit" disabled={createPatientMutation.isPending}>
               {createPatientMutation.isPending ? "Creating..." : "Create Patient"}
             </Button>
-          </div>
+          </DialogFooter>
         </form>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

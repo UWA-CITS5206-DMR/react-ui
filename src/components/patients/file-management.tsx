@@ -11,6 +11,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { useToast } from "@/hooks/use-toast";
@@ -31,6 +39,8 @@ export default function FileManagement({ patientId }: FileManagementProps) {
   const [requiresPagination, setRequiresPagination] = useState(false);
   const [previewFile, setPreviewFile] = useState<PatientFile | null>(null);
   const [releaseFile, setReleaseFile] = useState<PatientFile | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [fileToDelete, setFileToDelete] = useState<string | null>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -87,6 +97,8 @@ export default function FileManagement({ patientId }: FileManagementProps) {
         title: "File Deleted",
         description: "Patient file has been deleted successfully.",
       });
+      setDeleteDialogOpen(false);
+      setFileToDelete(null);
     },
     onError: (error: any) => {
       toast({
@@ -94,6 +106,8 @@ export default function FileManagement({ patientId }: FileManagementProps) {
         description: getErrorMessage(error, "Failed to delete file."),
         variant: "destructive",
       });
+      setDeleteDialogOpen(false);
+      setFileToDelete(null);
     },
   });
 
@@ -122,8 +136,13 @@ export default function FileManagement({ patientId }: FileManagementProps) {
   };
 
   const handleDelete = (fileId: string) => {
-    if (confirm("Are you sure you want to delete this file?")) {
-      deleteFileMutation.mutate(fileId);
+    setFileToDelete(fileId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = () => {
+    if (fileToDelete) {
+      deleteFileMutation.mutate(fileToDelete);
     }
   };
 
@@ -312,6 +331,34 @@ export default function FileManagement({ patientId }: FileManagementProps) {
           file={releaseFile}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete File</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete this file? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={deleteFileMutation.isPending}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleConfirmDelete}
+              disabled={deleteFileMutation.isPending}
+            >
+              {deleteFileMutation.isPending ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }

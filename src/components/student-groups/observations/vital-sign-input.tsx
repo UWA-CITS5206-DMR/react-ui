@@ -24,7 +24,7 @@ export function VitalSignInput({
   isLoading = false,
 }: VitalSignInputProps) {
   return (
-    <Card>
+    <Card className="bg-muted/50">
       <CardHeader>
         <CardTitle className="text-base flex items-center gap-2">
           <Activity className="h-4 w-4" />
@@ -32,8 +32,8 @@ export function VitalSignInput({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
-          <div>
+        <div className="flex gap-4 items-end">
+          <div className="flex-1">
             <Label htmlFor={config.key}>
               {config.label} {config.unit && `(${config.unit})`}
             </Label>
@@ -48,8 +48,8 @@ export function VitalSignInput({
               max={config.max}
             />
           </div>
-          <Button onClick={onSubmit} disabled={!value || isLoading}>
-            {isLoading ? "Recording..." : "Record"}
+          <Button onClick={onSubmit} disabled={!value || isLoading} className="w-24">
+            {isLoading ? "Adding..." : "Add"}
           </Button>
         </div>
       </CardContent>

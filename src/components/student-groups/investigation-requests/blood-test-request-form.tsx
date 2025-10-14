@@ -14,7 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { DialogFooter } from "@/components/ui/dialog";
 import { Send } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { BloodTestType } from "@/lib/api-client-v2";
@@ -22,12 +22,18 @@ import { BLOOD_TEST_OPTIONS, getBloodTestLabel } from "@/lib/constants";
 
 interface BloodTestRequestFormProps {
   patientId: string;
+  onSuccess?: () => void;
+  onCancel?: () => void;
 }
 
 /**
  * Blood test request form component
  */
-export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
+export function BloodTestRequestForm({
+  patientId,
+  onSuccess,
+  onCancel,
+}: BloodTestRequestFormProps) {
   const [testType, setTestType] = useState<BloodTestType | "">("");
   const [details, setDetails] = useState("");
   const [signOffName, setSignOffName] = useState("");
@@ -68,6 +74,7 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
       setDetails("");
       setSignOffName("");
       setSignOffRole("");
+      onSuccess?.();
     },
     onError: (error: any) => {
       toast({
@@ -95,60 +102,63 @@ export function BloodTestRequestForm({ patientId }: BloodTestRequestFormProps) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <Card>
-        <CardHeader>
-          <CardTitle>Blood Test Request</CardTitle>
-          <CardDescription>Submit a new blood test request for this patient</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Test Type Selection */}
-          <div className="space-y-2">
-            <Label htmlFor="blood-test-type">Test Type *</Label>
-            <Select value={testType} onValueChange={(value) => setTestType(value as BloodTestType)}>
-              <SelectTrigger id="blood-test-type">
-                <SelectValue placeholder="Select blood test type" />
-              </SelectTrigger>
-              <SelectContent>
-                {BLOOD_TEST_OPTIONS.map((test) => (
-                  <SelectItem key={test} value={test}>
-                    {getBloodTestLabel(test)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <div className="space-y-4 py-4">
+        {/* Test Type Selection */}
+        <div className="space-y-2">
+          <Label htmlFor="blood-test-type">Test Type *</Label>
+          <Select value={testType} onValueChange={(value) => setTestType(value as BloodTestType)}>
+            <SelectTrigger id="blood-test-type">
+              <SelectValue placeholder="Select blood test type" />
+            </SelectTrigger>
+            <SelectContent>
+              {BLOOD_TEST_OPTIONS.map((test) => (
+                <SelectItem key={test} value={test}>
+                  {getBloodTestLabel(test)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
 
-          {/* Clinical Details */}
-          <div className="space-y-2">
-            <Label htmlFor="blood-test-details">Clinical Details *</Label>
-            <Textarea
-              id="blood-test-details"
-              value={details}
-              onChange={(e) => setDetails(e.target.value)}
-              placeholder="Provide clinical details for this blood test request..."
-              rows={4}
-            />
-          </div>
-
-          {/* Sign-off Section */}
-          <SignOffSection
-            name={signOffName}
-            role={signOffRole}
-            onNameChange={setSignOffName}
-            onRoleChange={setSignOffRole}
-            idPrefix="blood-test"
+        {/* Clinical Details */}
+        <div className="space-y-2">
+          <Label htmlFor="blood-test-details">Clinical Details *</Label>
+          <Textarea
+            id="blood-test-details"
+            value={details}
+            onChange={(e) => setDetails(e.target.value)}
+            placeholder="Provide clinical details for this blood test request..."
+            rows={4}
           />
+        </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
-            disabled={createBloodTestMutation.isPending}
-          >
-            <Send className="h-4 w-4 mr-2" />
-            {createBloodTestMutation.isPending ? "Submitting..." : "Submit Blood Test Request"}
-          </Button>
-        </CardContent>
-      </Card>
+        {/* Sign-off Section */}
+        <SignOffSection
+          name={signOffName}
+          role={signOffRole}
+          onNameChange={setSignOffName}
+          onRoleChange={setSignOffRole}
+          idPrefix="blood-test"
+        />
+      </div>
+      <DialogFooter>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={onCancel}
+          disabled={createBloodTestMutation.isPending}
+        >
+          Cancel
+        </Button>
+        <Button
+          type="submit"
+          disabled={createBloodTestMutation.isPending}
+          className="bg-hospital-blue hover:bg-hospital-blue/90"
+        >
+          <Send className="h-4 w-4 mr-2" />
+          {createBloodTestMutation.isPending ? "Submitting..." : "Submit Blood Test Request"}
+        </Button>
+      </DialogFooter>
     </form>
   );
 }
