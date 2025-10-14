@@ -5,6 +5,7 @@ import type { Patient } from "@/lib/api-client-v2";
 import EditPatientModal from "./edit-patient-modal";
 import { getGenderLabel } from "@/lib/constants";
 import { formatDate } from "@/lib/utils";
+import { useAuth } from "@/hooks/use-auth";
 
 interface PatientHeaderProps {
   patient: Patient;
@@ -13,6 +14,8 @@ interface PatientHeaderProps {
 
 export default function PatientHeader({ patient, onPatientUpdated }: PatientHeaderProps) {
   const [isEditing, setIsEditing] = useState(false);
+  const { user } = useAuth();
+  const isStudent = user?.role === "student";
 
   const calculateAge = (dateOfBirth: string) => {
     const today = new Date();
@@ -42,15 +45,17 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
                 Patient ID: {patient.id}
               </span>
 
-              <Button
-                onClick={() => setIsEditing(true)}
-                variant="outline"
-                size="sm"
-                className="flex items-center space-x-2"
-              >
-                <Edit className="h-4 w-4" />
-                <span>Edit</span>
-              </Button>
+              {!isStudent && (
+                <Button
+                  onClick={() => setIsEditing(true)}
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center space-x-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  <span>Edit</span>
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
@@ -77,12 +82,15 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
       </div>
 
       {/* Edit Patient Modal */}
-      <EditPatientModal
-        isOpen={isEditing}
-        onClose={() => setIsEditing(false)}
-        patient={patient}
-        onPatientUpdated={handlePatientUpdated}
-      />
+      {/* Only render edit modal for non-students */}
+      {!isStudent && (
+        <EditPatientModal
+          isOpen={isEditing}
+          onClose={() => setIsEditing(false)}
+          patient={patient}
+          onPatientUpdated={handlePatientUpdated}
+        />
+      )}
     </>
   );
 }

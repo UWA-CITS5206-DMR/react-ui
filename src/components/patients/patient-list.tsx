@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import type { Patient } from "@/lib/api-client-v2";
 import CreatePatientModal from "./create-patient-modal";
 import { getGenderLabel } from "@/lib/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 interface PatientListProps {
   patients: Patient[];
@@ -25,6 +26,8 @@ export default function PatientList({
   showCreateButton = true, // Default to showing create button
 }: PatientListProps) {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const { user } = useAuth();
+  const isStudent = user?.role === "student";
 
   const getStatusColor = (status?: string) => {
     switch (status?.toLowerCase()) {
@@ -90,16 +93,17 @@ export default function PatientList({
             <>
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold text-gray-900">Patient List</h2>
-                {showCreateButton && ( // ONLY show if showCreateButton is true
-                  <Button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    size="sm"
-                    className="bg-hospital-blue hover:bg-hospital-blue/90"
-                  >
-                    <Plus className="h-4 w-4 mr-1" />
-                    Add Patient
-                  </Button>
-                )}
+                {showCreateButton &&
+                  !isStudent && ( // ONLY show if showCreateButton is true AND not a student
+                    <Button
+                      onClick={() => setIsCreateModalOpen(true)}
+                      size="sm"
+                      className="bg-hospital-blue hover:bg-hospital-blue/90"
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add Patient
+                    </Button>
+                  )}
               </div>
               <p className="text-sm text-gray-500">Select a patient to view records</p>
             </>
@@ -165,11 +169,14 @@ export default function PatientList({
       </div>
 
       {/* Create Patient Modal */}
-      <CreatePatientModal
-        isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
-        onPatientCreated={handlePatientCreated}
-      />
+      {/* Only render create modal for non-students */}
+      {!isStudent && (
+        <CreatePatientModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          onPatientCreated={handlePatientCreated}
+        />
+      )}
     </>
   );
 }

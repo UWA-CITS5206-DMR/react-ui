@@ -9,6 +9,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { getErrorMessage } from "@/lib/error-utils";
 import type { Patient, PatientUpdate } from "@/lib/api-client-v2";
 import { GENDER_OPTIONS, getGenderLabel } from "@/lib/constants";
+import { useAuth } from "@/hooks/use-auth";
 
 interface EditPatientModalProps {
   isOpen: boolean;
@@ -23,6 +24,8 @@ export default function EditPatientModal({
   patient,
   onPatientUpdated,
 }: EditPatientModalProps) {
+  const { user } = useAuth();
+  const isStudent = user?.role === "student";
   const [formData, setFormData] = useState<PatientUpdate>({
     first_name: "",
     last_name: "",
@@ -89,6 +92,9 @@ export default function EditPatientModal({
   const handleChange = (field: keyof PatientUpdate, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
+
+  // If a student somehow mounts this modal, don't render it.
+  if (isStudent) return null;
 
   if (!isOpen) return null;
 
