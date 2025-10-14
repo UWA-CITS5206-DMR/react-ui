@@ -556,8 +556,8 @@ export class ApiClientV2 {
       }
 
       // Handle authentication errors globally
-      if (response.status === 401 || response.status === 403) {
-        // Clear stored user data
+      if (response.status === 401) {
+        // 401 Unauthorized: User is not authenticated, clear stored user data and redirect to login
         if (typeof window !== "undefined" && window.localStorage) {
           localStorage.removeItem("user");
         }
@@ -566,6 +566,7 @@ export class ApiClientV2 {
           window.location.href = "/";
         }
       }
+      // 403 Forbidden: User is authenticated but not authorized - do not clear user data or redirect
 
       throw new ApiError({
         message: `Request failed with status ${response.status}`,
@@ -731,6 +732,16 @@ export class ApiClientV2 {
       retrieve: (id: number) =>
         this.request<DischargeSummary>(`/api/student-groups/discharge-summaries/${id}/`, {
           method: "GET",
+        }),
+      update: (id: number, payload: DischargeSummaryCreate) =>
+        this.request<DischargeSummary>(`/api/student-groups/discharge-summaries/${id}/`, {
+          method: "PUT",
+          body: payload,
+        }),
+      partialUpdate: (id: number, payload: Partial<DischargeSummaryCreate>) =>
+        this.request<DischargeSummary>(`/api/student-groups/discharge-summaries/${id}/`, {
+          method: "PATCH",
+          body: payload,
         }),
     },
     imagingRequests: {
