@@ -10,7 +10,6 @@ import FileManagement from "@/components/patients/file-management";
 import GoogleForms from "@/components/patients/google-forms";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-// Patient type intentionally not imported here to avoid unused-type errors
 
 const LAST_PATIENT_KEY = "lastSelectedPatientId";
 const LAST_TAB_KEY = "instructorDashboardLastTab";
