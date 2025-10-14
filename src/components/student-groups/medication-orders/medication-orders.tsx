@@ -56,17 +56,10 @@ export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
             </DialogDescription>
           </DialogHeader>
 
-          <MedicationOrderForm
-            patientId={patientId}
-            onSuccess={handleCloseDialog}
-          />
+          <MedicationOrderForm patientId={patientId} onSuccess={handleCloseDialog} />
 
           <DialogFooter>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={handleCloseDialog}
-            >
+            <Button type="button" variant="outline" onClick={handleCloseDialog}>
               Cancel
             </Button>
             <Button
