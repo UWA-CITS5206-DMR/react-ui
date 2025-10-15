@@ -3,9 +3,6 @@ import { useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { CheckCircle, Clock, FileText, Eye, Pencil, Trash2 } from "lucide-react";
-import type { ApprovedFile } from "@/lib/api-client-v2";
-import StudentFilePreviewDialog from "./student-file-preview-dialog";
 import {
   Dialog,
   DialogContent,
@@ -14,9 +11,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { CheckCircle, Clock, FileText, Eye, Trash2 } from "lucide-react";
+import type { ApprovedFile } from "@/lib/api-client-v2";
+import StudentFilePreviewDialog from "./file-preview-dialog";
 
 interface RequestCardProps {
-  id: number;
   testType: string;
   details: string;
   status: "pending" | "completed";
@@ -27,18 +26,17 @@ interface RequestCardProps {
   };
   approvedFiles?: ApprovedFile[];
   patientId: number;
-  onEdit?: (id: number) => void;
-  onDelete?: (id: number) => void;
-  canModify?: boolean;
+  canDelete?: boolean;
+  onDelete?: () => void;
+  isDeleting?: boolean;
 }
 
 /**
  * Request card component - Displays details of a single investigation request
  * Shows approved files and provides preview functionality when request is completed
- * Allows students to edit and delete their own pending requests
+ * Allows students to delete their own pending requests when provided with handlers
  */
 export function RequestCard({
-  id,
   testType,
   details,
   status,
@@ -46,9 +44,9 @@ export function RequestCard({
   requestedBy,
   approvedFiles = [],
   patientId,
-  onEdit,
+  canDelete = false,
   onDelete,
-  canModify = true,
+  isDeleting = false,
 }: RequestCardProps) {
   // State for file preview dialog
   const [previewDialogOpen, setPreviewDialogOpen] = useState(false);
@@ -58,8 +56,6 @@ export function RequestCard({
     pageRange?: string;
     requiresPagination: boolean;
   } | null>(null);
-
-  // State for delete confirmation dialog
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
   const handlePreviewFile = (file: ApprovedFile) => {
@@ -72,21 +68,13 @@ export function RequestCard({
     setPreviewDialogOpen(true);
   };
 
-  const handleEdit = () => {
-    if (onEdit) {
-      onEdit(id);
+  const handleConfirmDelete = () => {
+    if (isDeleting) {
+      return;
     }
-  };
-
-  const handleDeleteConfirm = () => {
-    if (onDelete) {
-      onDelete(id);
-    }
+    onDelete?.();
     setDeleteDialogOpen(false);
   };
-
-  // Only show edit/delete buttons for pending requests
-  const showModifyButtons = canModify && status === "pending";
 
   return (
     <>
@@ -109,21 +97,17 @@ export function RequestCard({
                   </>
                 )}
               </Badge>
-              {showModifyButtons && (
-                <div className="flex gap-1">
-                  <Button size="sm" variant="ghost" onClick={handleEdit} title="Edit request">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setDeleteDialogOpen(true)}
-                    title="Delete request"
-                    className="text-destructive hover:text-destructive"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
-                </div>
+              {canDelete && onDelete && status === "pending" && (
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setDeleteDialogOpen(true)}
+                  title="Delete request"
+                  className="text-destructive hover:text-destructive"
+                  disabled={isDeleting}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
               )}
             </div>
           </div>
@@ -163,7 +147,7 @@ export function RequestCard({
                         onClick={() => handlePreviewFile(file)}
                         className="ml-2"
                       >
-                        <Eye className="h-4 w-4 mr-1" />
+                        <Eye className="h-4 w-4" />
                         Preview
                       </Button>
                     </div>
@@ -186,27 +170,32 @@ export function RequestCard({
             pageRange={selectedFile.pageRange}
           />
         )}
-      </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Delete Investigation Request</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to delete this {testType} request? This action cannot be undone.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
-              Cancel
-            </Button>
-            <Button variant="destructive" onClick={handleDeleteConfirm}>
-              Delete
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete Investigation Request</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this investigation request? This action cannot be
+                undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button
+                variant="outline"
+                onClick={() => setDeleteDialogOpen(false)}
+                disabled={isDeleting}
+              >
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting}>
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </Card>
     </>
   );
 }

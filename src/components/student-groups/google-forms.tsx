@@ -4,6 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import PageLayout from "@/components/layout/page-layout";
 
 export default function GoogleForms() {
   const {
@@ -46,17 +47,16 @@ export default function GoogleForms() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Google Forms</h2>
-      </div>
-
+    <PageLayout
+      title="Google Forms"
+      description="Forms will open in a new tab. Please ensure you have completed all required fields before submitting."
+    >
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {googleForms.map((form) => (
           <Card key={form.id} className="hover:shadow-lg transition-shadow flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-hospital-blue" />
+                <FileText className="h-5 w-5 text-hospital-blue flex-shrink-0" />
                 {form.title}
               </CardTitle>
               {form.description && (
@@ -69,7 +69,7 @@ export default function GoogleForms() {
                   onClick={() => window.open(form.url, "_blank", "noopener,noreferrer")}
                   className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-4 w-4" />
                   Open Form
                 </Button>
               </div>
@@ -77,13 +77,6 @@ export default function GoogleForms() {
           </Card>
         ))}
       </div>
-
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800">
-          <strong>Note:</strong> Forms will open in a new tab. Please ensure you have completed all
-          required fields before submitting.
-        </p>
-      </div>
-    </div>
+    </PageLayout>
   );
 }

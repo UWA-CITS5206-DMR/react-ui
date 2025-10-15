@@ -381,6 +381,14 @@ export interface GoogleFormLink {
   updated_at: ISODateString;
 }
 
+export interface GoogleFormLinkCreate {
+  title: string;
+  url: string;
+  description?: string;
+  display_order?: number;
+  is_active?: boolean;
+}
+
 export interface ObservationBundle {
   blood_pressures: BloodPressureRecord[];
   heart_rates: HeartRateRecord[];
@@ -417,7 +425,6 @@ export interface ObservationListResponse {
   results: ObservationBundle;
 }
 
-export type InstructorDashboardSummary = Record<string, unknown>;
 export type StatsResponse = Record<string, unknown>;
 
 export class ApiError extends Error {
@@ -608,10 +615,6 @@ export class ApiClientV2 {
   };
 
   instructors = {
-    dashboard: () =>
-      this.request<InstructorDashboardSummary>("/api/instructors/dashboard/", {
-        method: "GET",
-      }),
     studentGroups: {
       list: (query?: QueryParams) =>
         this.request<User[]>("/api/instructors/student-groups/", {
@@ -621,80 +624,93 @@ export class ApiClientV2 {
     },
     bloodTestRequests: {
       list: (query?: QueryParams) =>
-        this.request<PaginatedResponse<BloodTestRequest>>("/api/instructors/blood-test-requests/", {
-          method: "GET",
-          query,
-        }),
+        this.request<PaginatedResponse<BloodTestRequest>>(
+          "/api/student-groups/blood-test-requests/",
+          {
+            method: "GET",
+            query,
+          }
+        ),
       create: (payload: BloodTestRequestCreate) =>
-        this.request<BloodTestRequest>("/api/instructors/blood-test-requests/", {
+        this.request<BloodTestRequest>("/api/student-groups/blood-test-requests/", {
           method: "POST",
           body: payload,
         }),
       retrieve: (id: number) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "GET",
         }),
       update: (id: number, payload: BloodTestRequestCreate) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "PUT",
           body: payload,
         }),
       partialUpdate: (id: number, payload: Partial<BloodTestRequestCreate>) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
       delete: (id: number) =>
-        this.request<void>(`/api/instructors/blood-test-requests/${id}/`, { method: "DELETE" }),
-      pending: () =>
+        this.request<void>(`/api/student-groups/blood-test-requests/${id}/`, {
+          method: "DELETE",
+        }),
+      pending: (query?: QueryParams) =>
         this.request<PaginatedResponse<BloodTestRequest>>(
-          "/api/instructors/blood-test-requests/pending/",
-          { method: "GET" }
+          "/api/student-groups/blood-test-requests/pending/",
+          { method: "GET", query }
         ),
-      stats: () =>
-        this.request<StatsResponse>("/api/instructors/blood-test-requests/stats/", {
+      stats: (query?: QueryParams) =>
+        this.request<StatsResponse>("/api/student-groups/blood-test-requests/stats/", {
           method: "GET",
+          query,
         }),
       updateStatus: (id: number, payload: BloodTestRequestStatusUpdate) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
     },
     imagingRequests: {
       list: (query?: QueryParams) =>
-        this.request<PaginatedResponse<ImagingRequest>>("/api/instructors/imaging-requests/", {
+        this.request<PaginatedResponse<ImagingRequest>>("/api/student-groups/imaging-requests/", {
           method: "GET",
           query,
         }),
       create: (payload: ImagingRequestCreate) =>
-        this.request<ImagingRequest>("/api/instructors/imaging-requests/", {
+        this.request<ImagingRequest>("/api/student-groups/imaging-requests/", {
           method: "POST",
           body: payload,
         }),
       retrieve: (id: number) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, { method: "GET" }),
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "GET",
+        }),
       update: (id: number, payload: ImagingRequestCreate) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, {
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "PUT",
           body: payload,
         }),
       partialUpdate: (id: number, payload: Partial<ImagingRequestCreate>) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, {
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
       delete: (id: number) =>
-        this.request<void>(`/api/instructors/imaging-requests/${id}/`, { method: "DELETE" }),
-      pending: () =>
+        this.request<void>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "DELETE",
+        }),
+      pending: (query?: QueryParams) =>
         this.request<PaginatedResponse<ImagingRequest>>(
-          "/api/instructors/imaging-requests/pending/",
-          { method: "GET" }
+          "/api/student-groups/imaging-requests/pending/",
+          { method: "GET", query }
         ),
-      stats: () =>
-        this.request<StatsResponse>("/api/instructors/imaging-requests/stats/", { method: "GET" }),
+      stats: (query?: QueryParams) =>
+        this.request<StatsResponse>("/api/student-groups/imaging-requests/stats/", {
+          method: "GET",
+          query,
+        }),
       updateStatus: (id: number, payload: ImagingRequestStatusUpdate) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, {
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
@@ -1187,6 +1203,20 @@ export class ApiClientV2 {
     retrieve: (id: number) =>
       this.request<GoogleFormLink>(`/api/patients/google-forms/${id}/`, {
         method: "GET",
+      }),
+    create: (data: GoogleFormLinkCreate) =>
+      this.request<GoogleFormLink>("/api/patients/google-forms/", {
+        method: "POST",
+        body: data,
+      }),
+    partialUpdate: (id: number, data: Partial<GoogleFormLinkCreate>) =>
+      this.request<GoogleFormLink>(`/api/patients/google-forms/${id}/`, {
+        method: "PATCH",
+        body: data,
+      }),
+    delete: (id: number) =>
+      this.request<void>(`/api/patients/google-forms/${id}/`, {
+        method: "DELETE",
       }),
   };
 }

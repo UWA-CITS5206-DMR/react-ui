@@ -155,7 +155,7 @@ export function BloodTestRequestForm({
           disabled={createBloodTestMutation.isPending}
           className="bg-hospital-blue hover:bg-hospital-blue/90"
         >
-          <Send className="h-4 w-4 mr-2" />
+          <Send className="h-4 w-4" />
           {createBloodTestMutation.isPending ? "Submitting..." : "Submit Blood Test Request"}
         </Button>
       </DialogFooter>

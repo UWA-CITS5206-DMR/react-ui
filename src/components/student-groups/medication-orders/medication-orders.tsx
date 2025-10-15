@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { MedicationOrderForm } from "./medication-order-form";
 import { MedicationOrderList } from "./medication-order-list";
+import PageLayout from "@/components/layout/page-layout";
 
 interface MedicationOrdersProps {
   patientId: string;
@@ -19,7 +20,7 @@ interface MedicationOrdersProps {
 /**
  * Main medication orders component with floating action button
  *
- * Displays medication order list by default with a floating button to create new orders.
+ * Displays medication order list by default with a floating button to add new orders.
  */
 export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
   const [orderDialogOpen, setOrderDialogOpen] = useState(false);
@@ -33,7 +34,11 @@ export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <PageLayout
+      title="Medication Orders"
+      description="View and manage medication orders for this patient. Use the + button to prescribe new medications."
+      extraBottomPadding
+    >
       {/* Medication Order List */}
       <MedicationOrderList patientId={patientId} />
 
@@ -41,16 +46,16 @@ export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
       <Button
         onClick={handleOpenOrderDialog}
         className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
-        title="Create medication order"
+        title="Add medication order"
       >
         <Plus className="h-6 w-6" />
       </Button>
 
-      {/* Create Order Dialog */}
+      {/* Add Order Dialog */}
       <Dialog open={orderDialogOpen} onOpenChange={setOrderDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Create Medication Order</DialogTitle>
+            <DialogTitle>Add Medication Order</DialogTitle>
             <DialogDescription>
               Fill in the medication order information below. Fields marked with * are required.
             </DialogDescription>
@@ -67,12 +72,12 @@ export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
               form="medication-order-form"
               className="bg-hospital-blue hover:bg-hospital-blue/90"
             >
-              <Pill className="h-4 w-4 mr-2" />
+              <Pill className="h-4 w-4" />
               Submit Medication Orders
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }

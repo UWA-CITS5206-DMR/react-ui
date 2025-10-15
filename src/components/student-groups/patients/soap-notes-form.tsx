@@ -4,7 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -14,17 +14,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { NoteEntry } from "@/lib/api-client-v2";
 import { formatDate } from "@/lib/utils";
+import PageLayout from "@/components/layout/page-layout";
 
 interface SOAPNotesFormProps {
   patientId: string;
 }
 
 export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
-  // Create/Edit modal state - reused for both create and edit
+  // Add/Edit modal state - reused for both add and edit
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<NoteEntry | null>(null);
   const [content, setContent] = useState("");
@@ -59,7 +60,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
           patient: parseInt(patientId),
         });
       } else {
-        // Create new note
+        // Add new note
         return apiClientV2.studentGroups.notes.create({
           patient: parseInt(patientId),
           name: signOffName,
@@ -72,7 +73,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
       queryClient.invalidateQueries({ queryKey: ["notes", patientId] });
       toast({
         title: "Success",
-        description: editingNote ? "Note updated successfully!" : "Note created successfully!",
+        description: editingNote ? "Note updated successfully!" : "Note added successfully!",
       });
       handleCloseDialog();
     },
@@ -109,7 +110,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
     },
   });
 
-  const handleOpenCreateDialog = () => {
+  const handleOpenAddDialog = () => {
     setEditingNote(null);
     setContent("");
     setSignOffName("");
@@ -169,84 +170,75 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
-      {/* Notes List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Clinical Notes</CardTitle>
-          <CardDescription>
-            View, edit, and delete clinical notes for this patient. Click the + button to add a new
-            note.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!notes || notes.results.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No notes found. Click the + button to create your first note.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {notes.results.map((note: NoteEntry) => (
-                <Card key={note.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(note.created_at)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleOpenEditDialog(note)}
-                          title="Edit note"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDelete(note.id)}
-                          title="Delete note"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div className="space-y-3">
-                      <div className="bg-muted/30 p-4 rounded-md">
-                        <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
-                      </div>
-                      <div className="border-t pt-2">
-                        <p className="text-xs text-muted-foreground">
-                          Written by: {note.name} ({note.role})
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+    <PageLayout
+      title="Clinical Notes"
+      description="View, edit, and delete clinical notes for this patient. Click the + button to add a new note."
+      extraBottomPadding
+    >
+      {!notes || notes.results.length === 0 ? (
+        <p className="text-muted-foreground text-center py-8">
+          No notes found. Click the + button to add your first note.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {notes.results.map((note: NoteEntry) => (
+            <Card key={note.id}>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{formatDate(note.created_at)}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleOpenEditDialog(note)}
+                      title="Edit note"
+                      className="h-6 w-6 p-0"
+                    >
+                      <Edit className="h-3 w-3" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(note.id)}
+                      title="Delete note"
+                      className="text-destructive hover:text-destructive h-6 w-6 p-0"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-muted/30 p-4 rounded-md">
+                    <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
+                  </div>
+                  <div className="border-t pt-2">
+                    <p className="text-xs text-muted-foreground">
+                      Written by: {note.name} ({note.role})
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Floating Action Button */}
       <Button
-        onClick={handleOpenCreateDialog}
+        onClick={handleOpenAddDialog}
         className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
         title="Add new note"
       >
         <Plus className="h-6 w-6" />
       </Button>
 
-      {/* Create/Edit Note Dialog */}
+      {/* Add/Edit Note Dialog */}
       <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingNote ? "Edit Clinical Note" : "Create Clinical Note"}</DialogTitle>
+            <DialogTitle>{editingNote ? "Edit Clinical Note" : "Add Clinical Note"}</DialogTitle>
             <DialogDescription>
               {editingNote
                 ? "Update the clinical note information below. Fields marked with * are required."
@@ -262,7 +254,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Enter your clinical notes here. You may structure as SOAP (Subjective, Objective, Assessment, Plan) or use free-form text..."
-                  className="min-h-[300px]"
+                  className="min-h-[200px]"
                 />
                 <p className="text-xs text-muted-foreground">
                   Tip: Consider organizing your notes using headings like Subjective, Objective,
@@ -291,11 +283,16 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                 disabled={saveNoteMutation.isPending}
                 className="bg-hospital-blue hover:bg-hospital-blue/90"
               >
-                {saveNoteMutation.isPending
-                  ? "Saving..."
-                  : editingNote
-                  ? "Update Note"
-                  : "Create Note"}
+                {saveNoteMutation.isPending ? (
+                  "Saving..."
+                ) : editingNote ? (
+                  "Update Note"
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    Add Note
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>
@@ -329,6 +326,6 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }

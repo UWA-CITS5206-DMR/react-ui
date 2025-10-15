@@ -16,6 +16,7 @@ interface FilePreviewDialogProps {
   fileName: string;
   category?: FileCategory;
   requiresPagination?: boolean;
+  defaultPageRange?: string;
 }
 
 export default function FilePreviewDialog({
@@ -26,6 +27,7 @@ export default function FilePreviewDialog({
   fileName,
   category,
   requiresPagination = false,
+  defaultPageRange,
 }: FilePreviewDialogProps) {
   const [pageRange, setPageRange] = useState<string | undefined>(undefined);
   const [showPageRangeInput, setShowPageRangeInput] = useState(false);
@@ -33,13 +35,18 @@ export default function FilePreviewDialog({
   // Reset state when dialog opens/closes
   useEffect(() => {
     if (open && requiresPagination) {
-      setShowPageRangeInput(true);
-      setPageRange(undefined);
+      if (defaultPageRange) {
+        setShowPageRangeInput(false);
+        setPageRange(defaultPageRange);
+      } else {
+        setShowPageRangeInput(true);
+        setPageRange(undefined);
+      }
     } else if (!open) {
       setShowPageRangeInput(false);
       setPageRange(undefined);
     }
-  }, [open, requiresPagination]);
+  }, [open, requiresPagination, defaultPageRange]);
 
   // Fetch file blob
   const {

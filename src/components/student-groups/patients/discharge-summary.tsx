@@ -1,15 +1,18 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { formatDate } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import type { Patient } from "@/lib/api-client-v2";
+import PageLayout from "@/components/layout/page-layout";
 
 interface DischargeSummaryProps {
   patient: Patient;
@@ -17,6 +20,7 @@ interface DischargeSummaryProps {
 
 export default function DischargeSummary({ patient }: DischargeSummaryProps) {
   const { user } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isEditing, setIsEditing] = useState(false);
 
@@ -84,6 +88,17 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
       queryClient.invalidateQueries({
         queryKey: ["student-groups", "discharge-summaries", patient.id],
       });
+      toast({
+        title: "Success",
+        description: "Discharge summary saved successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
     },
   });
 
@@ -107,6 +122,17 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
       // Invalidate and refetch the query
       queryClient.invalidateQueries({
         queryKey: ["student-groups", "discharge-summaries", patient.id],
+      });
+      toast({
+        title: "Success",
+        description: "Discharge summary updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: getErrorMessage(error),
+        variant: "destructive",
       });
     },
   });
@@ -139,73 +165,70 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
   };
 
   return (
-    <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg">Discharge Summary</CardTitle>
-              <p className="text-sm text-gray-600">
-                {existingSummary && !isEditing
-                  ? `Completed discharge summary for ${patient.first_name} ${patient.last_name}`
-                  : `Complete the discharge summary for ${patient.first_name} ${patient.last_name}`}
-              </p>
-              {existingSummary && (
-                <p className="text-xs text-gray-500 mt-1">
-                  Submitted on {formatDate(existingSummary.created_at)}
-                </p>
-              )}
+    <PageLayout title="Discharge Summary">
+      <div className="flex items-center justify-between mb-6">
+        <div>
+          <p className="text-sm text-gray-600">
+            {existingSummary && !isEditing
+              ? `Completed discharge summary for ${patient.first_name} ${patient.last_name}`
+              : `Complete the discharge summary for ${patient.first_name} ${patient.last_name}`}
+          </p>
+          {existingSummary && (
+            <p className="text-xs text-gray-500 mt-1">
+              Submitted on {formatDate(existingSummary.created_at)}
+            </p>
+          )}
+        </div>
+        {existingSummary && !isEditing && (
+          <Button onClick={handleEdit} variant="outline" size="sm">
+            Edit
+          </Button>
+        )}
+      </div>
+      {existingSummary && !isEditing ? (
+        // Display mode - show submitted content
+        <div className="space-y-6">
+          {/* Diagnosis */}
+          <div className="space-y-2">
+            <Label>Diagnosis</Label>
+            <div className="p-3 bg-gray-50 rounded-md">
+              <p className="text-sm">{existingSummary.diagnosis}</p>
             </div>
-            {existingSummary && !isEditing && (
-              <Button onClick={handleEdit} variant="outline" size="sm">
-                Edit
-              </Button>
-            )}
           </div>
-        </CardHeader>
-        <CardContent>
-          {existingSummary && !isEditing ? (
-            // Display mode - show submitted content
-            <div className="space-y-6">
-              {/* Diagnosis */}
-              <div className="space-y-2">
-                <Label>Diagnosis</Label>
-                <div className="p-3 bg-gray-50 rounded-md">
-                  <p className="text-sm">{existingSummary.diagnosis}</p>
-                </div>
-              </div>
 
-              {/* Clinical Summary */}
-              <div className="space-y-2">
-                <Label>Clinical Summary</Label>
-                <div className="p-3 bg-gray-50 rounded-md">
-                  <p className="text-sm whitespace-pre-wrap">
-                    {existingSummary.free_text || "No clinical summary provided"}
-                  </p>
-                </div>
-              </div>
+          {/* Clinical Summary */}
+          <div className="space-y-2">
+            <Label>Clinical Summary</Label>
+            <div className="p-3 bg-gray-50 rounded-md">
+              <p className="text-sm whitespace-pre-wrap">
+                {existingSummary.free_text || "No clinical summary provided"}
+              </p>
+            </div>
+          </div>
 
-              {/* Discharge Plan */}
-              <div className="space-y-2">
-                <Label>Discharge Plan</Label>
-                <div className="p-3 bg-gray-50 rounded-md">
-                  <p className="text-sm whitespace-pre-wrap">{existingSummary.plan}</p>
-                </div>
-              </div>
+          {/* Discharge Plan */}
+          <div className="space-y-2">
+            <Label>Discharge Plan</Label>
+            <div className="p-3 bg-gray-50 rounded-md">
+              <p className="text-sm whitespace-pre-wrap">{existingSummary.plan}</p>
+            </div>
+          </div>
 
-              {/* Sign-off */}
-              <div className="border-t pt-6">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium">Signed by:</p>
-                    <p className="text-sm text-gray-600">{existingSummary.name}</p>
-                    <p className="text-xs text-gray-500">{existingSummary.role}</p>
-                  </div>
-                </div>
+          {/* Sign-off */}
+          <div className="border-t pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">Signed by:</p>
+                <p className="text-sm text-gray-600">{existingSummary.name}</p>
+                <p className="text-xs text-gray-500">{existingSummary.role}</p>
               </div>
             </div>
-          ) : (
-            // Edit mode - show form
+          </div>
+        </div>
+      ) : (
+        // Edit mode - show form
+        <Card>
+          <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Diagnosis */}
               <div className="space-y-2">
@@ -285,23 +308,9 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
                 </div>
               </div>
             </form>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Success Message */}
-      {(createDischargeSummaryMutation.isSuccess || updateDischargeSummaryMutation.isSuccess) && (
-        <Card className="border-green-200 bg-green-50">
-          <CardContent className="pt-6">
-            <div className="flex items-center space-x-2 text-green-800">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-sm font-medium">
-                Discharge summary {existingSummary && isEditing ? "updated" : "saved"} successfully
-              </span>
-            </div>
           </CardContent>
         </Card>
       )}
-    </div>
+    </PageLayout>
   );
 }

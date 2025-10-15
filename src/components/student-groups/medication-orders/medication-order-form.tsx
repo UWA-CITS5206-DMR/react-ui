@@ -162,7 +162,7 @@ export function MedicationOrderForm({ patientId, onSuccess }: MedicationOrderFor
             ))}
             <div className="flex gap-2 mt-4">
               <Button type="button" variant="outline" onClick={addMedication} className="flex-1">
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-4 w-4" />
                 Add Another Medication
               </Button>
             </div>

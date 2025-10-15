@@ -50,7 +50,7 @@ export default function PatientHeader({ patient, onPatientUpdated }: PatientHead
                   onClick={() => setIsEditing(true)}
                   variant="outline"
                   size="sm"
-                  className="flex items-center space-x-2"
+                  className="flex items-center"
                 >
                   <Edit className="h-4 w-4" />
                   <span>Edit</span>

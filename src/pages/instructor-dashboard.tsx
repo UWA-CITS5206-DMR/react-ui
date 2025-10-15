@@ -4,10 +4,10 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import InstructorPatientOverview from "@/components/instructors/instructor-patient-overview";
-import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
-import FileManagement from "@/components/patients/file-management";
-import GoogleForms from "@/components/patients/google-forms";
+import InstructorPatientOverview from "@/components/instructors/patients/patient-overview";
+import InstructorLabRequests from "@/components/instructors/investigation-requests/investigation-requests";
+import FileManagement from "@/components/instructors/patients/file-management";
+import GoogleFormsManagement from "@/components/instructors/google-forms-management";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -180,7 +180,7 @@ export default function InstructorDashboard() {
 
             <TabsContent value="google-forms" className="flex-1 min-h-0 overflow-auto m-0">
               <div className="bg-bg-light p-6">
-                <GoogleForms />
+                <GoogleFormsManagement />
               </div>
             </TabsContent>
           </Tabs>

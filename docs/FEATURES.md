@@ -40,6 +40,15 @@ This document provides a comprehensive overview of the DMR frontend application,
 - Students can access files linked to their completed requests or via instructor manual release
 - Request dashboard, to-do lists, and statistics for instructors
 
+### Google Forms Integration
+
+- Instructors can create, edit, and delete Google Form links
+- Forms are displayed to both students and instructors
+- Configurable display order and active/inactive status
+- Forms open in new tabs with proper security settings
+- Centralized management interface for instructors
+- Support for form descriptions and categorization
+
 ### User Management
 
 - Multi-role authentication and authorization (Admin, Instructor, Student)
@@ -61,7 +70,7 @@ Students operate using a **student group shared account model**, where each stud
 - View patient records and documents (with page-level access control)
 - Submit observations (vital signs, clinical notes)
 - Create, edit, and delete clinical notes (SOAP notes)
-- Create, edit, and delete investigation requests (imaging, blood tests)
+- Create and delete investigation requests (imaging, blood tests); only instructors can update existing requests
 - Order medications
 - Create discharge summaries
 - Access approved files for completed requests only
@@ -88,6 +97,8 @@ Students operate using a **student group shared account model**, where each stud
 - View all student observations (read-only access)
 - Access dashboard with request statistics and to-do lists
 - Monitor student progress across all groups
+- Create, edit, and delete Google Form links for students and patients
+- Configure form visibility and display order
 
 #### Access Control (Instructors)
 

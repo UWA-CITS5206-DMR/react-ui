@@ -88,7 +88,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
       <div className="container mx-auto px-4 py-8">
         <div className="text-center mb-12">
           <div className="flex items-center justify-center mb-6">
@@ -129,8 +128,7 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Work together in real-time with fellow students on complex patient cases and
-                    scenarios.
+                    Work together in real-time with fellow students on complex patient cases.
                   </p>
                 </CardContent>
               </Card>
@@ -138,12 +136,11 @@ export default function Landing() {
               <Card className="border-orange-200 hover:shadow-lg transition-shadow">
                 <CardHeader className="text-center pb-4">
                   <Clock className="h-12 w-12 text-orange-600 mx-auto mb-2" />
-                  <CardTitle className="text-lg">Dynamic Scenarios</CardTitle>
+                  <CardTitle className="text-lg">Investigation Requests</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Experience time-based patient progression with evolving symptoms and test
-                    results.
+                    Students can request lab tests and imaging, simulating real clinical workflows.
                   </p>
                 </CardContent>
               </Card>
@@ -155,8 +152,8 @@ export default function Landing() {
                 </CardHeader>
                 <CardContent>
                   <p className="text-sm text-gray-600 text-center">
-                    Instructors can create scenarios, monitor progress, and guide learning
-                    experiences.
+                    Instructors can manage patients and files, review student investigations, and
+                    release documents.
                   </p>
                 </CardContent>
               </Card>
@@ -167,15 +164,15 @@ export default function Landing() {
               <h3 className="text-lg font-semibold mb-4 text-gray-800">Platform Users</h3>
               <div className="flex flex-wrap justify-center gap-2">
                 <Badge variant="outline" className="px-4 py-2 text-blue-600 border-blue-300">
-                  <GraduationCap className="h-4 w-4 mr-2" />
+                  <GraduationCap />
                   Nursing Students
                 </Badge>
                 <Badge variant="outline" className="px-4 py-2 text-green-600 border-green-300">
-                  <BookOpen className="h-4 w-4 mr-2" />
+                  <BookOpen />
                   Medical Students
                 </Badge>
                 <Badge variant="outline" className="px-4 py-2 text-purple-600 border-purple-300">
-                  <UserCog className="h-4 w-4 mr-2" />
+                  <UserCog />
                   Clinical Instructors
                 </Badge>
               </div>

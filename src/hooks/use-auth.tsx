@@ -74,8 +74,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Clear user info from frontend regardless of backend success
       setUser(null);
       localStorage.removeItem("user");
-      // Force page refresh to ensure complete state reset
-      window.location.reload();
+      // Navigate to home page instead of reloading
+      window.location.href = "/";
     }
   };
 

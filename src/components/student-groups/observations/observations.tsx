@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +11,9 @@ import {
 } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ListChecks, Layers } from "lucide-react";
-import CurrentObservations from "./current-observations";
+import { apiClientV2 } from "@/lib/queryClient";
+import { LatestObservationsDisplay } from "./latest-observations-display";
+import { ObservationChart } from "./observation-chart";
 import { IndividualVitalSignsForm } from "./individual-vital-signs-form";
 import { BulkVitalSignsForm } from "./bulk-vital-signs-form";
 import type { Patient } from "@/lib/api-client-v2";
@@ -28,6 +31,45 @@ interface ObservationsProps {
 export default function Observations({ patient }: ObservationsProps) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
 
+  // Fetch all observations for the patient
+  const { data: observationsResponse } = useQuery({
+    queryKey: ["/api/student-groups/observations", patient.id],
+    queryFn: async () => {
+      return await apiClientV2.studentGroups.observations.list({
+        patient: patient.id,
+        ordering: "-created_at",
+      });
+    },
+  });
+
+  const observations = observationsResponse?.results;
+
+  // Extract the latest value for each vital sign type for display
+  const latestVitals = observations
+    ? {
+        bloodPressure: observations.blood_pressures[0]
+          ? `${observations.blood_pressures[0].systolic}/${observations.blood_pressures[0].diastolic}`
+          : undefined,
+        heartRate: observations.heart_rates[0]?.heart_rate,
+        temperature: observations.body_temperatures[0]?.temperature,
+        respiratoryRate: observations.respiratory_rates[0]?.respiratory_rate,
+        oxygenSaturation: observations.oxygen_saturations[0]?.saturation_percentage,
+        bloodSugar: observations.blood_sugars[0]
+          ? Number(observations.blood_sugars[0].sugar_level)
+          : undefined,
+        painScore: observations.pain_scores[0]?.score,
+      }
+    : undefined;
+
+  // Extract arrays for chart
+  const allBloodPressures = observations?.blood_pressures || [];
+  const allHeartRates = observations?.heart_rates || [];
+  const allBodyTemperatures = observations?.body_temperatures || [];
+  const allRespiratoryRates = observations?.respiratory_rates || [];
+  const allBloodSugars = observations?.blood_sugars || [];
+  const allOxygenSaturations = observations?.oxygen_saturations || [];
+  const allPainScores = observations?.pain_scores || [];
+
   const handleOpenAddDialog = () => {
     setAddDialogOpen(true);
   };
@@ -37,9 +79,22 @@ export default function Observations({ patient }: ObservationsProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Current Observations Display */}
-      <CurrentObservations patient={patient} />
+    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
+      <div className="space-y-6">
+        {/* Latest Observations Display */}
+        <LatestObservationsDisplay vitals={latestVitals} />
+
+        {/* Historical Trends Chart */}
+        <ObservationChart
+          bloodPressures={allBloodPressures}
+          heartRates={allHeartRates}
+          bodyTemperatures={allBodyTemperatures}
+          respiratoryRates={allRespiratoryRates}
+          bloodSugars={allBloodSugars}
+          oxygenSaturations={allOxygenSaturations}
+          painScores={allPainScores}
+        />
+      </div>
 
       {/* Floating Action Button */}
       <Button
@@ -63,11 +118,11 @@ export default function Observations({ patient }: ObservationsProps) {
           <Tabs defaultValue="individual" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="individual">
-                <ListChecks className="h-4 w-4 mr-2" />
+                <ListChecks className="h-4 w-4" />
                 Individual Entry
               </TabsTrigger>
               <TabsTrigger value="bulk">
-                <Layers className="h-4 w-4 mr-2" />
+                <Layers className="h-4 w-4" />
                 Bulk Entry
               </TabsTrigger>
             </TabsList>

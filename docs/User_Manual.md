@@ -27,6 +27,7 @@ This manual helps end-users (students, instructors, and admins) operate the DMR 
   - Manage Patient Files (Upload, Preview, Delete)
   - Review and Complete Requests (approve files + page ranges)
   - Release File Access to Student Groups (manual)
+  - Manage Google Forms
 - Admins
   - Using Django Admin (backend)
 - Tips and Troubleshooting
@@ -125,14 +126,14 @@ Note
   - Fill in test type, clinical details, and other required fields.
   - Enter your name and role for sign-off.
   - Submit; the request status starts as "pending".
-- Edit Request: Click the Edit button on pending requests to update details.
 - Delete Request: Click the Delete button on pending requests to remove them.
+- Need to change details? Delete the pending request and submit a new one with the updated information.
 - Instructors will review and may attach "approved files" when marking completed.
 
 Viewing Requests
 
 - Use the lists to track your requests and statuses. For completed requests with approved files, you'll see links or previews depending on access.
-- You can only edit or delete pending requests. Once a request is completed, it cannot be modified.
+- You can delete pending requests. Once a request is completed, it cannot be modified.
 - The floating button adapts to the active tab, making it easy to create the right type of request.
 
 ### Medication Orders
@@ -229,6 +230,35 @@ Notes
 - Manual release creates an internal Approved File entry linked directly to the student group account (no request needed).
 - For paginated PDFs, students can only view the pages specified by your page range.
 - You can revoke access by removing the corresponding Approved File record in the backend admin if necessary.
+
+### Manage Google Forms
+
+Instructors can manage Google Form links that are displayed to all students and patients:
+
+1. Go to the Google Forms tab in the instructor dashboard.
+2. View all existing forms with their status (active/inactive) and display order.
+3. Create a new form:
+   - Click "Add Form"
+   - Enter the form title (required)
+   - Enter the complete Google Form URL (required)
+   - Optionally add a description
+   - Set the display order (lower numbers appear first, default is 0)
+   - Toggle "Active" to control visibility
+   - Click "Create Form"
+4. Edit an existing form:
+   - Click the pencil icon on any form card
+   - Update the desired fields
+   - Click "Update Form"
+5. Delete a form:
+   - Click the trash icon on the form card
+   - Confirm deletion
+
+Notes
+
+- Only active forms are visible to students and patients
+- Forms are displayed in order according to the display order number
+- Forms open in a new browser tab when accessed
+- All form management is restricted to instructor accounts
 
 ---
 
