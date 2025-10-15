@@ -624,80 +624,91 @@ export class ApiClientV2 {
     },
     bloodTestRequests: {
       list: (query?: QueryParams) =>
-        this.request<PaginatedResponse<BloodTestRequest>>("/api/instructors/blood-test-requests/", {
-          method: "GET",
-          query,
-        }),
+        this.request<PaginatedResponse<BloodTestRequest>>(
+          "/api/student-groups/blood-test-requests/",
+          {
+            method: "GET",
+            query,
+          }
+        ),
       create: (payload: BloodTestRequestCreate) =>
-        this.request<BloodTestRequest>("/api/instructors/blood-test-requests/", {
+        this.request<BloodTestRequest>("/api/student-groups/blood-test-requests/", {
           method: "POST",
           body: payload,
         }),
       retrieve: (id: number) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "GET",
         }),
       update: (id: number, payload: BloodTestRequestCreate) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "PUT",
           body: payload,
         }),
       partialUpdate: (id: number, payload: Partial<BloodTestRequestCreate>) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
       delete: (id: number) =>
-        this.request<void>(`/api/instructors/blood-test-requests/${id}/`, { method: "DELETE" }),
+        this.request<void>(`/api/student-groups/blood-test-requests/${id}/`, {
+          method: "DELETE",
+        }),
       pending: () =>
         this.request<PaginatedResponse<BloodTestRequest>>(
-          "/api/instructors/blood-test-requests/pending/",
+          "/api/student-groups/blood-test-requests/pending/",
           { method: "GET" }
         ),
       stats: () =>
-        this.request<StatsResponse>("/api/instructors/blood-test-requests/stats/", {
+        this.request<StatsResponse>("/api/student-groups/blood-test-requests/stats/", {
           method: "GET",
         }),
       updateStatus: (id: number, payload: BloodTestRequestStatusUpdate) =>
-        this.request<BloodTestRequest>(`/api/instructors/blood-test-requests/${id}/`, {
+        this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
     },
     imagingRequests: {
       list: (query?: QueryParams) =>
-        this.request<PaginatedResponse<ImagingRequest>>("/api/instructors/imaging-requests/", {
+        this.request<PaginatedResponse<ImagingRequest>>("/api/student-groups/imaging-requests/", {
           method: "GET",
           query,
         }),
       create: (payload: ImagingRequestCreate) =>
-        this.request<ImagingRequest>("/api/instructors/imaging-requests/", {
+        this.request<ImagingRequest>("/api/student-groups/imaging-requests/", {
           method: "POST",
           body: payload,
         }),
       retrieve: (id: number) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, { method: "GET" }),
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "GET",
+        }),
       update: (id: number, payload: ImagingRequestCreate) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, {
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "PUT",
           body: payload,
         }),
       partialUpdate: (id: number, payload: Partial<ImagingRequestCreate>) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, {
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),
       delete: (id: number) =>
-        this.request<void>(`/api/instructors/imaging-requests/${id}/`, { method: "DELETE" }),
+        this.request<void>(`/api/student-groups/imaging-requests/${id}/`, {
+          method: "DELETE",
+        }),
       pending: () =>
         this.request<PaginatedResponse<ImagingRequest>>(
-          "/api/instructors/imaging-requests/pending/",
+          "/api/student-groups/imaging-requests/pending/",
           { method: "GET" }
         ),
       stats: () =>
-        this.request<StatsResponse>("/api/instructors/imaging-requests/stats/", { method: "GET" }),
+        this.request<StatsResponse>("/api/student-groups/imaging-requests/stats/", {
+          method: "GET",
+        }),
       updateStatus: (id: number, payload: ImagingRequestStatusUpdate) =>
-        this.request<ImagingRequest>(`/api/instructors/imaging-requests/${id}/`, {
+        this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "PATCH",
           body: payload,
         }),

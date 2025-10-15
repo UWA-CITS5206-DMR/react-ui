@@ -126,14 +126,14 @@ Note
   - Fill in test type, clinical details, and other required fields.
   - Enter your name and role for sign-off.
   - Submit; the request status starts as "pending".
-- Edit Request: Click the Edit button on pending requests to update details.
 - Delete Request: Click the Delete button on pending requests to remove them.
+- Need to change details? Delete the pending request and submit a new one with the updated information.
 - Instructors will review and may attach "approved files" when marking completed.
 
 Viewing Requests
 
 - Use the lists to track your requests and statuses. For completed requests with approved files, you'll see links or previews depending on access.
-- You can only edit or delete pending requests. Once a request is completed, it cannot be modified.
+- You can delete pending requests. Once a request is completed, it cannot be modified.
 - The floating button adapts to the active tab, making it easy to create the right type of request.
 
 ### Medication Orders

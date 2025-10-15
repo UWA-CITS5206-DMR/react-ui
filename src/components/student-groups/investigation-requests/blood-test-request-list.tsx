@@ -1,56 +1,57 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { RequestCard } from "./request-card";
 import type { BloodTestRequest } from "@/lib/api-client-v2";
+import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 
 interface BloodTestRequestListProps {
   patientId: string;
 }
 
 /**
- * Blood test request list component with edit and delete functionality
+ * Blood test request list component with delete support for pending requests
  */
 export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const { data: bloodTestRequests } = useQuery({
     queryKey: ["blood-test-requests", patientId],
     queryFn: () => apiClientV2.studentGroups.bloodTestRequests.list({ patient: patientId }),
   });
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: (requestId: number) =>
-      apiClientV2.studentGroups.bloodTestRequests.delete(requestId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["blood-test-requests", patientId] });
-      toast({
-        title: "Success",
-        description: "Blood test request deleted successfully",
-      });
+  const deleteBloodTestRequestMutation = useMutation({
+    mutationFn: async (requestId: number) => {
+      await apiClientV2.studentGroups.bloodTestRequests.delete(requestId);
     },
-    onError: () => {
+    onMutate: (requestId: number) => {
+      setDeletingId(requestId);
+    },
+    onSuccess: () => {
       toast({
-        title: "Error",
-        description: "Failed to delete blood test request",
+        title: "Request deleted",
+        description: "The blood test request has been removed.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["blood-test-requests", patientId] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Unable to delete",
+        description: getErrorMessage(error, "Failed to delete the blood test request."),
         variant: "destructive",
       });
     },
+    onSettled: () => {
+      setDeletingId(null);
+    },
   });
 
-  const handleEdit = (_requestId: number) => {
-    // TODO: Implement edit functionality with a dialog
-    toast({
-      title: "Edit Feature",
-      description: "Edit functionality coming soon!",
-    });
-  };
-
-  const handleDelete = (requestId: number) => {
-    deleteMutation.mutate(requestId);
+  const handleDeleteRequest = (requestId: number) => {
+    deleteBloodTestRequestMutation.mutate(requestId);
   };
 
   return (
@@ -58,8 +59,8 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
       <CardHeader>
         <CardTitle>Blood Test Requests</CardTitle>
         <CardDescription>
-          View and manage your blood test requests for this patient. You can edit or delete pending
-          requests.
+          View blood test requests submitted for this patient. Pending requests can be deleted when
+          you need to resubmit with updated clinical information.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -70,7 +71,6 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
             {bloodTestRequests.results.map((request: BloodTestRequest) => (
               <RequestCard
                 key={request.id}
-                id={request.id}
                 testType={request.test_type}
                 details={request.details}
                 status={request.status}
@@ -81,9 +81,9 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
                 }}
                 approvedFiles={request.approved_files}
                 patientId={parseInt(patientId)}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                canModify={true}
+                canDelete={request.status === "pending"}
+                onDelete={() => handleDeleteRequest(request.id)}
+                isDeleting={deletingId === request.id && deleteBloodTestRequestMutation.isPending}
               />
             ))}
           </div>

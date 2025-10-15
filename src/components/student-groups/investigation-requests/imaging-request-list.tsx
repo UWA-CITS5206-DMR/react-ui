@@ -1,55 +1,57 @@
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { useToast } from "@/hooks/use-toast";
 import { RequestCard } from "./request-card";
 import type { ImagingRequest } from "@/lib/api-client-v2";
+import { useToast } from "@/hooks/use-toast";
+import { getErrorMessage } from "@/lib/error-utils";
 
 interface ImagingRequestListProps {
   patientId: string;
 }
 
 /**
- * Imaging request list component with edit and delete functionality
+ * Imaging request list component with delete support for pending requests
  */
 export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const { data: imagingRequests } = useQuery({
     queryKey: ["imaging-requests", patientId],
     queryFn: () => apiClientV2.studentGroups.imagingRequests.list({ patient: patientId }),
   });
 
-  // Delete mutation
-  const deleteMutation = useMutation({
-    mutationFn: (requestId: number) => apiClientV2.studentGroups.imagingRequests.delete(requestId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["imaging-requests", patientId] });
-      toast({
-        title: "Success",
-        description: "Imaging request deleted successfully",
-      });
+  const deleteImagingRequestMutation = useMutation({
+    mutationFn: async (requestId: number) => {
+      await apiClientV2.studentGroups.imagingRequests.delete(requestId);
     },
-    onError: () => {
+    onMutate: (requestId: number) => {
+      setDeletingId(requestId);
+    },
+    onSuccess: () => {
       toast({
-        title: "Error",
-        description: "Failed to delete imaging request",
+        title: "Request deleted",
+        description: "The imaging request has been removed.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["imaging-requests", patientId] });
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Unable to delete",
+        description: getErrorMessage(error, "Failed to delete the imaging request."),
         variant: "destructive",
       });
     },
+    onSettled: () => {
+      setDeletingId(null);
+    },
   });
 
-  const handleEdit = (_requestId: number) => {
-    // TODO: Implement edit functionality with a dialog
-    toast({
-      title: "Edit Feature",
-      description: "Edit functionality coming soon!",
-    });
-  };
-
-  const handleDelete = (requestId: number) => {
-    deleteMutation.mutate(requestId);
+  const handleDeleteRequest = (requestId: number) => {
+    deleteImagingRequestMutation.mutate(requestId);
   };
 
   return (
@@ -57,8 +59,8 @@ export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
       <CardHeader>
         <CardTitle>Imaging Requests</CardTitle>
         <CardDescription>
-          View and manage your imaging requests for this patient. You can edit or delete pending
-          requests.
+          View imaging requests submitted for this patient. Pending requests can be deleted if you
+          need to resubmit with updated details.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -69,7 +71,6 @@ export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
             {imagingRequests.results.map((request: ImagingRequest) => (
               <RequestCard
                 key={request.id}
-                id={request.id}
                 testType={request.test_type}
                 details={request.details}
                 status={request.status}
@@ -80,9 +81,9 @@ export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
                 }}
                 approvedFiles={request.approved_files}
                 patientId={parseInt(patientId)}
-                onEdit={handleEdit}
-                onDelete={handleDelete}
-                canModify={true}
+                canDelete={request.status === "pending"}
+                onDelete={() => handleDeleteRequest(request.id)}
+                isDeleting={deletingId === request.id && deleteImagingRequestMutation.isPending}
               />
             ))}
           </div>
