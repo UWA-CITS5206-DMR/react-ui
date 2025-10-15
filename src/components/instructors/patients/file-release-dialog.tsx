@@ -18,6 +18,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { getErrorMessage } from "@/lib/error-utils";
+import { formatUserDisplay } from "@/lib/utils";
 import type {
   ManualFileReleaseRequest,
   ManualFileReleaseResponse,
@@ -197,12 +198,7 @@ export default function FileReleaseDialog({
                 <ScrollArea className="h-48 border rounded-md">
                   <div className="divide-y">
                     {groups.map((group) => {
-                      const fullName = [group.first_name, group.last_name]
-                        .filter(Boolean)
-                        .join(" ");
-                      const displayName = fullName
-                        ? `${fullName} (@${group.username})`
-                        : group.username;
+                      const displayName = formatUserDisplay(group);
                       const isChecked = formState.selectedGroups.has(group.id);
                       return (
                         <label

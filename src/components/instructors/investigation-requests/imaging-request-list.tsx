@@ -12,12 +12,13 @@ import type { ImagingRequest, BloodTestRequest, ApprovedFileRequest } from "@/li
 interface ImagingRequestListProps {
   patientId?: number;
   showCompleted: boolean;
+  user?: string;
 }
 
 /**
  * Imaging request list component with approval functionality
  */
-export function ImagingRequestList({ patientId, showCompleted }: ImagingRequestListProps) {
+export function ImagingRequestList({ patientId, showCompleted, user }: ImagingRequestListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -38,6 +39,7 @@ export function ImagingRequestList({ patientId, showCompleted }: ImagingRequestL
       page,
       pageSize,
       patientId,
+      user,
     ],
     queryFn: () => {
       if (showCompleted) {
@@ -45,11 +47,13 @@ export function ImagingRequestList({ patientId, showCompleted }: ImagingRequestL
           page,
           page_size: pageSize,
           ...(patientId && { patient: patientId }),
+          ...(user && user !== "all" && { user: parseInt(user) }),
         });
       } else {
         return apiClientV2.instructors.imagingRequests
           .pending({
             ...(patientId && { patient: patientId }),
+            ...(user && user !== "all" && { user: parseInt(user) }),
           })
           .then((data) => ({
             ...data,
