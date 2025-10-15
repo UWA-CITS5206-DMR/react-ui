@@ -209,7 +209,7 @@ export default function GoogleFormsManagement() {
   return (
     <PageLayout
       title="Google Forms Management"
-      description="Manage Google Forms that are displayed to students and patients"
+      description="Manage Google Forms that are displayed to students."
     >
       {forms.length === 0 ? (
         <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-gray-300 rounded-lg">

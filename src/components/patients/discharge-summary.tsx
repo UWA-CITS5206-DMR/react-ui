@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -9,6 +10,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { apiClientV2 } from "@/lib/queryClient";
 import { formatDate } from "@/lib/utils";
+import { getErrorMessage } from "@/lib/error-utils";
 import type { Patient } from "@/lib/api-client-v2";
 import PageLayout from "@/components/layout/page-layout";
 
@@ -91,6 +93,13 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         description: "Discharge summary saved successfully",
       });
     },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: getErrorMessage(error),
+        variant: "destructive",
+      });
+    },
   });
 
   const updateDischargeSummaryMutation = useMutation({
@@ -117,6 +126,13 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
       toast({
         title: "Success",
         description: "Discharge summary updated successfully",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error",
+        description: getErrorMessage(error),
+        variant: "destructive",
       });
     },
   });
@@ -211,85 +227,89 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         </div>
       ) : (
         // Edit mode - show form
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Diagnosis */}
-          <div className="space-y-2">
-            <Label htmlFor="diagnosis">Diagnosis *</Label>
-            <Input
-              id="diagnosis"
-              placeholder="Primary and secondary diagnoses"
-              value={formData.diagnosis}
-              onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
-              required
-              disabled={!isEditing && !!existingSummary}
-            />
-          </div>
+        <Card>
+          <CardContent className="pt-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Diagnosis */}
+              <div className="space-y-2">
+                <Label htmlFor="diagnosis">Diagnosis *</Label>
+                <Input
+                  id="diagnosis"
+                  placeholder="Primary and secondary diagnoses"
+                  value={formData.diagnosis}
+                  onChange={(e) => setFormData({ ...formData, diagnosis: e.target.value })}
+                  required
+                  disabled={!isEditing && !!existingSummary}
+                />
+              </div>
 
-          {/* Free Text */}
-          <div className="space-y-2">
-            <Label htmlFor="freeText">Clinical Summary *</Label>
-            <Textarea
-              id="freeText"
-              placeholder="Detailed clinical summary of patient's stay, treatment provided, and response to treatment..."
-              rows={6}
-              value={formData.freeText}
-              onChange={(e) => setFormData({ ...formData, freeText: e.target.value })}
-              required
-              disabled={!isEditing && !!existingSummary}
-            />
-          </div>
+              {/* Free Text */}
+              <div className="space-y-2">
+                <Label htmlFor="freeText">Clinical Summary *</Label>
+                <Textarea
+                  id="freeText"
+                  placeholder="Detailed clinical summary of patient's stay, treatment provided, and response to treatment..."
+                  rows={6}
+                  value={formData.freeText}
+                  onChange={(e) => setFormData({ ...formData, freeText: e.target.value })}
+                  required
+                  disabled={!isEditing && !!existingSummary}
+                />
+              </div>
 
-          {/* Plan */}
-          <div className="space-y-2">
-            <Label htmlFor="plan">Discharge Plan *</Label>
-            <Textarea
-              id="plan"
-              placeholder="Follow-up appointments, medications, instructions for patient care, lifestyle modifications..."
-              rows={4}
-              value={formData.plan}
-              onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
-              required
-              disabled={!isEditing && !!existingSummary}
-            />
-          </div>
+              {/* Plan */}
+              <div className="space-y-2">
+                <Label htmlFor="plan">Discharge Plan *</Label>
+                <Textarea
+                  id="plan"
+                  placeholder="Follow-up appointments, medications, instructions for patient care, lifestyle modifications..."
+                  rows={4}
+                  value={formData.plan}
+                  onChange={(e) => setFormData({ ...formData, plan: e.target.value })}
+                  required
+                  disabled={!isEditing && !!existingSummary}
+                />
+              </div>
 
-          {/* Sign-off Section */}
-          <div className="border-t pt-6">
-            <SignOffSection
-              name={formData.name}
-              role={formData.role}
-              onNameChange={(name) => setFormData({ ...formData, name })}
-              onRoleChange={(role) => setFormData({ ...formData, role })}
-              idPrefix="discharge-signoff"
-            />
-          </div>
+              {/* Sign-off Section */}
+              <div className="border-t pt-6">
+                <SignOffSection
+                  name={formData.name}
+                  role={formData.role}
+                  onNameChange={(name) => setFormData({ ...formData, name })}
+                  onRoleChange={(role) => setFormData({ ...formData, role })}
+                  idPrefix="discharge-signoff"
+                />
+              </div>
 
-          {/* Submit/Cancel Buttons */}
-          <div className="flex items-center justify-between pt-4">
-            <p className="text-sm text-gray-500">* Required fields</p>
-            <div className="flex gap-2">
-              {isEditing && existingSummary && (
-                <Button type="button" variant="outline" onClick={handleCancel}>
-                  Cancel
-                </Button>
-              )}
-              <Button
-                type="submit"
-                disabled={
-                  createDischargeSummaryMutation.isPending ||
-                  updateDischargeSummaryMutation.isPending
-                }
-              >
-                {createDischargeSummaryMutation.isPending ||
-                updateDischargeSummaryMutation.isPending
-                  ? "Saving..."
-                  : existingSummary && isEditing
-                  ? "Update Discharge Summary"
-                  : "Save Discharge Summary"}
-              </Button>
-            </div>
-          </div>
-        </form>
+              {/* Submit/Cancel Buttons */}
+              <div className="flex items-center justify-between pt-4">
+                <p className="text-sm text-gray-500">* Required fields</p>
+                <div className="flex gap-2">
+                  {isEditing && existingSummary && (
+                    <Button type="button" variant="outline" onClick={handleCancel}>
+                      Cancel
+                    </Button>
+                  )}
+                  <Button
+                    type="submit"
+                    disabled={
+                      createDischargeSummaryMutation.isPending ||
+                      updateDischargeSummaryMutation.isPending
+                    }
+                  >
+                    {createDischargeSummaryMutation.isPending ||
+                    updateDischargeSummaryMutation.isPending
+                      ? "Saving..."
+                      : existingSummary && isEditing
+                      ? "Update Discharge Summary"
+                      : "Save Discharge Summary"}
+                  </Button>
+                </div>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
       )}
     </PageLayout>
   );

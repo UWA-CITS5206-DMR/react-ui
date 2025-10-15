@@ -47,7 +47,10 @@ export default function GoogleForms() {
   }
 
   return (
-    <PageLayout title="Google Forms">
+    <PageLayout
+      title="Google Forms"
+      description="Forms will open in a new tab. Please ensure you have completed all required fields before submitting."
+    >
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {googleForms.map((form) => (
           <Card key={form.id} className="hover:shadow-lg transition-shadow flex flex-col">
@@ -73,13 +76,6 @@ export default function GoogleForms() {
             </CardContent>
           </Card>
         ))}
-      </div>
-
-      <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
-        <p className="text-sm text-blue-800">
-          <strong>Note:</strong> Forms will open in a new tab. Please ensure you have completed all
-          required fields before submitting.
-        </p>
       </div>
     </PageLayout>
   );
