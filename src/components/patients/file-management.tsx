@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -28,6 +27,7 @@ import { Upload, FileText, Image, File, Trash2, Share2 } from "lucide-react";
 import type { PatientFile, FileCategory } from "@/lib/api-client-v2";
 import FilePreviewDialog from "./file-preview-dialog";
 import FileReleaseDialog from "./file-release-dialog";
+import PageLayout from "@/components/layout/page-layout";
 
 interface FileManagementProps {
   patientId: number;
@@ -175,11 +175,11 @@ export default function FileManagement({ patientId }: FileManagementProps) {
   };
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold">Patient File Management</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <PageLayout
+      title="Patient File Management"
+      description="Files uploaded here can be linked to student investigation requests or manually released to selected student groups using the Release button. Use manual release to grant immediate access without waiting for a request approval."
+    >
+      <div className="space-y-6">
         {/* File Upload Section */}
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -297,17 +297,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
             )}
           </ScrollArea>
         </div>
-
-        {/* File Access Control Info */}
-        <div className="bg-blue-50 p-3 rounded-lg">
-          <h4 className="text-sm font-medium text-blue-900 mb-2">File Access Control</h4>
-          <p className="text-xs text-blue-700">
-            Files uploaded here can be linked to student investigation requests or manually released
-            to selected student groups using the Release button. Use manual release to grant
-            immediate access without waiting for a request approval.
-          </p>
-        </div>
-      </CardContent>
+      </div>
 
       {/* File Preview Dialog */}
       {previewFile && (
@@ -359,6 +349,6 @@ export default function FileManagement({ patientId }: FileManagementProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </Card>
+    </PageLayout>
   );
 }

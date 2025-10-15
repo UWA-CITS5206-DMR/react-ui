@@ -19,6 +19,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Plus, Pencil, Trash2, FileText, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { GoogleFormLink, GoogleFormLinkCreate } from "@/lib/api-client-v2";
+import PageLayout from "@/components/layout/page-layout";
 
 export default function GoogleFormsManagement() {
   // Create/Edit modal state
@@ -206,112 +207,112 @@ export default function GoogleFormsManagement() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center mb-6">
-        <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Google Forms Management</h2>
-          <p className="text-sm text-gray-600">
-            Manage Google Forms that are displayed to students and patients
-          </p>
-        </div>
-        <Button
-          onClick={handleOpenCreateDialog}
-          className="bg-hospital-blue hover:bg-hospital-blue/90"
-        >
-          <Plus className="h-4 w-4 mr-2" />
-          Add Form
-        </Button>
-      </div>
-
-      {forms.length === 0 ? (
-        <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-gray-300 rounded-lg">
-          <FileText className="h-16 w-16 text-gray-300 mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No Forms Available</h3>
-          <p className="text-gray-500 mb-4">Get started by creating your first Google Form link.</p>
-          <Button
-            onClick={handleOpenCreateDialog}
-            className="bg-hospital-blue hover:bg-hospital-blue/90"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Form
-          </Button>
-        </div>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {forms.map((form) => (
-            <Card
-              key={form.id}
-              className={`hover:shadow-lg transition-shadow flex flex-col ${
-                !form.is_active ? "opacity-60 border-gray-300" : ""
-              }`}
+    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
+      <PageLayout
+        title="Google Forms Management"
+        description="Manage Google Forms that are displayed to students and patients"
+      >
+        {forms.length === 0 ? (
+          <div className="flex flex-col items-center justify-center p-12 text-center border-2 border-dashed border-gray-300 rounded-lg">
+            <FileText className="h-16 w-16 text-gray-300 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 mb-2">No Forms Available</h3>
+            <p className="text-gray-500 mb-4">
+              Get started by creating your first Google Form link.
+            </p>
+            <Button
+              onClick={handleOpenCreateDialog}
+              className="bg-hospital-blue hover:bg-hospital-blue/90"
             >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <CardTitle className="flex items-center gap-2 flex-1">
-                    <FileText className="h-5 w-5 text-hospital-blue" />
-                    <span className="line-clamp-2">{form.title}</span>
-                  </CardTitle>
-                  <div className="flex gap-1 ml-2">
+              <Plus className="h-4 w-4 mr-2" />
+              Add Form
+            </Button>
+          </div>
+        ) : (
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {forms.map((form) => (
+              <Card
+                key={form.id}
+                className={`hover:shadow-lg transition-shadow flex flex-col ${
+                  !form.is_active ? "opacity-60 border-gray-300" : ""
+                }`}
+              >
+                <CardHeader>
+                  <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
+                    <CardTitle className="flex items-center gap-2 flex-1">
+                      <FileText className="h-5 w-5 text-hospital-blue" />
+                      <span className="line-clamp-2">{form.title}</span>
+                    </CardTitle>
+                    <div className="flex gap-1 ml-2 sm:ml-0 sm:mt-0 mt-2">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenEditDialog(form)}
+                        title="Edit form"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          setDeleteFormId(form.id);
+                          setDeleteDialogOpen(true);
+                        }}
+                        title="Delete form"
+                        className="text-red-600 hover:text-red-700"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  {form.description && (
+                    <CardDescription className="mt-2 line-clamp-3">
+                      {form.description}
+                    </CardDescription>
+                  )}
+                  <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
+                    <span>Order: {form.display_order}</span>
+                    <span className={form.is_active ? "text-green-600" : "text-gray-400"}>
+                      {form.is_active ? "Active" : "Inactive"}
+                    </span>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex flex-col flex-1">
+                  <div className="mt-auto">
                     <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleOpenEditDialog(form)}
-                      title="Edit form"
+                      onClick={() => window.open(form.url, "_blank", "noopener,noreferrer")}
+                      variant="outline"
+                      className="w-full"
                     >
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setDeleteFormId(form.id);
-                        setDeleteDialogOpen(true);
-                      }}
-                      title="Delete form"
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <Trash2 className="h-4 w-4" />
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      Open Form
                     </Button>
                   </div>
-                </div>
-                {form.description && (
-                  <CardDescription className="mt-2 line-clamp-3">
-                    {form.description}
-                  </CardDescription>
-                )}
-                <div className="flex items-center gap-4 mt-2 text-xs text-gray-500">
-                  <span>Order: {form.display_order}</span>
-                  <span className={form.is_active ? "text-green-600" : "text-gray-400"}>
-                    {form.is_active ? "Active" : "Inactive"}
-                  </span>
-                </div>
-              </CardHeader>
-              <CardContent className="flex flex-col flex-1">
-                <div className="mt-auto">
-                  <Button
-                    onClick={() => window.open(form.url, "_blank", "noopener,noreferrer")}
-                    variant="outline"
-                    className="w-full"
-                  >
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Open Form
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </PageLayout>
+
+      {/* Floating Action Button */}
+      <Button
+        onClick={handleOpenCreateDialog}
+        className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
+        title="Add new form"
+      >
+        <Plus className="h-6 w-6" />
+      </Button>
 
       {/* Create/Edit Dialog */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
-        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingForm ? "Edit Google Form" : "Add Google Form"}</DialogTitle>
+            <DialogTitle>{editingForm ? "Edit Google Form" : "Create Google Form"}</DialogTitle>
             <DialogDescription>
               {editingForm
-                ? "Update the Google Form information below."
-                : "Create a new Google Form link that will be displayed to students and patients."}
+                ? "Update the Google Form information below. Fields marked with * are required."
+                : "Fill in the Google Form information below. Fields marked with * are required."}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">

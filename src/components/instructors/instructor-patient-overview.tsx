@@ -51,130 +51,140 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
     <div className="bg-bg-light p-6">
       <div className="max-w-7xl mx-auto">
         {/* Patient Basic Information */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Patient Information</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-500">Name</label>
-              <p className="text-sm text-gray-900">
-                {patient.first_name} {patient.last_name}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Patient ID</label>
-              <p className="text-sm text-gray-900">{patient.id}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Date of Birth</label>
-              <p className="text-sm text-gray-900">
-                {new Date(patient.date_of_birth).toLocaleDateString()}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">MRN</label>
-              <p className="text-sm text-gray-900">{patient.mrn}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Gender</label>
-              <p className="text-sm text-gray-900">{getGenderLabel(patient.gender)}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Ward</label>
-              <p className="text-sm text-gray-900">{patient.ward}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Bed</label>
-              <p className="text-sm text-gray-900">{patient.bed}</p>
-            </div>
-            {patient.phone_number && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Patient Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Phone</label>
-                <p className="text-sm text-gray-900">{patient.phone_number}</p>
+                <label className="text-sm font-medium text-gray-500">Name</label>
+                <p className="text-sm text-gray-900">
+                  {patient.first_name} {patient.last_name}
+                </p>
               </div>
-            )}
-          </div>
-        </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Patient ID</label>
+                <p className="text-sm text-gray-900">{patient.id}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Date of Birth</label>
+                <p className="text-sm text-gray-900">
+                  {new Date(patient.date_of_birth).toLocaleDateString()}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">MRN</label>
+                <p className="text-sm text-gray-900">{patient.mrn}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Gender</label>
+                <p className="text-sm text-gray-900">{getGenderLabel(patient.gender)}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Ward</label>
+                <p className="text-sm text-gray-900">{patient.ward}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Bed</label>
+                <p className="text-sm text-gray-900">{patient.bed}</p>
+              </div>
+              {patient.phone_number && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Phone</label>
+                  <p className="text-sm text-gray-900">{patient.phone_number}</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Investigation Requests Overview */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Investigation Requests Overview
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium flex items-center">
-                  <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-                  Completed Requests
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-green-600">{completedLabRequests}</div>
-                <p className="text-sm text-gray-500 mt-1">Requests completed and approved</p>
-              </CardContent>
-            </Card>
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Investigation Requests Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Completed Requests
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-green-600">{completedLabRequests}</div>
+                  <p className="text-sm text-gray-500 mt-1">Requests completed and approved</p>
+                </CardContent>
+              </Card>
 
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium flex items-center">
-                  <Clock className="h-5 w-5 text-yellow-500 mr-2" />
-                  Pending Requests
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold text-yellow-600">{pendingLabRequests}</div>
-                <p className="text-sm text-gray-500 mt-1">Requests awaiting review</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          {totalLabRequests > 0 && (
-            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
-              <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-700">
-                  Total Investigation Requests
-                </span>
-                <span className="text-lg font-semibold text-gray-900">{totalLabRequests}</span>
-              </div>
-              <div className="mt-2 text-xs text-gray-500">
-                Blood Tests: {bloodTestsStatsData?.total || 0} • Imaging:{" "}
-                {imagingRequestsStatsData?.total || 0}
-              </div>
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center">
+                    <Clock className="h-5 w-5 text-yellow-500 mr-2" />
+                    Pending Requests
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-3xl font-bold text-yellow-600">{pendingLabRequests}</div>
+                  <p className="text-sm text-gray-500 mt-1">Requests awaiting review</p>
+                </CardContent>
+              </Card>
             </div>
-          )}
-        </div>
 
-        {/* Patient Files */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Patient Documents</h3>
-          {files.length > 0 ? (
-            <div className="space-y-2">
-              {files.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{file.display_name}</p>
-                    <p className="text-sm text-gray-500">
-                      Category: {file.category || "Unspecified"} • Created:{" "}
-                      {new Date(file.created_at).toLocaleDateString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{file.category || "Document"}</Badge>
-                    <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      Preview
-                    </Button>
-                  </div>
+            {totalLabRequests > 0 && (
+              <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-medium text-gray-700">
+                    Total Investigation Requests
+                  </span>
+                  <span className="text-lg font-semibold text-gray-900">{totalLabRequests}</span>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No documents available for this patient.</p>
-          )}
-        </div>
+                <div className="mt-2 text-xs text-gray-500">
+                  Blood Tests: {bloodTestsStatsData?.total || 0} • Imaging:{" "}
+                  {imagingRequestsStatsData?.total || 0}
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Patient Documents */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Patient Documents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {files.length > 0 ? (
+              <div className="space-y-2">
+                {files.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">{file.display_name}</p>
+                      <p className="text-sm text-gray-500">
+                        Category: {file.category || "Unspecified"} • Created:{" "}
+                        {new Date(file.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{file.category || "Document"}</Badge>
+                      <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Preview
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No documents available for this patient.</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* File Preview Dialog */}

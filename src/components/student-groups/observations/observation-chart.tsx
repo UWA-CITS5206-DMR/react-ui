@@ -144,7 +144,7 @@ export function ObservationChart({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Observations Chart</CardTitle>
+        <CardTitle>Observations Chart</CardTitle>
         <p className="text-sm text-gray-600">Historical trends of vital signs over time</p>
       </CardHeader>
       <CardContent>

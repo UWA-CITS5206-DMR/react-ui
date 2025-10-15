@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { apiClientV2 } from "@/lib/queryClient";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { RequestCard } from "./request-card";
 import type { BloodTestRequest } from "@/lib/api-client-v2";
 import { useToast } from "@/hooks/use-toast";
@@ -55,40 +54,31 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Blood Test Requests</CardTitle>
-        <CardDescription>
-          View blood test requests submitted for this patient. Pending requests can be deleted when
-          you need to resubmit with updated clinical information.
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {!bloodTestRequests || bloodTestRequests.results.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">No blood test requests found</p>
-        ) : (
-          <div className="space-y-4">
-            {bloodTestRequests.results.map((request: BloodTestRequest) => (
-              <RequestCard
-                key={request.id}
-                testType={request.test_type}
-                details={request.details}
-                status={request.status}
-                createdAt={request.created_at}
-                requestedBy={{
-                  name: request.name,
-                  role: request.role,
-                }}
-                approvedFiles={request.approved_files}
-                patientId={parseInt(patientId)}
-                canDelete={request.status === "pending"}
-                onDelete={() => handleDeleteRequest(request.id)}
-                isDeleting={deletingId === request.id && deleteBloodTestRequestMutation.isPending}
-              />
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+    <div>
+      {!bloodTestRequests || bloodTestRequests.results.length === 0 ? (
+        <p className="text-muted-foreground text-center py-8">No blood test requests found</p>
+      ) : (
+        <div className="space-y-4">
+          {bloodTestRequests.results.map((request: BloodTestRequest) => (
+            <RequestCard
+              key={request.id}
+              testType={request.test_type}
+              details={request.details}
+              status={request.status}
+              createdAt={request.created_at}
+              requestedBy={{
+                name: request.name,
+                role: request.role,
+              }}
+              approvedFiles={request.approved_files}
+              patientId={parseInt(patientId)}
+              canDelete={request.status === "pending"}
+              onDelete={() => handleDeleteRequest(request.id)}
+              isDeleting={deletingId === request.id && deleteBloodTestRequestMutation.isPending}
+            />
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

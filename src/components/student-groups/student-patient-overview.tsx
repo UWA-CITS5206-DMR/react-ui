@@ -142,151 +142,163 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
     <div className="bg-bg-light p-6">
       <div className="max-w-7xl mx-auto">
         {/* Patient Basic Information */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Patient Information</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div>
-              <label className="text-sm font-medium text-gray-500">Name</label>
-              <p className="text-sm text-gray-900">
-                {patient.first_name} {patient.last_name}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Patient ID</label>
-              <p className="text-sm text-gray-900">{patient.id}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Date of Birth</label>
-              <p className="text-sm text-gray-900">
-                {new Date(patient.date_of_birth).toLocaleDateString()}
-              </p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">MRN</label>
-              <p className="text-sm text-gray-900">{patient.mrn}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Gender</label>
-              <p className="text-sm text-gray-900">{getGenderLabel(patient.gender)}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Ward</label>
-              <p className="text-sm text-gray-900">{patient.ward}</p>
-            </div>
-            <div>
-              <label className="text-sm font-medium text-gray-500">Bed</label>
-              <p className="text-sm text-gray-900">{patient.bed}</p>
-            </div>
-            {patient.phone_number && (
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>Patient Information</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <label className="text-sm font-medium text-gray-500">Phone</label>
-                <p className="text-sm text-gray-900">{patient.phone_number}</p>
+                <label className="text-sm font-medium text-gray-500">Name</label>
+                <p className="text-sm text-gray-900">
+                  {patient.first_name} {patient.last_name}
+                </p>
               </div>
-            )}
-          </div>
-        </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Patient ID</label>
+                <p className="text-sm text-gray-900">{patient.id}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Date of Birth</label>
+                <p className="text-sm text-gray-900">
+                  {new Date(patient.date_of_birth).toLocaleDateString()}
+                </p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">MRN</label>
+                <p className="text-sm text-gray-900">{patient.mrn}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Gender</label>
+                <p className="text-sm text-gray-900">{getGenderLabel(patient.gender)}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Ward</label>
+                <p className="text-sm text-gray-900">{patient.ward}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-500">Bed</label>
+                <p className="text-sm text-gray-900">{patient.bed}</p>
+              </div>
+              {patient.phone_number && (
+                <div>
+                  <label className="text-sm font-medium text-gray-500">Phone</label>
+                  <p className="text-sm text-gray-900">{patient.phone_number}</p>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Clinical Overview */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Clinical Overview</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Observations Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium flex items-center">
-                  <Activity className="h-5 w-5 text-red-500 mr-2" />
-                  Observations
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-2">{latestObservationText}</p>
-                {latestRespRate && (
-                  <p className="text-xs text-gray-500">
-                    RR: {latestRespRate.respiratory_rate} • O2: {latestO2Sat?.saturation_percentage}
-                    %
-                  </p>
-                )}
-                <Badge variant="outline" className="mt-2">
-                  {observationStatus}
-                </Badge>
-              </CardContent>
-            </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Clinical Overview</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Observations Card */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center">
+                    <Activity className="h-5 w-5 text-red-500 mr-2" />
+                    Observations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-2">{latestObservationText}</p>
+                  {latestRespRate && (
+                    <p className="text-xs text-gray-500">
+                      RR: {latestRespRate.respiratory_rate} • O2:{" "}
+                      {latestO2Sat?.saturation_percentage}%
+                    </p>
+                  )}
+                  <Badge variant="outline" className="mt-2">
+                    {observationStatus}
+                  </Badge>
+                </CardContent>
+              </Card>
 
-            {/* Investigation Requests Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium flex items-center">
-                  <FlaskConical className="h-5 w-5 text-blue-500 mr-2" />
-                  Investigation Requests
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-2">{investigationText}</p>
-                {latestInvestigation && (
-                  <p className="text-xs text-gray-500">
-                    Created: {new Date(latestInvestigation.created_at).toLocaleDateString()}
-                  </p>
-                )}
-                <Badge variant="outline" className="mt-2">
-                  {investigationStatus}
-                </Badge>
-              </CardContent>
-            </Card>
+              {/* Investigation Requests Card */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center">
+                    <FlaskConical className="h-5 w-5 text-blue-500 mr-2" />
+                    Investigation Requests
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-2">{investigationText}</p>
+                  {latestInvestigation && (
+                    <p className="text-xs text-gray-500">
+                      Created: {new Date(latestInvestigation.created_at).toLocaleDateString()}
+                    </p>
+                  )}
+                  <Badge variant="outline" className="mt-2">
+                    {investigationStatus}
+                  </Badge>
+                </CardContent>
+              </Card>
 
-            {/* Medication Orders Card */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base font-medium flex items-center">
-                  <Pill className="h-5 w-5 text-green-500 mr-2" />
-                  Medication Orders
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm text-gray-600 mb-2">{medicationText}</p>
-                {latestMedication && (
-                  <p className="text-xs text-gray-500">
-                    Instructions: {latestMedication.instructions}
-                  </p>
-                )}
-                <Badge variant="outline" className="mt-2">
-                  {medicationStatus}
-                </Badge>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+              {/* Medication Orders Card */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base font-medium flex items-center">
+                    <Pill className="h-5 w-5 text-green-500 mr-2" />
+                    Medication Orders
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm text-gray-600 mb-2">{medicationText}</p>
+                  {latestMedication && (
+                    <p className="text-xs text-gray-500">
+                      Instructions: {latestMedication.instructions}
+                    </p>
+                  )}
+                  <Badge variant="outline" className="mt-2">
+                    {medicationStatus}
+                  </Badge>
+                </CardContent>
+              </Card>
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Patient Documents */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Patient Documents</h3>
-          {files.length > 0 ? (
-            <div className="space-y-2">
-              {files.map((file) => (
-                <div
-                  key={file.id}
-                  className="flex items-center justify-between p-3 border rounded-lg"
-                >
-                  <div>
-                    <p className="font-medium text-gray-900">{file.display_name}</p>
-                    <p className="text-sm text-gray-500">
-                      Category: {file.category || "Unspecified"} • Created:{" "}
-                      {new Date(file.created_at).toLocaleDateString()}
-                    </p>
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Patient Documents</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {files.length > 0 ? (
+              <div className="space-y-2">
+                {files.map((file) => (
+                  <div
+                    key={file.id}
+                    className="flex items-center justify-between p-3 border rounded-lg"
+                  >
+                    <div>
+                      <p className="font-medium text-gray-900">{file.display_name}</p>
+                      <p className="text-sm text-gray-500">
+                        Category: {file.category || "Unspecified"} • Created:{" "}
+                        {new Date(file.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline">{file.category || "Document"}</Badge>
+                      <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
+                        <Eye className="h-4 w-4 mr-1" />
+                        Preview
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="outline">{file.category || "Document"}</Badge>
-                    <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
-                      <Eye className="h-4 w-4 mr-1" />
-                      Preview
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-gray-500">No documents available for this patient.</p>
-          )}
-        </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-gray-500">No documents available for this patient.</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
 
       {/* File Preview Dialog */}

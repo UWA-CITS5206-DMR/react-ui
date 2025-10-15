@@ -24,7 +24,7 @@ export function LatestObservationsDisplay({ vitals }: LatestObservationsDisplayP
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-lg">Latest Observations</CardTitle>
+        <CardTitle>Latest Observations</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

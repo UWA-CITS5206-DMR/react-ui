@@ -7,7 +7,7 @@ import PatientHeader from "@/components/patients/patient-header";
 import InstructorPatientOverview from "@/components/instructors/instructor-patient-overview";
 import InstructorLabRequests from "@/components/instructors/investigation-requests/investigation-requests";
 import FileManagement from "@/components/patients/file-management";
-import GoogleFormsManagement from "@/components/instructor/google-forms-management";
+import GoogleFormsManagement from "@/components/instructors/google-forms-management";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

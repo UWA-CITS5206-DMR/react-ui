@@ -177,7 +177,8 @@ export function RequestCard({
             <DialogHeader>
               <DialogTitle>Delete Investigation Request</DialogTitle>
               <DialogDescription>
-                Are you sure you want to delete this investigation request? This action cannot be undone.
+                Are you sure you want to delete this investigation request? This action cannot be
+                undone.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter>
@@ -188,11 +189,7 @@ export function RequestCard({
               >
                 Cancel
               </Button>
-              <Button
-                variant="destructive"
-                onClick={handleConfirmDelete}
-                disabled={isDeleting}
-              >
+              <Button variant="destructive" onClick={handleConfirmDelete} disabled={isDeleting}>
                 {isDeleting ? "Deleting..." : "Delete"}
               </Button>
             </DialogFooter>

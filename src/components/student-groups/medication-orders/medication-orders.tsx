@@ -11,6 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { MedicationOrderForm } from "./medication-order-form";
 import { MedicationOrderList } from "./medication-order-list";
+import PageLayout from "@/components/layout/page-layout";
 
 interface MedicationOrdersProps {
   patientId: string;
@@ -33,9 +34,14 @@ export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      {/* Medication Order List */}
-      <MedicationOrderList patientId={patientId} />
+    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
+      <PageLayout
+        title="Medication Orders"
+        description="View and manage medication orders for this patient. Use the + button to prescribe new medications."
+      >
+        {/* Medication Order List */}
+        <MedicationOrderList patientId={patientId} />
+      </PageLayout>
 
       {/* Floating Action Button */}
       <Button

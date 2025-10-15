@@ -4,7 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +18,7 @@ import { Plus, Pencil, Trash2 } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { NoteEntry } from "@/lib/api-client-v2";
 import { formatDate } from "@/lib/utils";
+import PageLayout from "@/components/layout/page-layout";
 
 interface SOAPNotesFormProps {
   patientId: string;
@@ -171,67 +172,59 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   return (
     <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
       {/* Notes List */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Clinical Notes</CardTitle>
-          <CardDescription>
-            View, edit, and delete clinical notes for this patient. Click the + button to add a new
-            note.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {!notes || notes.results.length === 0 ? (
-            <p className="text-muted-foreground text-center py-8">
-              No notes found. Click the + button to create your first note.
-            </p>
-          ) : (
-            <div className="space-y-4">
-              {notes.results.map((note: NoteEntry) => (
-                <Card key={note.id}>
-                  <CardContent className="pt-6">
-                    <div className="flex justify-between items-start mb-3">
-                      <div>
-                        <p className="text-sm text-muted-foreground">
-                          {formatDate(note.created_at)}
-                        </p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleOpenEditDialog(note)}
-                          title="Edit note"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleDelete(note.id)}
-                          title="Delete note"
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+      <PageLayout
+        title="Clinical Notes"
+        description="View, edit, and delete clinical notes for this patient. Click the + button to add a new note."
+      >
+        {!notes || notes.results.length === 0 ? (
+          <p className="text-muted-foreground text-center py-8">
+            No notes found. Click the + button to create your first note.
+          </p>
+        ) : (
+          <div className="space-y-4">
+            {notes.results.map((note: NoteEntry) => (
+              <Card key={note.id}>
+                <CardContent className="pt-6">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="text-sm text-muted-foreground">{formatDate(note.created_at)}</p>
                     </div>
-                    <div className="space-y-3">
-                      <div className="bg-muted/30 p-4 rounded-md">
-                        <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
-                      </div>
-                      <div className="border-t pt-2">
-                        <p className="text-xs text-muted-foreground">
-                          Written by: {note.name} ({note.role})
-                        </p>
-                      </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleOpenEditDialog(note)}
+                        title="Edit note"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDelete(note.id)}
+                        title="Delete note"
+                        className="text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  </div>
+                  <div className="space-y-3">
+                    <div className="bg-muted/30 p-4 rounded-md">
+                      <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
+                    </div>
+                    <div className="border-t pt-2">
+                      <p className="text-xs text-muted-foreground">
+                        Written by: {note.name} ({note.role})
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </PageLayout>
 
       {/* Floating Action Button */}
       <Button

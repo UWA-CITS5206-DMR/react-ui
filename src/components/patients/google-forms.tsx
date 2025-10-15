@@ -4,6 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import PageLayout from "@/components/layout/page-layout";
 
 export default function GoogleForms() {
   const {
@@ -46,11 +47,7 @@ export default function GoogleForms() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Google Forms</h2>
-      </div>
-
+    <PageLayout title="Google Forms">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {googleForms.map((form) => (
           <Card key={form.id} className="hover:shadow-lg transition-shadow flex flex-col">
@@ -84,6 +81,6 @@ export default function GoogleForms() {
           required fields before submitting.
         </p>
       </div>
-    </div>
+    </PageLayout>
   );
 }
