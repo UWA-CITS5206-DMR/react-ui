@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, FileText, Eye, Pencil, Trash2 } from "lucide-react";
 import type { ApprovedFile } from "@/lib/api-client-v2";
-import StudentFilePreviewDialog from "./student-file-preview-dialog";
+import StudentFilePreviewDialog from "./file-preview-dialog";
 import {
   Dialog,
   DialogContent,

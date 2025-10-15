@@ -5,7 +5,7 @@ import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
 import InstructorPatientOverview from "@/components/instructors/instructor-patient-overview";
-import InstructorLabRequests from "@/components/instructors/instructor-lab-requests";
+import InstructorLabRequests from "@/components/instructors/investigation-requests/investigation-requests";
 import FileManagement from "@/components/patients/file-management";
 import GoogleForms from "@/components/patients/google-forms";
 import NotificationToast from "@/components/layout/notification-toast";
