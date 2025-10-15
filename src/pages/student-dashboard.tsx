@@ -4,7 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import StudentPatientOverview from "@/components/student-groups/patient-overview";
+import StudentPatientOverview from "@/components/student-groups/patients/patient-overview";
 import Observations from "@/components/student-groups/observations/observations";
 import SoapNotesForm from "@/components/student-groups/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";

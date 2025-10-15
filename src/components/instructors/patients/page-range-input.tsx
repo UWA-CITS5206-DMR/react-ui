@@ -15,7 +15,7 @@ interface PageRangeInputProps {
 export default function PageRangeInput({ onConfirm, onCancel, fileName }: PageRangeInputProps) {
   const [pageRange, setPageRange] = useState("");
   const [error, setError] = useState("");
-  const [previewEntireFile, setPreviewEntireFile] = useState(false);
+  const [previewEntireFile, setPreviewEntireFile] = useState(true);
 
   const validatePageRange = (value: string): boolean => {
     if (!value.trim()) {

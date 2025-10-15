@@ -6,7 +6,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import StudentFilePreviewDialog from "./investigation-requests/file-preview-dialog";
+import StudentFilePreviewDialog from "../investigation-requests/file-preview-dialog";
 import { getGenderLabel } from "@/lib/constants";
 import { getVitalSignAbbreviation, getBloodPressureAbbreviation } from "@/lib/vital-signs";
 

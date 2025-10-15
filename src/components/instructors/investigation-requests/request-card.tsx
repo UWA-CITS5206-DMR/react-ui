@@ -138,6 +138,7 @@ export function RequestCard({ request, onApprove }: RequestCardProps) {
           fileId={selectedPreviewFile.fileId}
           fileName={selectedPreviewFile.fileName}
           requiresPagination={selectedPreviewFile.requiresPagination}
+          defaultPageRange={selectedPreviewFile.pageRange}
         />
       )}
     </>

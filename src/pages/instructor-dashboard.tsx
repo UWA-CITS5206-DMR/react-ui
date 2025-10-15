@@ -4,7 +4,7 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import InstructorPatientOverview from "@/components/instructors/patient-overview";
+import InstructorPatientOverview from "@/components/instructors/patients/patient-overview";
 import InstructorLabRequests from "@/components/instructors/investigation-requests/investigation-requests";
 import FileManagement from "@/components/instructors/patients/file-management";
 import GoogleFormsManagement from "@/components/instructors/google-forms-management";
