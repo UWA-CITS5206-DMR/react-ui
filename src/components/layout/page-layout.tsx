@@ -4,6 +4,7 @@ interface PageLayoutProps {
   title: string;
   description?: string;
   useContainerLayout?: boolean;
+  extraBottomPadding?: boolean;
   children: React.ReactNode;
 }
 
@@ -11,6 +12,7 @@ export default function PageLayout({
   title,
   description,
   useContainerLayout = true,
+  extraBottomPadding = false,
   children,
 }: PageLayoutProps) {
   const content = (
@@ -25,7 +27,9 @@ export default function PageLayout({
   );
 
   return useContainerLayout ? (
-    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">{content}</div>
+    <div className={`max-w-7xl mx-auto space-y-6 relative ${extraBottomPadding ? "pb-20" : ""}`}>
+      {content}
+    </div>
   ) : (
     content
   );

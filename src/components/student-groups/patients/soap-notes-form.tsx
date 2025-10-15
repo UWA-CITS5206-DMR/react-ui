@@ -173,6 +173,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
     <PageLayout
       title="Clinical Notes"
       description="View, edit, and delete clinical notes for this patient. Click the + button to add a new note."
+      extraBottomPadding
     >
       {!notes || notes.results.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">

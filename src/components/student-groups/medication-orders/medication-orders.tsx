@@ -37,6 +37,7 @@ export default function MedicationOrders({ patientId }: MedicationOrdersProps) {
     <PageLayout
       title="Medication Orders"
       description="View and manage medication orders for this patient. Use the + button to prescribe new medications."
+      extraBottomPadding
     >
       {/* Medication Order List */}
       <MedicationOrderList patientId={patientId} />

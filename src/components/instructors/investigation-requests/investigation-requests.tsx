@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { apiClientV2 } from "@/lib/queryClient";
 import { BloodTestRequestList } from "./blood-test-request-list";
 import { ImagingRequestList } from "./imaging-request-list";
+import PageLayout from "@/components/layout/page-layout";
 
 interface InstructorInvestigationRequestsProps {
   patientId?: number;
@@ -51,31 +52,40 @@ export default function InstructorInvestigationRequests({
     : (imagingRequestsStats as any)?.pending || 0;
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Show Completed Toggle */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center space-x-2">
-          <Switch id="show-completed" checked={showCompleted} onCheckedChange={setShowCompleted} />
-          <Label htmlFor="show-completed" className="text-sm font-medium">
-            Show Completed Requests
-          </Label>
+    <PageLayout
+      title="Investigation Requests"
+      description="Approve blood test and imaging requests for patients."
+    >
+      <div className="h-full flex flex-col">
+        {/* Show Completed Toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="show-completed"
+              checked={showCompleted}
+              onCheckedChange={setShowCompleted}
+            />
+            <Label htmlFor="show-completed" className="text-sm font-medium">
+              Show Completed Requests
+            </Label>
+          </div>
         </div>
+
+        <Tabs defaultValue="blood" className="flex-1 flex flex-col">
+          <TabsList className="grid w-full grid-cols-2">
+            <TabsTrigger value="blood">Blood Tests ({bloodTestsTotal})</TabsTrigger>
+            <TabsTrigger value="imaging">Imaging Requests ({imagingRequestsTotal})</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="blood" className="flex-1 overflow-hidden mt-4">
+            <BloodTestRequestList patientId={patientId} showCompleted={showCompleted} />
+          </TabsContent>
+
+          <TabsContent value="imaging" className="flex-1 overflow-hidden mt-4">
+            <ImagingRequestList patientId={patientId} showCompleted={showCompleted} />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <Tabs defaultValue="blood" className="flex-1 flex flex-col">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="blood">Blood Tests ({bloodTestsTotal})</TabsTrigger>
-          <TabsTrigger value="imaging">Imaging Requests ({imagingRequestsTotal})</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="blood" className="flex-1 overflow-hidden mt-4">
-          <BloodTestRequestList patientId={patientId} showCompleted={showCompleted} />
-        </TabsContent>
-
-        <TabsContent value="imaging" className="flex-1 overflow-hidden mt-4">
-          <ImagingRequestList patientId={patientId} showCompleted={showCompleted} />
-        </TabsContent>
-      </Tabs>
-    </div>
+    </PageLayout>
   );
 }

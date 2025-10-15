@@ -178,6 +178,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
     <PageLayout
       title="Patient File Management"
       description="Files uploaded here can be linked to student investigation requests or manually released to selected student groups using the Release button. Use manual release to grant immediate access without waiting for a request approval."
+      extraBottomPadding
     >
       <div className="space-y-6">
         {/* File Upload Section */}
