@@ -4,13 +4,13 @@ import { apiClientV2 } from "@/lib/queryClient";
 import TopNavigation from "@/components/layout/top-navigation";
 import PatientList from "@/components/patients/patient-list";
 import PatientHeader from "@/components/patients/patient-header";
-import StudentPatientOverview from "@/components/student-groups/student-patient-overview";
+import StudentPatientOverview from "@/components/student-groups/patient-overview";
 import Observations from "@/components/student-groups/observations/observations";
-import SoapNotesForm from "@/components/patients/soap-notes-form";
+import SoapNotesForm from "@/components/student-groups/patients/soap-notes-form";
 import InvestigationRequests from "@/components/student-groups/investigation-requests/investigation-requests";
 import MedicationOrders from "@/components/student-groups/medication-orders/medication-orders";
-import DischargeSummary from "@/components/patients/discharge-summary";
-import GoogleForms from "@/components/patients/google-forms";
+import DischargeSummary from "@/components/student-groups/patients/discharge-summary";
+import GoogleForms from "@/components/student-groups/google-forms";
 import NotificationToast from "@/components/layout/notification-toast";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 

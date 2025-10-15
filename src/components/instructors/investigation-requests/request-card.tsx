@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { CheckCircle, Clock, FileText, User, Eye } from "lucide-react";
 import { formatDate } from "@/lib/utils";
 import { useState } from "react";
-import FilePreviewDialog from "@/components/patients/file-preview-dialog";
+import FilePreviewDialog from "@/components/instructors/patients/file-preview-dialog";
 import type { BloodTestRequest, ImagingRequest, ApprovedFile } from "@/lib/api-client-v2";
 
 interface RequestCardProps {
