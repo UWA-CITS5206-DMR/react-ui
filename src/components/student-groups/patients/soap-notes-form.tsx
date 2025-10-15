@@ -14,7 +14,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2 } from "lucide-react";
+import { Plus, Edit, Trash2 } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
 import type { NoteEntry } from "@/lib/api-client-v2";
 import { formatDate } from "@/lib/utils";
@@ -25,7 +25,7 @@ interface SOAPNotesFormProps {
 }
 
 export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
-  // Create/Edit modal state - reused for both create and edit
+  // Add/Edit modal state - reused for both add and edit
   const [noteDialogOpen, setNoteDialogOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<NoteEntry | null>(null);
   const [content, setContent] = useState("");
@@ -60,7 +60,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
           patient: parseInt(patientId),
         });
       } else {
-        // Create new note
+        // Add new note
         return apiClientV2.studentGroups.notes.create({
           patient: parseInt(patientId),
           name: signOffName,
@@ -73,7 +73,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
       queryClient.invalidateQueries({ queryKey: ["notes", patientId] });
       toast({
         title: "Success",
-        description: editingNote ? "Note updated successfully!" : "Note created successfully!",
+        description: editingNote ? "Note updated successfully!" : "Note added successfully!",
       });
       handleCloseDialog();
     },
@@ -110,7 +110,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
     },
   });
 
-  const handleOpenCreateDialog = () => {
+  const handleOpenAddDialog = () => {
     setEditingNote(null);
     setContent("");
     setSignOffName("");
@@ -177,7 +177,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
     >
       {!notes || notes.results.length === 0 ? (
         <p className="text-muted-foreground text-center py-8">
-          No notes found. Click the + button to create your first note.
+          No notes found. Click the + button to add your first note.
         </p>
       ) : (
         <div className="space-y-4">
@@ -194,17 +194,18 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                       variant="ghost"
                       onClick={() => handleOpenEditDialog(note)}
                       title="Edit note"
+                      className="h-6 w-6 p-0"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Edit className="h-3 w-3" />
                     </Button>
                     <Button
                       size="sm"
                       variant="ghost"
                       onClick={() => handleDelete(note.id)}
                       title="Delete note"
-                      className="text-destructive hover:text-destructive"
+                      className="text-destructive hover:text-destructive h-6 w-6 p-0"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -226,18 +227,18 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
 
       {/* Floating Action Button */}
       <Button
-        onClick={handleOpenCreateDialog}
+        onClick={handleOpenAddDialog}
         className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
         title="Add new note"
       >
         <Plus className="h-6 w-6" />
       </Button>
 
-      {/* Create/Edit Note Dialog */}
+      {/* Add/Edit Note Dialog */}
       <Dialog open={noteDialogOpen} onOpenChange={setNoteDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingNote ? "Edit Clinical Note" : "Create Clinical Note"}</DialogTitle>
+            <DialogTitle>{editingNote ? "Edit Clinical Note" : "Add Clinical Note"}</DialogTitle>
             <DialogDescription>
               {editingNote
                 ? "Update the clinical note information below. Fields marked with * are required."
@@ -253,7 +254,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                   value={content}
                   onChange={(e) => setContent(e.target.value)}
                   placeholder="Enter your clinical notes here. You may structure as SOAP (Subjective, Objective, Assessment, Plan) or use free-form text..."
-                  className="min-h-[300px]"
+                  className="min-h-[200px]"
                 />
                 <p className="text-xs text-muted-foreground">
                   Tip: Consider organizing your notes using headings like Subjective, Objective,
@@ -282,11 +283,16 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
                 disabled={saveNoteMutation.isPending}
                 className="bg-hospital-blue hover:bg-hospital-blue/90"
               >
-                {saveNoteMutation.isPending
-                  ? "Saving..."
-                  : editingNote
-                  ? "Update Note"
-                  : "Create Note"}
+                {saveNoteMutation.isPending ? (
+                  "Saving..."
+                ) : editingNote ? (
+                  "Update Note"
+                ) : (
+                  <>
+                    <Plus className="h-4 w-4" />
+                    Add Note
+                  </>
+                )}
               </Button>
             </DialogFooter>
           </form>

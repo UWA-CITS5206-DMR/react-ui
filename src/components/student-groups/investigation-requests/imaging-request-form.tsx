@@ -192,7 +192,7 @@ export function ImagingRequestForm({ patientId, onSuccess, onCancel }: ImagingRe
           disabled={createImagingMutation.isPending}
           className="bg-hospital-blue hover:bg-hospital-blue/90"
         >
-          <Send className="h-4 w-4 mr-2" />
+          <Send className="h-4 w-4" />
           {createImagingMutation.isPending ? "Submitting..." : "Submit Imaging Request"}
         </Button>
       </DialogFooter>

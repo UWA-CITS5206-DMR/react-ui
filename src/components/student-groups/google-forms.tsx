@@ -56,7 +56,7 @@ export default function GoogleForms() {
           <Card key={form.id} className="hover:shadow-lg transition-shadow flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-hospital-blue" />
+                <FileText className="h-5 w-5 text-hospital-blue flex-shrink-0" />
                 {form.title}
               </CardTitle>
               {form.description && (
@@ -69,7 +69,7 @@ export default function GoogleForms() {
                   onClick={() => window.open(form.url, "_blank", "noopener,noreferrer")}
                   className="w-full bg-hospital-blue hover:bg-hospital-blue/90"
                 >
-                  <ExternalLink className="h-4 w-4 mr-2" />
+                  <ExternalLink className="h-4 w-4" />
                   Open Form
                 </Button>
               </div>

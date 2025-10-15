@@ -20,13 +20,13 @@ import { useAuth } from "@/hooks/use-auth";
 interface CreatePatientModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onPatientCreated?: (patient: any) => void;
+  onPatientAdded?: (patient: any) => void;
 }
 
 export default function CreatePatientModal({
   isOpen,
   onClose,
-  onPatientCreated,
+  onPatientAdded,
 }: CreatePatientModalProps) {
   const { user } = useAuth();
   const isStudent = user?.role === "student";
@@ -50,10 +50,10 @@ export default function CreatePatientModal({
     onSuccess: (createdPatient) => {
       queryClient.invalidateQueries({ queryKey: ["patients"] });
       toast({
-        title: "Patient Created",
-        description: "Patient has been created successfully.",
+        title: "Patient Added",
+        description: "Patient has been added successfully.",
       });
-      onPatientCreated?.(createdPatient);
+      onPatientAdded?.(createdPatient);
       onClose();
       setFormData({
         first_name: "",
@@ -68,8 +68,8 @@ export default function CreatePatientModal({
     },
     onError: (error: any) => {
       toast({
-        title: "Creation Failed",
-        description: getErrorMessage(error, "Failed to create patient."),
+        title: "Addition Failed",
+        description: getErrorMessage(error, "Failed to add patient."),
         variant: "destructive",
       });
     },
@@ -91,7 +91,7 @@ export default function CreatePatientModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Patient</DialogTitle>
+          <DialogTitle>Add New Patient</DialogTitle>
           <DialogDescription>
             Fill in the patient information below. Fields marked with * are required.
           </DialogDescription>
@@ -193,7 +193,7 @@ export default function CreatePatientModal({
               Cancel
             </Button>
             <Button type="submit" disabled={createPatientMutation.isPending}>
-              {createPatientMutation.isPending ? "Creating..." : "Create Patient"}
+              {createPatientMutation.isPending ? "Adding..." : "Add Patient"}
             </Button>
           </DialogFooter>
         </form>

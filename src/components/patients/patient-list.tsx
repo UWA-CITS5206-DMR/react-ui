@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { User, Plus, ChevronLeft, ChevronRight } from "lucide-react";
+import { User, Plus, ChevronLeft, ChevronRight, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import type { Patient } from "@/lib/api-client-v2";
-import CreatePatientModal from "./create-patient-modal";
+import CreatePatientModal from "./add-patient-modal";
 import { getGenderLabel } from "@/lib/constants";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -10,22 +11,23 @@ interface PatientListProps {
   patients: Patient[];
   selectedPatientId?: string;
   onPatientSelect: (patientId: string) => void;
-  onPatientCreated?: (patient: Patient) => void; // Patient creation callback
+  onPatientAdded?: (patient: Patient) => void; // Patient addition callback
   isCollapsed?: boolean; // Collapse functionality
   onToggleCollapse?: () => void; // Collapse toggle
-  showCreateButton?: boolean; // Control Add Patient button visibility
+  showAddButton?: boolean; // Control Add Patient button visibility
 }
 
 export default function PatientList({
   patients,
   selectedPatientId,
   onPatientSelect,
-  onPatientCreated,
+  onPatientAdded,
   isCollapsed = false, // Default to not collapsed
   onToggleCollapse, // Optional collapse toggle
-  showCreateButton = true, // Default to showing create button
+  showAddButton = true, // Default to showing add button
 }: PatientListProps) {
-  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const { user } = useAuth();
   const isStudent = user?.role === "student";
 
@@ -58,10 +60,30 @@ export default function PatientList({
     return age;
   };
 
-  const handlePatientCreated = (newPatient: Patient) => {
-    onPatientCreated?.(newPatient);
-    setIsCreateModalOpen(false);
+  const handlePatientAdded = (newPatient: Patient) => {
+    onPatientAdded?.(newPatient);
+    setIsAddModalOpen(false);
   };
+
+  // Filter patients based on search query
+  const filteredPatients = patients.filter((patient) => {
+    if (!searchQuery.trim()) return true;
+
+    const query = searchQuery.toLowerCase();
+    const fullName = `${patient.first_name} ${patient.last_name}`.toLowerCase();
+    const wardBed = `${patient.ward}-${patient.bed}`.toLowerCase();
+    const gender = getGenderLabel(patient.gender).toLowerCase();
+
+    return (
+      fullName.includes(query) ||
+      wardBed.includes(query) ||
+      gender.includes(query) ||
+      patient.first_name.toLowerCase().includes(query) ||
+      patient.last_name.toLowerCase().includes(query) ||
+      patient.ward.toString().includes(query) ||
+      patient.bed.toString().includes(query)
+    );
+  });
 
   return (
     <>
@@ -87,25 +109,36 @@ export default function PatientList({
           </Button>
         )}
 
-        {/* Header with conditional Create Patient button */}
+        {/* Header with conditional Add Patient button */}
         <div className="p-4 border-b border-gray-200">
           {!isCollapsed ? (
             <>
               <div className="flex justify-between items-center mb-2">
                 <h2 className="text-lg font-semibold text-gray-900">Patient List</h2>
-                {showCreateButton &&
-                  !isStudent && ( // ONLY show if showCreateButton is true AND not a student
+                {showAddButton &&
+                  !isStudent && ( // ONLY show if showAddButton is true AND not a student
                     <Button
-                      onClick={() => setIsCreateModalOpen(true)}
+                      onClick={() => setIsAddModalOpen(true)}
                       size="sm"
                       className="bg-hospital-blue hover:bg-hospital-blue/90"
                     >
-                      <Plus className="h-4 w-4 mr-1" />
+                      <Plus className="h-4 w-4" />
                       Add Patient
                     </Button>
                   )}
               </div>
-              <p className="text-sm text-gray-500">Select a patient to view records</p>
+
+              {/* Search Input */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  type="text"
+                  placeholder="Search patients..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 h-9"
+                />
+              </div>
             </>
           ) : (
             <div className="flex justify-center">
@@ -115,7 +148,7 @@ export default function PatientList({
         </div>
 
         <div className="flex-1 overflow-y-auto">
-          {patients.map((patient) => (
+          {filteredPatients.map((patient) => (
             <div
               key={patient.id}
               onClick={() => onPatientSelect(patient.id.toString())}
@@ -168,13 +201,13 @@ export default function PatientList({
         </div>
       </div>
 
-      {/* Create Patient Modal */}
-      {/* Only render create modal for non-students */}
+      {/* Add Patient Modal */}
+      {/* Only render add modal for non-students */}
       {!isStudent && (
         <CreatePatientModal
-          isOpen={isCreateModalOpen}
-          onClose={() => setIsCreateModalOpen(false)}
-          onPatientCreated={handlePatientCreated}
+          isOpen={isAddModalOpen}
+          onClose={() => setIsAddModalOpen(false)}
+          onPatientAdded={handlePatientAdded}
         />
       )}
     </>

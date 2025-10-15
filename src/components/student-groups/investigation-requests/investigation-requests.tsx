@@ -40,7 +40,7 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
   return (
     <PageLayout
       title="Investigation Requests"
-      description="Submit and manage blood test and imaging requests for this patient. Use the + button to create new requests."
+      description="Submit and manage blood test and imaging requests for this patient. Use the + button to add new requests."
     >
       <Tabs
         value={activeTab}
@@ -49,11 +49,11 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
       >
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="blood-tests">
-            <FlaskConical className="h-4 w-4 mr-2" />
+            <FlaskConical className="h-4 w-4" />
             Blood Tests
           </TabsTrigger>
           <TabsTrigger value="imaging">
-            <Scan className="h-4 w-4 mr-2" />
+            <Scan className="h-4 w-4" />
             Imaging
           </TabsTrigger>
         </TabsList>
@@ -71,7 +71,7 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
       <Button
         onClick={handleOpenRequestDialog}
         className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
-        title={activeTab === "blood-tests" ? "Create blood test request" : "Create imaging request"}
+        title={activeTab === "blood-tests" ? "Add blood test request" : "Add imaging request"}
       >
         <Plus className="h-6 w-6" />
       </Button>
@@ -81,7 +81,7 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              {activeTab === "blood-tests" ? "Create Blood Test Request" : "Create Imaging Request"}
+              {activeTab === "blood-tests" ? "Add Blood Test Request" : "Add Imaging Request"}
             </DialogTitle>
             <DialogDescription>
               Fill in the investigation request information below. Fields marked with * are

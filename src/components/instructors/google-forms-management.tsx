@@ -16,13 +16,13 @@ import {
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Plus, Pencil, Trash2, FileText, ExternalLink } from "lucide-react";
+import { Plus, Edit, Trash2, FileText, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import type { GoogleFormLink, GoogleFormLinkCreate } from "@/lib/api-client-v2";
 import PageLayout from "@/components/layout/page-layout";
 
 export default function GoogleFormsManagement() {
-  // Create/Edit modal state
+  // Add/Edit modal state
   const [formDialogOpen, setFormDialogOpen] = useState(false);
   const [editingForm, setEditingForm] = useState<GoogleFormLink | null>(null);
   const [title, setTitle] = useState("");
@@ -50,7 +50,7 @@ export default function GoogleFormsManagement() {
 
   const forms = formsData || [];
 
-  // Save (create or update) mutation
+  // Save (add or update) mutation
   const saveFormMutation = useMutation({
     mutationFn: async () => {
       const payload: GoogleFormLinkCreate = {
@@ -73,7 +73,7 @@ export default function GoogleFormsManagement() {
         title: "Success",
         description: editingForm
           ? "Google Form updated successfully!"
-          : "Google Form created successfully!",
+          : "Google Form added successfully!",
       });
       handleCloseDialog();
     },
@@ -115,7 +115,7 @@ export default function GoogleFormsManagement() {
     },
   });
 
-  const handleOpenCreateDialog = () => {
+  const handleOpenAddDialog = () => {
     setEditingForm(null);
     setTitle("");
     setUrl("");
@@ -209,7 +209,7 @@ export default function GoogleFormsManagement() {
   return (
     <PageLayout
       title="Google Forms Management"
-      description="Create, edit, and manage Google Forms links for students."
+      description="Add, edit, and manage Google Forms links for students."
       extraBottomPadding
     >
       {forms.length === 0 ? (
@@ -218,10 +218,10 @@ export default function GoogleFormsManagement() {
           <h3 className="text-lg font-medium text-gray-900 mb-2">No Forms Available</h3>
           <p className="text-gray-500 mb-4">Get started by creating your first Google Form link.</p>
           <Button
-            onClick={handleOpenCreateDialog}
+            onClick={handleOpenAddDialog}
             className="bg-hospital-blue hover:bg-hospital-blue/90"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus />
             Add Form
           </Button>
         </div>
@@ -237,7 +237,7 @@ export default function GoogleFormsManagement() {
               <CardHeader>
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between">
                   <CardTitle className="flex items-center gap-2 flex-1">
-                    <FileText className="h-5 w-5 text-hospital-blue" />
+                    <FileText className="h-5 w-5 text-hospital-blue flex-shrink-0" />
                     <span className="line-clamp-2">{form.title}</span>
                   </CardTitle>
                   <div className="flex gap-1 ml-2 sm:ml-0 sm:mt-0 mt-2">
@@ -246,8 +246,9 @@ export default function GoogleFormsManagement() {
                       size="sm"
                       onClick={() => handleOpenEditDialog(form)}
                       title="Edit form"
+                      className="h-6 w-6 p-0"
                     >
-                      <Pencil className="h-4 w-4" />
+                      <Edit className="h-3 w-3" />
                     </Button>
                     <Button
                       variant="ghost"
@@ -257,9 +258,9 @@ export default function GoogleFormsManagement() {
                         setDeleteDialogOpen(true);
                       }}
                       title="Delete form"
-                      className="text-red-600 hover:text-red-700"
+                      className="text-red-600 hover:text-red-700 h-6 w-6 p-0"
                     >
-                      <Trash2 className="h-4 w-4" />
+                      <Trash2 className="h-3 w-3" />
                     </Button>
                   </div>
                 </div>
@@ -282,7 +283,7 @@ export default function GoogleFormsManagement() {
                     variant="outline"
                     className="w-full"
                   >
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="h-4 w-4" />
                     Open Form
                   </Button>
                 </div>
@@ -294,18 +295,18 @@ export default function GoogleFormsManagement() {
 
       {/* Floating Action Button */}
       <Button
-        onClick={handleOpenCreateDialog}
+        onClick={handleOpenAddDialog}
         className="fixed bottom-8 right-8 h-14 w-14 rounded-full shadow-lg bg-hospital-blue hover:bg-hospital-blue/90 z-50"
         title="Add new form"
       >
         <Plus className="h-6 w-6" />
       </Button>
 
-      {/* Create/Edit Dialog */}
+      {/* Add/Edit Dialog */}
       <Dialog open={formDialogOpen} onOpenChange={setFormDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>{editingForm ? "Edit Google Form" : "Create Google Form"}</DialogTitle>
+            <DialogTitle>{editingForm ? "Edit Google Form" : "Add Google Form"}</DialogTitle>
             <DialogDescription>
               {editingForm
                 ? "Update the Google Form information below. Fields marked with * are required."
@@ -387,7 +388,7 @@ export default function GoogleFormsManagement() {
                   ? "Saving..."
                   : editingForm
                   ? "Update Form"
-                  : "Create Form"}
+                  : "Add Form"}
               </Button>
             </DialogFooter>
           </form>

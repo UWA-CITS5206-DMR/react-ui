@@ -287,7 +287,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">{file.category || "Document"}</Badge>
                       <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
-                        <Eye className="h-4 w-4 mr-1" />
+                        <Eye className="h-4 w-4" />
                         Preview
                       </Button>
                     </div>

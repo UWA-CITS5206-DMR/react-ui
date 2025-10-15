@@ -142,13 +142,13 @@ export default function AdminDashboard() {
       dataVersionForm.reset();
       toast({
         title: "Success",
-        description: "Data version created successfully",
+        description: "Data version added successfully",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: getErrorMessage(error, "Failed to create data version"),
+        description: getErrorMessage(error, "Failed to add data version"),
         variant: "destructive",
       });
     },
@@ -179,13 +179,13 @@ export default function AdminDashboard() {
       userForm.reset();
       toast({
         title: "Success",
-        description: "User created successfully",
+        description: "User added successfully",
       });
     },
     onError: (error: any) => {
       toast({
         title: "Error",
-        description: getErrorMessage(error, "Failed to create user"),
+        description: getErrorMessage(error, "Failed to add user"),
         variant: "destructive",
       });
     },
@@ -213,7 +213,7 @@ export default function AdminDashboard() {
     },
   });
 
-  const onCreateDataVersion = (data: CreateDataVersionForm) => {
+  const onAddDataVersion = (data: CreateDataVersionForm) => {
     createDataVersionMutation.mutate(data);
   };
 
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
                   <CardContent>
                     <Form {...dataVersionForm}>
                       <form
-                        onSubmit={dataVersionForm.handleSubmit(onCreateDataVersion)}
+                        onSubmit={dataVersionForm.handleSubmit(onAddDataVersion)}
                         className="space-y-4"
                       >
                         <FormField

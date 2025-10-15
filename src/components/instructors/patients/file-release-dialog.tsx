@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { AlertCircle, Loader2, Users } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -142,14 +142,13 @@ export default function FileReleaseDialog({
     releaseMutation.mutate(payload);
   };
 
-  const dialogTitle = file ? `Release Access: ${file.display_name}` : "Release File";
+  const dialogTitle = file ? `Release: ${file.display_name}` : "Release File";
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader className="gap-2">
           <DialogTitle className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-primary" />
             <span className="truncate">{dialogTitle}</span>
           </DialogTitle>
           <DialogDescription>
@@ -289,7 +288,7 @@ export default function FileReleaseDialog({
           >
             {releaseMutation.isPending ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin mr-2" /> Releasing...
+                <Loader2 className="h-4 w-4 animate-spin" /> Releasing...
               </>
             ) : (
               "Release"

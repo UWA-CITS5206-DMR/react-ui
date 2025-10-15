@@ -237,7 +237,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
             disabled={!selectedFile || uploadFileMutation.isPending}
             className="w-full"
           >
-            <Upload className="h-4 w-4 mr-2" />
+            <Upload className="h-4 w-4" />
             {uploadFileMutation.isPending ? "Uploading..." : "Upload File"}
           </Button>
         </div>

@@ -118,11 +118,11 @@ export default function Observations({ patient }: ObservationsProps) {
           <Tabs defaultValue="individual" className="w-full">
             <TabsList className="grid w-full grid-cols-2 mb-6">
               <TabsTrigger value="individual">
-                <ListChecks className="h-4 w-4 mr-2" />
+                <ListChecks className="h-4 w-4" />
                 Individual Entry
               </TabsTrigger>
               <TabsTrigger value="bulk">
-                <Layers className="h-4 w-4 mr-2" />
+                <Layers className="h-4 w-4" />
                 Bulk Entry
               </TabsTrigger>
             </TabsList>
