@@ -3,8 +3,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { FlaskConical, Scan } from "lucide-react";
 import { apiClientV2 } from "@/lib/queryClient";
+import { formatUserDisplay } from "@/lib/utils";
 import { BloodTestRequestList } from "./blood-test-request-list";
 import { ImagingRequestList } from "./imaging-request-list";
 import PageLayout from "@/components/layout/page-layout";
@@ -28,21 +36,37 @@ export default function InstructorInvestigationRequests({
     return saved ? JSON.parse(saved) : false;
   });
 
+  const [selectedUser, setSelectedUser] = useState<string>("all");
+
   // Save to localStorage when showCompleted changes
   useEffect(() => {
     localStorage.setItem("instructor-investigation-show-completed", JSON.stringify(showCompleted));
   }, [showCompleted]);
 
+  // Fetch student groups
+  const { data: studentGroups } = useQuery({
+    queryKey: ["instructors", "student-groups"],
+    queryFn: () => apiClientV2.instructors.studentGroups.list(),
+  });
+
   // Fetch blood test requests stats for this patient
   const { data: bloodTestsStats } = useQuery({
-    queryKey: ["instructors", "blood-test-requests", "stats", patientId],
-    queryFn: () => apiClientV2.instructors.bloodTestRequests.stats({ patient: patientId }),
+    queryKey: ["instructors", "blood-test-requests", "stats", patientId, selectedUser],
+    queryFn: () =>
+      apiClientV2.instructors.bloodTestRequests.stats({
+        patient: patientId,
+        ...(selectedUser !== "all" && { user: parseInt(selectedUser) }),
+      }),
   });
 
   // Fetch imaging requests stats for this patient
   const { data: imagingRequestsStats } = useQuery({
-    queryKey: ["instructors", "imaging-requests", "stats", patientId],
-    queryFn: () => apiClientV2.instructors.imagingRequests.stats({ patient: patientId }),
+    queryKey: ["instructors", "imaging-requests", "stats", patientId, selectedUser],
+    queryFn: () =>
+      apiClientV2.instructors.imagingRequests.stats({
+        patient: patientId,
+        ...(selectedUser !== "all" && { user: parseInt(selectedUser) }),
+      }),
   });
 
   const bloodTestsTotal = showCompleted
@@ -58,7 +82,7 @@ export default function InstructorInvestigationRequests({
       description="Approve blood test and imaging requests for patients."
     >
       <div className="h-full flex flex-col">
-        {/* Show Completed Toggle */}
+        {/* Show Completed Toggle and User Filter */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-2">
             <Switch
@@ -70,6 +94,19 @@ export default function InstructorInvestigationRequests({
               Show Completed Requests
             </Label>
           </div>
+          <Select value={selectedUser} onValueChange={setSelectedUser}>
+            <SelectTrigger className="w-48">
+              <SelectValue placeholder="All groups" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All groups</SelectItem>
+              {studentGroups?.map((group) => (
+                <SelectItem key={group.id} value={group.id.toString()}>
+                  {formatUserDisplay(group)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <Tabs defaultValue="blood" className="flex-1 flex flex-col">
@@ -85,11 +122,19 @@ export default function InstructorInvestigationRequests({
           </TabsList>
 
           <TabsContent value="blood" className="flex-1 overflow-hidden mt-4">
-            <BloodTestRequestList patientId={patientId} showCompleted={showCompleted} />
+            <BloodTestRequestList
+              patientId={patientId}
+              showCompleted={showCompleted}
+              user={selectedUser}
+            />
           </TabsContent>
 
           <TabsContent value="imaging" className="flex-1 overflow-hidden mt-4">
-            <ImagingRequestList patientId={patientId} showCompleted={showCompleted} />
+            <ImagingRequestList
+              patientId={patientId}
+              showCompleted={showCompleted}
+              user={selectedUser}
+            />
           </TabsContent>
         </Tabs>
       </div>

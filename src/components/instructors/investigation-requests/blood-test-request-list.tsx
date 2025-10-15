@@ -12,12 +12,17 @@ import type { BloodTestRequest, ImagingRequest, ApprovedFileRequest } from "@/li
 interface BloodTestRequestListProps {
   patientId?: number;
   showCompleted: boolean;
+  user?: string;
 }
 
 /**
  * Blood test request list component with approval functionality
  */
-export function BloodTestRequestList({ patientId, showCompleted }: BloodTestRequestListProps) {
+export function BloodTestRequestList({
+  patientId,
+  showCompleted,
+  user,
+}: BloodTestRequestListProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -38,6 +43,7 @@ export function BloodTestRequestList({ patientId, showCompleted }: BloodTestRequ
       page,
       pageSize,
       patientId,
+      user,
     ],
     queryFn: () => {
       if (showCompleted) {
@@ -45,11 +51,13 @@ export function BloodTestRequestList({ patientId, showCompleted }: BloodTestRequ
           page,
           page_size: pageSize,
           ...(patientId && { patient: patientId }),
+          ...(user && user !== "all" && { user: parseInt(user) }),
         });
       } else {
         return apiClientV2.instructors.bloodTestRequests
           .pending({
             ...(patientId && { patient: patientId }),
+            ...(user && user !== "all" && { user: parseInt(user) }),
           })
           .then((data) => ({
             ...data,

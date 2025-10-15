@@ -6,6 +6,19 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Format user display name consistently across the application.
+ * Shows as "FirstName LastName (@username)" or just "username" if no name.
+ */
+export function formatUserDisplay(user: {
+  first_name?: string;
+  last_name?: string;
+  username: string;
+}): string {
+  const fullName = [user.first_name, user.last_name].filter(Boolean).join(" ");
+  return fullName ? `${fullName} (@${user.username})` : user.username;
+}
+
+/**
  * Format a date string or Date into a localized string using Intl.DateTimeFormat options.
  * - dateInput: string or Date
  * - locale: default 'en-AU'
