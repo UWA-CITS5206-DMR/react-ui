@@ -16,24 +16,16 @@ interface InstructorPatientOverviewProps {
 export default function InstructorPatientOverview({ patient }: InstructorPatientOverviewProps) {
   const [previewFile, setPreviewFile] = useState<PatientFile | null>(null);
 
-  // Fetch blood test requests for this patient
-  const { data: bloodTestsData } = useQuery({
-    queryKey: ["instructors", "blood-test-requests", patient.id],
-    queryFn: () =>
-      apiClientV2.instructors.bloodTestRequests.list({
-        patient: patient.id,
-        page_size: 1000, // Get all to count statuses
-      }),
+  // Fetch blood test requests stats for this patient
+  const { data: bloodTestsStats } = useQuery({
+    queryKey: ["instructors", "blood-test-requests", "stats", patient.id],
+    queryFn: () => apiClientV2.instructors.bloodTestRequests.stats(),
   });
 
-  // Fetch imaging requests for this patient
-  const { data: imagingRequestsData } = useQuery({
-    queryKey: ["instructors", "imaging-requests", patient.id],
-    queryFn: () =>
-      apiClientV2.instructors.imagingRequests.list({
-        patient: patient.id,
-        page_size: 1000, // Get all to count statuses
-      }),
+  // Fetch imaging requests stats for this patient
+  const { data: imagingRequestsStats } = useQuery({
+    queryKey: ["instructors", "imaging-requests", "stats", patient.id],
+    queryFn: () => apiClientV2.instructors.imagingRequests.stats(),
   });
 
   // Fetch patient files using API Client v2
@@ -44,15 +36,16 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
 
   const files = patientFiles?.results || [];
 
-  // Calculate lab request statistics
-  const bloodTests = bloodTestsData?.results || [];
-  const imagingRequests = imagingRequestsData?.results || [];
+  // Calculate lab request statistics from stats API
+  const bloodTestsStatsData = bloodTestsStats as any; // Type assertion since StatsResponse is generic
+  const imagingRequestsStatsData = imagingRequestsStats as any;
 
-  const totalLabRequests = bloodTests.length + imagingRequests.length;
+  const totalLabRequests =
+    (bloodTestsStatsData?.total || 0) + (imagingRequestsStatsData?.total || 0);
   const completedLabRequests =
-    bloodTests.filter((req) => req.status === "completed").length +
-    imagingRequests.filter((req) => req.status === "completed").length;
-  const pendingLabRequests = totalLabRequests - completedLabRequests;
+    (bloodTestsStatsData?.completed || 0) + (imagingRequestsStatsData?.completed || 0);
+  const pendingLabRequests =
+    (bloodTestsStatsData?.pending || 0) + (imagingRequestsStatsData?.pending || 0);
 
   return (
     <div className="bg-bg-light p-6">
@@ -144,7 +137,8 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
                 <span className="text-lg font-semibold text-gray-900">{totalLabRequests}</span>
               </div>
               <div className="mt-2 text-xs text-gray-500">
-                Blood Tests: {bloodTests.length} • Imaging: {imagingRequests.length}
+                Blood Tests: {bloodTestsStatsData?.total || 0} • Imaging:{" "}
+                {imagingRequestsStatsData?.total || 0}
               </div>
             </div>
           )}

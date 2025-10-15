@@ -29,6 +29,7 @@ import type {
   ApprovedFile,
 } from "@/lib/api-client-v2";
 import FilePreviewDialog from "@/components/patients/file-preview-dialog";
+import { Switch } from "@/components/ui/switch";
 
 interface InstructorLabRequestsProps {
   patientId?: number;
@@ -70,26 +71,66 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
     patientId: number;
   } | null>(null);
 
+  // Show completed requests toggle
+  const [showCompleted, setShowCompleted] = useState(false);
+
   // Fetch blood test requests (with pagination)
   const { data: bloodTestsData, isLoading: isLoadingBloodTests } = useQuery({
-    queryKey: ["instructors", "blood-test-requests", bloodTestPage, pageSize, patientId],
-    queryFn: () =>
-      apiClientV2.instructors.bloodTestRequests.list({
-        page: bloodTestPage,
-        page_size: pageSize,
-        ...(patientId && { patient: patientId }),
-      }),
+    queryKey: [
+      "instructors",
+      "blood-test-requests",
+      showCompleted ? "all" : "pending",
+      bloodTestPage,
+      pageSize,
+      patientId,
+    ],
+    queryFn: () => {
+      if (showCompleted) {
+        // Show all requests when toggle is on
+        return apiClientV2.instructors.bloodTestRequests.list({
+          page: bloodTestPage,
+          page_size: pageSize,
+          ...(patientId && { patient: patientId }),
+        });
+      } else {
+        // Show only pending requests when toggle is off
+        return apiClientV2.instructors.bloodTestRequests.pending().then((data) => ({
+          ...data,
+          results: data.results.slice((bloodTestPage - 1) * pageSize, bloodTestPage * pageSize),
+        }));
+      }
+    },
   });
 
   // Fetch imaging requests (with pagination)
   const { data: imagingRequestsData, isLoading: isLoadingImagingRequests } = useQuery({
-    queryKey: ["instructors", "imaging-requests", imagingRequestPage, pageSize, patientId],
-    queryFn: () =>
-      apiClientV2.instructors.imagingRequests.list({
-        page: imagingRequestPage,
-        page_size: pageSize,
-        ...(patientId && { patient: patientId }),
-      }),
+    queryKey: [
+      "instructors",
+      "imaging-requests",
+      showCompleted ? "all" : "pending",
+      imagingRequestPage,
+      pageSize,
+      patientId,
+    ],
+    queryFn: () => {
+      if (showCompleted) {
+        // Show all requests when toggle is on
+        return apiClientV2.instructors.imagingRequests.list({
+          page: imagingRequestPage,
+          page_size: pageSize,
+          ...(patientId && { patient: patientId }),
+        });
+      } else {
+        // Show only pending requests when toggle is off
+        return apiClientV2.instructors.imagingRequests.pending().then((data) => ({
+          ...data,
+          results: data.results.slice(
+            (imagingRequestPage - 1) * pageSize,
+            imagingRequestPage * pageSize
+          ),
+        }));
+      }
+    },
   });
 
   // Fetch patient files for approval dialog
@@ -264,6 +305,7 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
   const imagingRequests = imagingRequestsData?.results || [];
   const patientFiles = patientFilesData?.results || [];
 
+  // Calculate total pages based on API response
   const totalBloodTestPages = bloodTestsData ? Math.ceil(bloodTestsData.count / pageSize) : 1;
   const totalImagingPages = imagingRequestsData
     ? Math.ceil(imagingRequestsData.count / pageSize)
@@ -415,12 +457,24 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
   return (
     <>
       <div className="h-full flex flex-col">
+        {/* Show Completed Toggle */}
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-2">
+            <Switch
+              id="show-completed"
+              checked={showCompleted}
+              onCheckedChange={setShowCompleted}
+            />
+            <Label htmlFor="show-completed" className="text-sm font-medium">
+              Show Completed Requests
+            </Label>
+          </div>
+        </div>
+
         <Tabs defaultValue="blood" className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="blood">Blood Tests ({bloodTestsData?.count || 0})</TabsTrigger>
-            <TabsTrigger value="imaging">
-              Imaging Requests ({imagingRequestsData?.count || 0})
-            </TabsTrigger>
+            <TabsTrigger value="blood">Blood Tests ({bloodTests.length})</TabsTrigger>
+            <TabsTrigger value="imaging">Imaging Requests ({imagingRequests.length})</TabsTrigger>
           </TabsList>
 
           <TabsContent value="blood" className="flex-1 overflow-hidden mt-4">
@@ -428,7 +482,11 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               {isLoadingBloodTests ? (
                 <p className="text-center text-gray-500 py-8">Loading...</p>
               ) : bloodTests.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No blood test requests found</p>
+                <p className="text-center text-gray-500 py-8">
+                  {showCompleted
+                    ? "No blood test requests found"
+                    : "No pending blood test requests"}
+                </p>
               ) : (
                 <>
                   {bloodTests.map((request) => renderRequestCard(request, "blood"))}
@@ -443,7 +501,9 @@ export default function InstructorLabRequests({ patientId }: InstructorLabReques
               {isLoadingImagingRequests ? (
                 <p className="text-center text-gray-500 py-8">Loading...</p>
               ) : imagingRequests.length === 0 ? (
-                <p className="text-center text-gray-500 py-8">No imaging requests found</p>
+                <p className="text-center text-gray-500 py-8">
+                  {showCompleted ? "No imaging requests found" : "No pending imaging requests"}
+                </p>
               ) : (
                 <>
                   {imagingRequests.map((request) => renderRequestCard(request, "imaging"))}
