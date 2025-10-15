@@ -381,6 +381,14 @@ export interface GoogleFormLink {
   updated_at: ISODateString;
 }
 
+export interface GoogleFormLinkCreate {
+  title: string;
+  url: string;
+  description?: string;
+  display_order?: number;
+  is_active?: boolean;
+}
+
 export interface ObservationBundle {
   blood_pressures: BloodPressureRecord[];
   heart_rates: HeartRateRecord[];
@@ -417,7 +425,6 @@ export interface ObservationListResponse {
   results: ObservationBundle;
 }
 
-export type InstructorDashboardSummary = Record<string, unknown>;
 export type StatsResponse = Record<string, unknown>;
 
 export class ApiError extends Error {
@@ -608,10 +615,6 @@ export class ApiClientV2 {
   };
 
   instructors = {
-    dashboard: () =>
-      this.request<InstructorDashboardSummary>("/api/instructors/dashboard/", {
-        method: "GET",
-      }),
     studentGroups: {
       list: (query?: QueryParams) =>
         this.request<User[]>("/api/instructors/student-groups/", {
@@ -1187,6 +1190,20 @@ export class ApiClientV2 {
     retrieve: (id: number) =>
       this.request<GoogleFormLink>(`/api/patients/google-forms/${id}/`, {
         method: "GET",
+      }),
+    create: (data: GoogleFormLinkCreate) =>
+      this.request<GoogleFormLink>("/api/patients/google-forms/", {
+        method: "POST",
+        body: data,
+      }),
+    partialUpdate: (id: number, data: Partial<GoogleFormLinkCreate>) =>
+      this.request<GoogleFormLink>(`/api/patients/google-forms/${id}/`, {
+        method: "PATCH",
+        body: data,
+      }),
+    delete: (id: number) =>
+      this.request<void>(`/api/patients/google-forms/${id}/`, {
+        method: "DELETE",
       }),
   };
 }
