@@ -19,13 +19,13 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
   // Fetch blood test requests stats for this patient
   const { data: bloodTestsStats } = useQuery({
     queryKey: ["instructors", "blood-test-requests", "stats", patient.id],
-    queryFn: () => apiClientV2.instructors.bloodTestRequests.stats(),
+    queryFn: () => apiClientV2.instructors.bloodTestRequests.stats({ patient: patient.id }),
   });
 
   // Fetch imaging requests stats for this patient
   const { data: imagingRequestsStats } = useQuery({
     queryKey: ["instructors", "imaging-requests", "stats", patient.id],
-    queryFn: () => apiClientV2.instructors.imagingRequests.stats(),
+    queryFn: () => apiClientV2.instructors.imagingRequests.stats({ patient: patient.id }),
   });
 
   // Fetch patient files using API Client v2

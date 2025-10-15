@@ -38,36 +38,34 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
-      <PageLayout
-        title="Investigation Requests"
-        description="Submit and manage blood test and imaging requests for this patient. Use the + button to create new requests."
+    <PageLayout
+      title="Investigation Requests"
+      description="Submit and manage blood test and imaging requests for this patient. Use the + button to create new requests."
+    >
+      <Tabs
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as "blood-tests" | "imaging")}
+        className="w-full"
       >
-        <Tabs
-          value={activeTab}
-          onValueChange={(value) => setActiveTab(value as "blood-tests" | "imaging")}
-          className="w-full"
-        >
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="blood-tests">
-              <FlaskConical className="h-4 w-4 mr-2" />
-              Blood Tests
-            </TabsTrigger>
-            <TabsTrigger value="imaging">
-              <Scan className="h-4 w-4 mr-2" />
-              Imaging
-            </TabsTrigger>
-          </TabsList>
+        <TabsList className="grid w-full grid-cols-2 mb-6">
+          <TabsTrigger value="blood-tests">
+            <FlaskConical className="h-4 w-4 mr-2" />
+            Blood Tests
+          </TabsTrigger>
+          <TabsTrigger value="imaging">
+            <Scan className="h-4 w-4 mr-2" />
+            Imaging
+          </TabsTrigger>
+        </TabsList>
 
-          <TabsContent value="blood-tests">
-            <BloodTestRequestList patientId={patientId} />
-          </TabsContent>
+        <TabsContent value="blood-tests">
+          <BloodTestRequestList patientId={patientId} />
+        </TabsContent>
 
-          <TabsContent value="imaging">
-            <ImagingRequestList patientId={patientId} />
-          </TabsContent>
-        </Tabs>
-      </PageLayout>
+        <TabsContent value="imaging">
+          <ImagingRequestList patientId={patientId} />
+        </TabsContent>
+      </Tabs>
 
       {/* Floating Action Button */}
       <Button
@@ -106,6 +104,6 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
           )}
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }

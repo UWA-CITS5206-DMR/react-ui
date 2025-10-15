@@ -47,10 +47,14 @@ export function ImagingRequestList({ patientId, showCompleted }: ImagingRequestL
           ...(patientId && { patient: patientId }),
         });
       } else {
-        return apiClientV2.instructors.imagingRequests.pending().then((data) => ({
-          ...data,
-          results: data.results.slice((page - 1) * pageSize, page * pageSize),
-        }));
+        return apiClientV2.instructors.imagingRequests
+          .pending({
+            ...(patientId && { patient: patientId }),
+          })
+          .then((data) => ({
+            ...data,
+            results: data.results.slice((page - 1) * pageSize, page * pageSize),
+          }));
       }
     },
   });

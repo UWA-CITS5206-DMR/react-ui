@@ -654,14 +654,15 @@ export class ApiClientV2 {
         this.request<void>(`/api/student-groups/blood-test-requests/${id}/`, {
           method: "DELETE",
         }),
-      pending: () =>
+      pending: (query?: QueryParams) =>
         this.request<PaginatedResponse<BloodTestRequest>>(
           "/api/student-groups/blood-test-requests/pending/",
-          { method: "GET" }
+          { method: "GET", query }
         ),
-      stats: () =>
+      stats: (query?: QueryParams) =>
         this.request<StatsResponse>("/api/student-groups/blood-test-requests/stats/", {
           method: "GET",
+          query,
         }),
       updateStatus: (id: number, payload: BloodTestRequestStatusUpdate) =>
         this.request<BloodTestRequest>(`/api/student-groups/blood-test-requests/${id}/`, {
@@ -698,14 +699,15 @@ export class ApiClientV2 {
         this.request<void>(`/api/student-groups/imaging-requests/${id}/`, {
           method: "DELETE",
         }),
-      pending: () =>
+      pending: (query?: QueryParams) =>
         this.request<PaginatedResponse<ImagingRequest>>(
           "/api/student-groups/imaging-requests/pending/",
-          { method: "GET" }
+          { method: "GET", query }
         ),
-      stats: () =>
+      stats: (query?: QueryParams) =>
         this.request<StatsResponse>("/api/student-groups/imaging-requests/stats/", {
           method: "GET",
+          query,
         }),
       updateStatus: (id: number, payload: ImagingRequestStatusUpdate) =>
         this.request<ImagingRequest>(`/api/student-groups/imaging-requests/${id}/`, {

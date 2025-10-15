@@ -170,61 +170,58 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6 relative pb-20">
-      {/* Notes List */}
-      <PageLayout
-        title="Clinical Notes"
-        description="View, edit, and delete clinical notes for this patient. Click the + button to add a new note."
-      >
-        {!notes || notes.results.length === 0 ? (
-          <p className="text-muted-foreground text-center py-8">
-            No notes found. Click the + button to create your first note.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {notes.results.map((note: NoteEntry) => (
-              <Card key={note.id}>
-                <CardContent className="pt-6">
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
-                      <p className="text-sm text-muted-foreground">{formatDate(note.created_at)}</p>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleOpenEditDialog(note)}
-                        title="Edit note"
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleDelete(note.id)}
-                        title="Delete note"
-                        className="text-destructive hover:text-destructive"
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+    <PageLayout
+      title="Clinical Notes"
+      description="View, edit, and delete clinical notes for this patient. Click the + button to add a new note."
+    >
+      {!notes || notes.results.length === 0 ? (
+        <p className="text-muted-foreground text-center py-8">
+          No notes found. Click the + button to create your first note.
+        </p>
+      ) : (
+        <div className="space-y-4">
+          {notes.results.map((note: NoteEntry) => (
+            <Card key={note.id}>
+              <CardContent className="pt-6">
+                <div className="flex justify-between items-start mb-3">
+                  <div>
+                    <p className="text-sm text-muted-foreground">{formatDate(note.created_at)}</p>
                   </div>
-                  <div className="space-y-3">
-                    <div className="bg-muted/30 p-4 rounded-md">
-                      <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
-                    </div>
-                    <div className="border-t pt-2">
-                      <p className="text-xs text-muted-foreground">
-                        Written by: {note.name} ({note.role})
-                      </p>
-                    </div>
+                  <div className="flex items-center gap-2">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleOpenEditDialog(note)}
+                      title="Edit note"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => handleDelete(note.id)}
+                      title="Delete note"
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        )}
-      </PageLayout>
+                </div>
+                <div className="space-y-3">
+                  <div className="bg-muted/30 p-4 rounded-md">
+                    <pre className="whitespace-pre-wrap text-sm font-sans">{note.content}</pre>
+                  </div>
+                  <div className="border-t pt-2">
+                    <p className="text-xs text-muted-foreground">
+                      Written by: {note.name} ({note.role})
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
 
       {/* Floating Action Button */}
       <Button
@@ -322,6 +319,6 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
+    </PageLayout>
   );
 }

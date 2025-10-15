@@ -47,10 +47,14 @@ export function BloodTestRequestList({ patientId, showCompleted }: BloodTestRequ
           ...(patientId && { patient: patientId }),
         });
       } else {
-        return apiClientV2.instructors.bloodTestRequests.pending().then((data) => ({
-          ...data,
-          results: data.results.slice((page - 1) * pageSize, page * pageSize),
-        }));
+        return apiClientV2.instructors.bloodTestRequests
+          .pending({
+            ...(patientId && { patient: patientId }),
+          })
+          .then((data) => ({
+            ...data,
+            results: data.results.slice((page - 1) * pageSize, page * pageSize),
+          }));
       }
     },
   });

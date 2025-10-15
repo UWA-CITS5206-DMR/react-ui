@@ -24,7 +24,7 @@ export default function CurrentObservations({ patient }: CurrentObservationsProp
     queryKey: ["/api/student-groups/observations", patient.id],
     queryFn: async () => {
       return await apiClientV2.studentGroups.observations.list({
-        patient_id: patient.id,
+        patient: patient.id,
         ordering: "-created_at",
       });
     },
