@@ -8,7 +8,6 @@ import Landing from "@/pages/landing";
 import StudentDashboard from "@/pages/student-dashboard";
 import InstructorDashboard from "@/pages/instructor-dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
-import GroupManager from "@/pages/group-manager";
 import NotFound from "@/pages/not-found";
 
 function AppRouter() {
@@ -18,7 +17,6 @@ function AppRouter() {
       <Route path="/student" component={StudentDashboard} />
       <Route path="/instructor" component={InstructorDashboard} />
       <Route path="/admin" component={AdminDashboard} />
-      <Route path="/group-manager" component={GroupManager} />
       <Route component={NotFound} />
     </Switch>
   );

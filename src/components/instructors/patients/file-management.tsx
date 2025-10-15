@@ -212,7 +212,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
               </Select>
               {selectedCategory === "Admission" && (
                 <p className="text-xs text-blue-600 mt-1">
-                  Admission files will be visible to all student groups by default
+                  Admission files will be visible to all student groups
                 </p>
               )}
             </div>
