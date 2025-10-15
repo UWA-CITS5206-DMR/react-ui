@@ -49,11 +49,11 @@ export default function InvestigationRequests({ patientId }: InvestigationReques
       >
         <TabsList className="grid w-full grid-cols-2 mb-6">
           <TabsTrigger value="blood-tests">
-            <FlaskConical className="h-4 w-4" />
+            <FlaskConical className="h-4 w-4 mr-1" />
             Blood Tests
           </TabsTrigger>
           <TabsTrigger value="imaging">
-            <Scan className="h-4 w-4" />
+            <Scan className="h-4 w-4 mr-1" />
             Imaging
           </TabsTrigger>
         </TabsList>

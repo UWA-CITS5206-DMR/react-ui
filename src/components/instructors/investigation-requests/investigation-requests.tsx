@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { FlaskConical, Scan } from "lucide-react";
 import { apiClientV2 } from "@/lib/queryClient";
 import { BloodTestRequestList } from "./blood-test-request-list";
 import { ImagingRequestList } from "./imaging-request-list";
@@ -73,8 +74,14 @@ export default function InstructorInvestigationRequests({
 
         <Tabs defaultValue="blood" className="flex-1 flex flex-col">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="blood">Blood Tests ({bloodTestsTotal})</TabsTrigger>
-            <TabsTrigger value="imaging">Imaging Requests ({imagingRequestsTotal})</TabsTrigger>
+            <TabsTrigger value="blood">
+              <FlaskConical className="h-4 w-4 mr-1" />
+              Blood Tests ({bloodTestsTotal})
+            </TabsTrigger>
+            <TabsTrigger value="imaging">
+              <Scan className="h-4 w-4 mr-1" />
+              Imaging Requests ({imagingRequestsTotal})
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="blood" className="flex-1 overflow-hidden mt-4">
