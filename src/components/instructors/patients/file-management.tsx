@@ -266,6 +266,7 @@ export default function FileManagement({ patientId }: FileManagementProps) {
                           >
                             {file.category || "Other"}
                           </Badge>
+                          {file.requires_pagination && <Badge variant="secondary">Paginated</Badge>}
                           <span className="text-xs text-gray-500">Patient #{file.patient}</span>
                         </div>
                       </div>
