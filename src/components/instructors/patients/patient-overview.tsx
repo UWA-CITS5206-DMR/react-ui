@@ -172,6 +172,7 @@ export default function InstructorPatientOverview({ patient }: InstructorPatient
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline">{file.category || "Document"}</Badge>
+                      {file.requires_pagination && <Badge variant="secondary">Paginated</Badge>}
                       <Button variant="ghost" size="sm" onClick={() => setPreviewFile(file)}>
                         <Eye className="h-4 w-4" />
                         Preview
