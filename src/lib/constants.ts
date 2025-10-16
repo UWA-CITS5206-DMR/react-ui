@@ -110,6 +110,15 @@ export const GENDER_OPTIONS: readonly Gender[] = [
 ] as const;
 
 /**
+ * Default polling interval (milliseconds) used across the app for data refresh.
+ * Pages and queries should import and use this constant (for example as
+ * the `refetchInterval` value for React Query) so the interval is consistent.
+ *
+ * Chosen default: 3000 ms (3 seconds). Adjust as needed.
+ */
+export const POLLING_INTERVAL = 3000;
+
+/**
  * Get display label for blood test type
  */
 export function getBloodTestLabel(type: BloodTestType): string {

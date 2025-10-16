@@ -11,6 +11,9 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { format } from "date-fns";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { RefreshCw } from "lucide-react";
 import type {
   BloodPressureRecord,
   HeartRateRecord,
@@ -35,6 +38,7 @@ interface ObservationChartProps {
   bloodSugars?: BloodSugarRecord[];
   oxygenSaturations?: OxygenSaturationRecord[];
   painScores?: PainScoreRecord[];
+  onRefresh?: () => Promise<unknown> | void;
 }
 
 /**
@@ -51,71 +55,121 @@ export function ObservationChart({
   bloodSugars = [],
   oxygenSaturations = [],
   painScores = [],
+  onRefresh,
 }: ObservationChartProps) {
-  // Transform blood pressure data for chart
-  // Sort by created_at in ascending order (oldest to newest) and format with full date
-  const bpData = bloodPressures
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((bp) => ({
-      time: format(new Date(bp.created_at), "MMM dd HH:mm"),
-      systolic: bp.systolic,
-      diastolic: bp.diastolic,
-      fullTime: format(new Date(bp.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+  // Controlled tab state: remember selected tab in localStorage so it persists
+  const [activeTab, setActiveTab] = useState<string | undefined>(() => {
+    try {
+      return localStorage.getItem("observation-chart-active-tab") || undefined;
+    } catch {
+      return undefined;
+    }
+  });
 
-  // Transform heart rate data for chart
-  const hrData = heartRates
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((hr) => ({
-      time: format(new Date(hr.created_at), "MMM dd HH:mm"),
-      heartRate: hr.heart_rate,
-      fullTime: format(new Date(hr.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+  // Local state to force re-render when user hits refresh (useful if props are updated but parent doesn't rerender)
+  const [, setTick] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Transform temperature data for chart
-  const tempData = bodyTemperatures
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((temp) => ({
-      time: format(new Date(temp.created_at), "MMM dd HH:mm"),
-      temperature: parseFloat(temp.temperature),
-      fullTime: format(new Date(temp.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+  useEffect(() => {
+    try {
+      if (activeTab) localStorage.setItem("observation-chart-active-tab", activeTab);
+    } catch {
+      // ignore storage errors
+    }
+  }, [activeTab]);
 
-  // Transform respiratory rate data for chart
-  const rrData = respiratoryRates
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((rr) => ({
-      time: format(new Date(rr.created_at), "MMM dd HH:mm"),
-      respiratoryRate: rr.respiratory_rate,
-      fullTime: format(new Date(rr.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+  async function handleRefresh() {
+    // show loading animation for a minimum duration and await parent refresh if provided
+    const MIN_MS = 800;
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    setLoading(true);
+    const start = Date.now();
 
-  // Transform blood sugar data for chart
-  const bsData = bloodSugars
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((bs) => ({
-      time: format(new Date(bs.created_at), "MMM dd HH:mm"),
-      bloodSugar: parseFloat(bs.sugar_level),
-      fullTime: format(new Date(bs.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+    // trigger parent refresh if provided
+    try {
+      if (typeof onRefresh === "function") {
+        await onRefresh();
+      }
+    } catch (err) {
+      // swallow errors here — parent can surface them via toasts
+      // eslint-disable-next-line no-console
+      console.error("ObservationChart refresh error:", err);
+    }
 
-  // Transform oxygen saturation data for chart
-  const o2Data = oxygenSaturations
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((o2) => ({
-      time: format(new Date(o2.created_at), "MMM dd HH:mm"),
-      oxygenSaturation: o2.saturation_percentage,
-      fullTime: format(new Date(o2.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+    // force a local re-render; if parent passes new props this will also reflect updated data
+    setTick((t: number) => t + 1);
 
-  // Transform pain score data for chart
-  const painData = painScores
-    .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
-    .map((pain) => ({
-      time: format(new Date(pain.created_at), "MMM dd HH:mm"),
-      painScore: pain.score,
-      fullTime: format(new Date(pain.created_at), "MMM dd, yyyy HH:mm"),
-    }));
+    const elapsed = Date.now() - start;
+    const remaining = Math.max(0, MIN_MS - elapsed);
+    if (remaining > 0) {
+      timerRef.current = setTimeout(() => {
+        setLoading(false);
+        timerRef.current = null;
+      }, remaining);
+    } else {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+  // Generic transformer for records with created_at timestamp
+  function transformByCreatedAt<T, R extends { time: string; fullTime: string }>(
+    records: T[] | undefined,
+    mapFn: (rec: T) => Omit<R, "time" | "fullTime">
+  ): R[] {
+    if (!records || records.length === 0) return [];
+    return records
+      .slice()
+      .sort((a: any, b: any) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime())
+      .map((rec: any) => {
+        const base = mapFn(rec as T) as any;
+        const created = new Date(rec.created_at);
+        return {
+          ...base,
+          time: format(created, "MMM dd HH:mm"),
+          fullTime: format(created, "MMM dd, yyyy HH:mm"),
+        } as R;
+      });
+  }
+
+  const bpData = transformByCreatedAt(bloodPressures, (bp) => ({
+    systolic: (bp as BloodPressureRecord).systolic,
+    diastolic: (bp as BloodPressureRecord).diastolic,
+  }));
+
+  const hrData = transformByCreatedAt(heartRates, (hr) => ({
+    heartRate: (hr as HeartRateRecord).heart_rate,
+  }));
+
+  const tempData = transformByCreatedAt(bodyTemperatures, (temp) => ({
+    temperature: parseFloat((temp as BodyTemperatureRecord).temperature),
+  }));
+
+  const rrData = transformByCreatedAt(respiratoryRates, (rr) => ({
+    respiratoryRate: (rr as RespiratoryRateRecord).respiratory_rate,
+  }));
+
+  const bsData = transformByCreatedAt(bloodSugars, (bs) => ({
+    bloodSugar: parseFloat((bs as BloodSugarRecord).sugar_level),
+  }));
+
+  const o2Data = transformByCreatedAt(oxygenSaturations, (o2) => ({
+    oxygenSaturation: (o2 as OxygenSaturationRecord).saturation_percentage,
+  }));
+
+  const painData = transformByCreatedAt(painScores, (pain) => ({
+    painScore: (pain as PainScoreRecord).score,
+  }));
 
   const hasData =
     bpData.length > 0 ||
@@ -140,15 +194,46 @@ export function ObservationChart({
       </Card>
     );
   }
+  // compute available tabs in preferred order
+  const availableTabs: string[] = [];
+  if (bpData.length > 0) availableTabs.push("blood-pressure");
+  if (hrData.length > 0) availableTabs.push("heart-rate");
+  if (tempData.length > 0) availableTabs.push("temperature");
+  if (rrData.length > 0) availableTabs.push("respiratory");
+  if (bsData.length > 0) availableTabs.push("blood-sugar");
+  if (o2Data.length > 0) availableTabs.push("oxygen");
+  if (painData.length > 0) availableTabs.push("pain");
+
+  const defaultTab = availableTabs[0] ?? "blood-pressure";
+  const currentTab = activeTab ?? defaultTab;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Observations Chart</CardTitle>
-        <p className="text-sm text-gray-600">Historical trends of vital signs over time</p>
+        <div className="w-full flex items-start justify-between">
+          <div>
+            <CardTitle>Observations Chart</CardTitle>
+            <p className="text-sm text-gray-600">Historical trends of vital signs over time</p>
+          </div>
+          <div className="ml-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleRefresh}
+              title="Refresh charts"
+              className="h-6 w-6 p-0"
+              disabled={loading}
+              aria-pressed={loading}
+              aria-busy={loading}
+            >
+              <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
+            </Button>
+          </div>
+        </div>
       </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="blood-pressure" className="w-full">
+      <CardContent className="relative">
+        {/* no overlay; button indicates loading via spin + disabled */}
+        <Tabs value={currentTab} onValueChange={(v) => setActiveTab(v)} className="w-full">
           <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
             {bpData.length > 0 && (
               <TabsTrigger value="blood-pressure">{BLOOD_PRESSURE.abbreviation}</TabsTrigger>

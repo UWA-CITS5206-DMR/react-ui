@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { POLLING_INTERVAL } from "@/lib/constants";
 import { Activity, FlaskConical, Pill, Eye } from "lucide-react";
 import type { Patient, PatientFile } from "@/lib/api-client-v2";
 import { apiClientV2 } from "@/lib/queryClient";
@@ -26,6 +27,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
         ordering: "-created_at",
       });
     },
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // Fetch blood test requests for this patient
@@ -36,6 +38,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
         patient: patient.id,
         page_size: 1000,
       }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // Fetch imaging requests for this patient
@@ -46,6 +49,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
         patient: patient.id,
         page_size: 1000,
       }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // Fetch medication orders for this patient
@@ -56,12 +60,14 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
         patient: patient.id,
         page_size: 1000,
       }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // Fetch patient files using API Client v2 (filtered by backend for students)
   const { data: patientFiles } = useQuery({
     queryKey: ["patient-files", patient.id],
     queryFn: () => apiClientV2.patients.files.list(patient.id),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   const observations = observationsResponse?.results;

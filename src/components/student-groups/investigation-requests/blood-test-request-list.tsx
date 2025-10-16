@@ -5,6 +5,7 @@ import { RequestCard } from "./request-card";
 import type { BloodTestRequest } from "@/lib/api-client-v2";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
+import { POLLING_INTERVAL } from "@/lib/constants";
 
 interface BloodTestRequestListProps {
   patientId: string;
@@ -21,6 +22,7 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
   const { data: bloodTestRequests } = useQuery({
     queryKey: ["blood-test-requests", patientId],
     queryFn: () => apiClientV2.studentGroups.bloodTestRequests.list({ patient: patientId }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   const deleteBloodTestRequestMutation = useMutation({

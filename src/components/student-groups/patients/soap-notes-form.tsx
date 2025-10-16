@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { POLLING_INTERVAL } from "@/lib/constants";
 import { apiClientV2 } from "@/lib/queryClient";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
@@ -47,6 +48,7 @@ export default function SOAPNotesForm({ patientId }: SOAPNotesFormProps) {
   const { data: notes } = useQuery({
     queryKey: ["notes", patientId],
     queryFn: () => apiClientV2.studentGroups.notes.list({ patient: patientId }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   const saveNoteMutation = useMutation({

@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { POLLING_INTERVAL } from "@/lib/constants";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,8 +31,9 @@ interface ObservationsProps {
  */
 export default function Observations({ patient }: ObservationsProps) {
   const [addDialogOpen, setAddDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  // Fetch all observations for the patient
+  // Fetch all observations for the patient (use shared POLLING_INTERVAL)
   const { data: observationsResponse } = useQuery({
     queryKey: ["/api/student-groups/observations", patient.id],
     queryFn: async () => {
@@ -40,7 +42,10 @@ export default function Observations({ patient }: ObservationsProps) {
         ordering: "-created_at",
       });
     },
+    refetchInterval: POLLING_INTERVAL,
   });
+
+  // polling handled by refetchInterval in the query
 
   const observations = observationsResponse?.results;
 
@@ -74,8 +79,18 @@ export default function Observations({ patient }: ObservationsProps) {
     setAddDialogOpen(true);
   };
 
-  const handleCloseDialog = () => {
-    setAddDialogOpen(false);
+  // Close dialog without triggering refetch (user may close manually)
+  const handleCloseDialog = () => setAddDialogOpen(false);
+
+  // Called after a successful add operation: invalidate/fetch latest observations but keep the modal open
+  const handleAfterAddSuccess = async () => {
+    try {
+      await queryClient.invalidateQueries({
+        queryKey: ["/api/student-groups/observations", patient.id],
+      });
+    } catch {
+      // ignore
+    }
   };
 
   return (
@@ -93,6 +108,11 @@ export default function Observations({ patient }: ObservationsProps) {
           bloodSugars={allBloodSugars}
           oxygenSaturations={allOxygenSaturations}
           painScores={allPainScores}
+          onRefresh={async () =>
+            await queryClient.invalidateQueries({
+              queryKey: ["/api/student-groups/observations", patient.id],
+            })
+          }
         />
       </div>
 
@@ -128,13 +148,13 @@ export default function Observations({ patient }: ObservationsProps) {
             </TabsList>
 
             <TabsContent value="individual">
-              <IndividualVitalSignsForm patient={patient} onSuccess={handleCloseDialog} />
+              <IndividualVitalSignsForm patient={patient} onSuccess={handleAfterAddSuccess} />
             </TabsContent>
 
             <TabsContent value="bulk">
               <BulkVitalSignsForm
                 patient={patient}
-                onSuccess={handleCloseDialog}
+                onSuccess={handleAfterAddSuccess}
                 onCancel={handleCloseDialog}
               />
             </TabsContent>

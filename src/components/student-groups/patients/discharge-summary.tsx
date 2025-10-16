@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { POLLING_INTERVAL } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -32,6 +33,7 @@ export default function DischargeSummary({ patient }: DischargeSummaryProps) {
         patient: patient.id,
       }),
     select: (response) => response.results?.[0], // Get the first (most recent) summary
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // Note: name and role are intentionally left empty
