@@ -24,7 +24,6 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
     queryFn: async () => {
       return await apiClientV2.studentGroups.observations.list({
         patient: patient.id,
-        ordering: "-created_at",
       });
     },
     refetchInterval: POLLING_INTERVAL,
