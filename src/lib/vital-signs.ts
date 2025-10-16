@@ -88,12 +88,12 @@ export const VITAL_SIGN_CONFIGS: Record<VitalSignKey, VitalSignConfig> = {
   bloodSugar: {
     key: "bloodSugar",
     label: "Blood Sugar",
-    unit: "mg/dL",
-    placeholder: "60",
+    unit: "mmol/L",
+    placeholder: "3.3",
     type: "number",
     step: "0.1",
     chartColor: "#ec4899",
-    chartDomain: [60, 200],
+    chartDomain: [2, 18],
     abbreviation: "BS",
   },
   painScore: {

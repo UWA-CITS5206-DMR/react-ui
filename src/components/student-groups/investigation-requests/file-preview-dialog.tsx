@@ -39,8 +39,13 @@ export default function StudentFilePreviewDialog({
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["patients", patientId, "files", fileId, "view"],
-    queryFn: () => apiClientV2.patients.files.view(patientId, fileId),
+    queryKey: ["patients", patientId, "files", fileId, "view", pageRange],
+    queryFn: () =>
+      apiClientV2.patients.files.view(
+        patientId,
+        fileId,
+        requiresPagination ? pageRange : undefined
+      ),
     enabled: open,
     staleTime: 0, // Always refetch when dialog opens
     gcTime: 0, // Don't cache the blob
