@@ -5,6 +5,7 @@ import { RequestCard } from "./request-card";
 import type { ImagingRequest } from "@/lib/api-client-v2";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
+import { POLLING_INTERVAL } from "@/lib/constants";
 
 interface ImagingRequestListProps {
   patientId: string;
@@ -21,6 +22,7 @@ export function ImagingRequestList({ patientId }: ImagingRequestListProps) {
   const { data: imagingRequests } = useQuery({
     queryKey: ["imaging-requests", patientId],
     queryFn: () => apiClientV2.studentGroups.imagingRequests.list({ patient: patientId }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   const deleteImagingRequestMutation = useMutation({

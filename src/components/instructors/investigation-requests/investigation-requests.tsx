@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { POLLING_INTERVAL } from "@/lib/constants";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -57,6 +58,7 @@ export default function InstructorInvestigationRequests({
         patient: patientId,
         ...(selectedUser !== "all" && { user: parseInt(selectedUser) }),
       }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // Fetch imaging requests stats for this patient
@@ -67,6 +69,7 @@ export default function InstructorInvestigationRequests({
         patient: patientId,
         ...(selectedUser !== "all" && { user: parseInt(selectedUser) }),
       }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   const bloodTestsTotal = showCompleted

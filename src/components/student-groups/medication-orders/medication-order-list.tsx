@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
+import { POLLING_INTERVAL } from "@/lib/constants";
 import { apiClientV2 } from "@/lib/queryClient";
 import { formatDate } from "@/lib/utils";
 import { Card, CardContent } from "@/components/ui/card";
@@ -17,6 +18,7 @@ export function MedicationOrderList({ patientId }: MedicationOrderListProps) {
   const { data: medicationOrders } = useQuery({
     queryKey: ["medication-orders", patientId],
     queryFn: () => apiClientV2.studentGroups.medicationOrders.list({ patient: patientId }),
+    refetchInterval: POLLING_INTERVAL,
   });
 
   // use shared formatDate with time
