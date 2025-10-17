@@ -24,7 +24,6 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
     queryFn: async () => {
       return await apiClientV2.studentGroups.observations.list({
         patient: patient.id,
-        ordering: "-created_at",
       });
     },
     refetchInterval: POLLING_INTERVAL,
@@ -109,7 +108,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
   const latestImaging = imagingRequests[0];
   const latestInvestigation = latestBloodTest || latestImaging;
   const investigationText = latestInvestigation
-    ? `${latestBloodTest ? latestBloodTest.test_type : latestImaging?.test_type} - ${
+    ? `${latestBloodTest ? latestBloodTest.test_types.join(", ") : latestImaging?.test_type} - ${
         latestInvestigation.status
       }`
     : "No investigation requests";

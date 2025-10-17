@@ -7,13 +7,7 @@ import { getErrorMessage } from "@/lib/error-utils";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { DialogFooter } from "@/components/ui/dialog";
 import { Send } from "lucide-react";
 import { SignOffSection } from "@/components/ui/sign-off-section";
@@ -27,14 +21,14 @@ interface BloodTestRequestFormProps {
 }
 
 /**
- * Blood test request form component
+ * Blood test request form component with multi-select support
  */
 export function BloodTestRequestForm({
   patientId,
   onSuccess,
   onCancel,
 }: BloodTestRequestFormProps) {
-  const [testType, setTestType] = useState<BloodTestType | "">("");
+  const [testTypes, setTestTypes] = useState<BloodTestType[]>([]);
   const [details, setDetails] = useState("");
   const [signOffName, setSignOffName] = useState("");
   const [signOffRole, setSignOffRole] = useState("");
@@ -56,7 +50,7 @@ export function BloodTestRequestForm({
       return apiClientV2.studentGroups.bloodTestRequests.create({
         patient: parseInt(patientId),
         user: user.id,
-        test_type: testType as BloodTestType,
+        test_types: testTypes,
         details: details,
         status: "pending",
         name: signOffName,
@@ -70,7 +64,7 @@ export function BloodTestRequestForm({
         description: "Blood test request submitted successfully!",
       });
       // Reset form
-      setTestType("");
+      setTestTypes([]);
       setDetails("");
       setSignOffName("");
       setSignOffRole("");
@@ -85,13 +79,20 @@ export function BloodTestRequestForm({
     },
   });
 
+  const handleTestTypeToggle = (testType: BloodTestType) => {
+    setTestTypes((prev) =>
+      prev.includes(testType) ? prev.filter((t) => t !== testType) : [...prev, testType]
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!testType || !details || !signOffName || !signOffRole) {
+    if (testTypes.length === 0 || !details || !signOffName || !signOffRole) {
       toast({
         title: "Validation Error",
-        description: "Please fill in all required fields including your name and role.",
+        description:
+          "Please select at least one test type and fill in all required fields including your name and role.",
         variant: "destructive",
       });
       return;
@@ -105,19 +106,29 @@ export function BloodTestRequestForm({
       <div className="space-y-4 py-4">
         {/* Test Type Selection */}
         <div className="space-y-2">
-          <Label htmlFor="blood-test-type">Test Type *</Label>
-          <Select value={testType} onValueChange={(value) => setTestType(value as BloodTestType)}>
-            <SelectTrigger id="blood-test-type">
-              <SelectValue placeholder="Select blood test type" />
-            </SelectTrigger>
-            <SelectContent>
-              {BLOOD_TEST_OPTIONS.map((test) => (
-                <SelectItem key={test} value={test}>
+          <Label>Test Types * (Select one or more)</Label>
+          <div className="grid grid-cols-1 gap-3 max-h-80 overflow-y-auto border rounded-md p-4">
+            {BLOOD_TEST_OPTIONS.map((test) => (
+              <div key={test} className="flex items-center space-x-2">
+                <Checkbox
+                  id={`test-${test}`}
+                  checked={testTypes.includes(test)}
+                  onCheckedChange={() => handleTestTypeToggle(test)}
+                />
+                <label
+                  htmlFor={`test-${test}`}
+                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                >
                   {getBloodTestLabel(test)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+                </label>
+              </div>
+            ))}
+          </div>
+          {testTypes.length > 0 && (
+            <p className="text-sm text-muted-foreground">
+              Selected: {testTypes.map((t) => getBloodTestLabel(t)).join(", ")}
+            </p>
+          )}
         </div>
 
         {/* Clinical Details */}

@@ -93,7 +93,7 @@ export interface BloodTestRequest {
   id: number;
   patient: Patient;
   user: User;
-  test_type: BloodTestType;
+  test_types: BloodTestType[];
   details: string;
   status: Status;
   name: string;
@@ -106,7 +106,7 @@ export interface BloodTestRequest {
 export interface BloodTestRequestCreate {
   patient: number;
   user: number;
-  test_type: BloodTestType;
+  test_types: BloodTestType[];
   details: string;
   status?: Status;
   name: string;

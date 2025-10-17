@@ -16,7 +16,7 @@ import type { ApprovedFile } from "@/lib/api-client-v2";
 import StudentFilePreviewDialog from "./file-preview-dialog";
 
 interface RequestCardProps {
-  testType: string;
+  testType: string | string[];
   details: string;
   status: "pending" | "completed";
   createdAt: string;
@@ -76,13 +76,16 @@ export function RequestCard({
     setDeleteDialogOpen(false);
   };
 
+  // Format test types for display
+  const displayTestType = Array.isArray(testType) ? testType.join(", ") : testType;
+
   return (
     <>
       <Card>
         <CardContent className="pt-6">
           <div className="flex justify-between items-start mb-3">
             <div className="flex-1">
-              <h3 className="font-semibold text-lg">{testType}</h3>
+              <h3 className="font-semibold text-lg">{displayTestType}</h3>
               <p className="text-sm text-muted-foreground">{formatDate(createdAt)}</p>
             </div>
             <div className="flex items-center gap-2">

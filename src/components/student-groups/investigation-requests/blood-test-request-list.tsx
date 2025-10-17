@@ -5,7 +5,7 @@ import { RequestCard } from "./request-card";
 import type { BloodTestRequest } from "@/lib/api-client-v2";
 import { useToast } from "@/hooks/use-toast";
 import { getErrorMessage } from "@/lib/error-utils";
-import { POLLING_INTERVAL } from "@/lib/constants";
+import { POLLING_INTERVAL, getBloodTestLabel } from "@/lib/constants";
 
 interface BloodTestRequestListProps {
   patientId: string;
@@ -55,6 +55,11 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
     deleteBloodTestRequestMutation.mutate(requestId);
   };
 
+  // Format test types with labels
+  const formatTestTypes = (testTypes: string[]): string => {
+    return testTypes.map((type) => getBloodTestLabel(type as any)).join(", ");
+  };
+
   return (
     <div>
       {!bloodTestRequests || bloodTestRequests.results.length === 0 ? (
@@ -64,7 +69,7 @@ export function BloodTestRequestList({ patientId }: BloodTestRequestListProps) {
           {bloodTestRequests.results.map((request: BloodTestRequest) => (
             <RequestCard
               key={request.id}
-              testType={request.test_type}
+              testType={formatTestTypes(request.test_types)}
               details={request.details}
               status={request.status}
               createdAt={request.created_at}

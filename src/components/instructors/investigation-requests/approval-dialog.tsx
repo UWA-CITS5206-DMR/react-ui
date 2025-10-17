@@ -22,6 +22,7 @@ import type {
   PatientFile,
   ApprovedFileRequest,
 } from "@/lib/api-client-v2";
+import { getBloodTestLabel } from "@/lib/constants";
 
 interface ApprovalDialogProps {
   open: boolean;
@@ -108,6 +109,18 @@ export function ApprovalDialog({
 
   const patientFiles = patientFilesData?.results || [];
 
+  // Format test type display
+  const displayTestType = (() => {
+    if ("test_types" in request) {
+      // BloodTestRequest with multiple types
+      return request.test_types.map((t) => getBloodTestLabel(t)).join(", ");
+    } else if ("test_type" in request) {
+      // ImagingRequest with single type
+      return request.test_type;
+    }
+    return "";
+  })();
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[80vh] flex flex-col min-h-0">
@@ -121,7 +134,7 @@ export function ApprovalDialog({
         <div className="flex-1 min-h-0 flex flex-col gap-4">
           <div className="bg-gray-50 p-4 rounded-lg space-y-2">
             <div className="flex items-center justify-between">
-              <h4 className="font-semibold">{request.test_type}</h4>
+              <h4 className="font-semibold">{displayTestType}</h4>
               <Badge>{request.status}</Badge>
             </div>
             <p className="text-sm text-gray-600">
