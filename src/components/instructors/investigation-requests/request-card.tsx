@@ -6,6 +6,7 @@ import { formatDate } from "@/lib/utils";
 import { useState } from "react";
 import FilePreviewDialog from "@/components/instructors/patients/file-preview-dialog";
 import type { BloodTestRequest, ImagingRequest, ApprovedFile } from "@/lib/api-client-v2";
+import { getBloodTestLabel } from "@/lib/constants";
 
 interface RequestCardProps {
   request: BloodTestRequest | ImagingRequest;
@@ -36,6 +37,18 @@ export function RequestCard({ request, onApprove }: RequestCardProps) {
     setPreviewDialogOpen(true);
   };
 
+  // Format test type display
+  const displayTestType = (() => {
+    if ("test_types" in request) {
+      // BloodTestRequest with multiple types
+      return request.test_types.map((t) => getBloodTestLabel(t)).join(", ");
+    } else if ("test_type" in request) {
+      // ImagingRequest with single type
+      return request.test_type;
+    }
+    return "";
+  })();
+
   return (
     <>
       <Card className="mb-4">
@@ -43,7 +56,7 @@ export function RequestCard({ request, onApprove }: RequestCardProps) {
           <div className="space-y-3">
             <div className="flex justify-between items-start mb-3">
               <div>
-                <h3 className="font-semibold text-lg">{request.test_type}</h3>
+                <h3 className="font-semibold text-lg">{displayTestType}</h3>
                 <p className="text-sm text-muted-foreground">{formatDate(request.created_at)}</p>
               </div>
               <Badge variant={request.status === "completed" ? "default" : "secondary"}>

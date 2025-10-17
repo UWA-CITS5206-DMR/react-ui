@@ -108,7 +108,7 @@ export default function StudentPatientOverview({ patient }: StudentPatientOvervi
   const latestImaging = imagingRequests[0];
   const latestInvestigation = latestBloodTest || latestImaging;
   const investigationText = latestInvestigation
-    ? `${latestBloodTest ? latestBloodTest.test_type : latestImaging?.test_type} - ${
+    ? `${latestBloodTest ? latestBloodTest.test_types.join(", ") : latestImaging?.test_type} - ${
         latestInvestigation.status
       }`
     : "No investigation requests";
